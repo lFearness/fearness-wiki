@@ -432,6 +432,21 @@ const $=s=>document.querySelector(s);
 const tabHooks=[];
 function loadImg(img){if(img.dataset.src){img.src=img.dataset.src;delete img.dataset.src}}
 function vsrc(v,url){if(!v.hasAttribute('src'))v.src=url}
+// Preparação seletiva dos recursos interativos, sem alterar os arquivos originais.
+const interactiveImages=new Map();
+function mediaTimeout(task,ms=45000){let t;return Promise.race([task,new Promise((_,reject)=>{t=setTimeout(()=>reject(new Error('Tempo de carregamento excedido')),ms)})]).finally(()=>clearTimeout(t))}
+function decodedImage(url){
+ if(!interactiveImages.has(url)){
+  const img=new Image();img.decoding='async';img.loading='eager';
+  const task=new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+  const ready=mediaTimeout(task.then(async()=>{if(img.decode)await img.decode();return img})).catch(err=>{interactiveImages.delete(url);throw err});
+  interactiveImages.set(url,ready);
+ }
+ return interactiveImages.get(url);
+}
+function mediaNotice(root,message){let n=root.querySelector('.media-notice');if(!n){n=document.createElement('p');n.className='media-notice';n.setAttribute('role','status');n.style.cssText='font-size:.8rem;color:var(--mut);margin:6px 0';n.hidden=true;root.appendChild(n)}n.textContent=message;n.hidden=!message}
+const nextPaint=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+
 function activateMedia(i){const sec=$('#s'+i);sec.querySelectorAll('img[data-src]:not(.qi)').forEach(loadImg);sec.querySelectorAll('video[data-poster]').forEach(v=>{v.poster=v.dataset.poster;delete v.dataset.poster});tabHooks.forEach(fn=>fn(i))}
 const tabs=['Personagem','Poder','Restrição','Transformação'];
 let INIT=true;const dq=matchMedia('(min-width:1000px)');
@@ -518,9 +533,27 @@ quads('q3',[['Transformação e ativação','Selos removidos + Sobrecarga.','A F
 ['Sobrecarga na transformação','Um limite próprio, maior que o normal.','A Forsaken Rupture possui um limite de armazenamento superior ao convencional. Quando esse limite é ultrapassado, a Sobrecarga desestabiliza o reservatório expandido, provocando o vazamento progressivo da energia acumulada.<br><br>Ao retornar à capacidade convencional, o excedente que sustenta a transformação se esgota, fazendo a máscara desaparecer e as marcas negras recuarem. A instabilidade energética permanece, mantendo a Sobrecarga ativa até a dissipação completa da reserva.'],
 ['Consequências e encerramento','Instabilidade metabólica crescente.','A transformação provoca instabilidade metabólica que cresce quanto mais tempo ele permanece nela. Isso ocorre porque sustentar uma reserva energética acima da capacidade convencional exige um esforço metabólico contínuo, cuja intensidade crescente provoca a instabilidade do organismo.<br><br>Ela pode ser encerrada voluntariamente, dissipando o excedente que a sustenta, ou à força, quando o organismo chega ao limite metabólico crítico, mesmo que ainda haja energia adicional. Ao atingir esse limite, a instabilidade do organismo compromete a contenção energética, provocando o colapso do reservatório e a dissipação involuntária de toda a energia armazenada, o que encerra a transformação.']]);
 const tg={s:0,o:0};const SI=document.querySelector('img[alt="Selo: faixas do antebraço"]'),SC=SI.parentNode.parentNode.querySelector('figcaption'),SS=[SI.dataset.src||SI.src,'assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],SN=['Selo','Selos removidos','Forsaken Rupture'];let sc=0;SI.style.transition='opacity .25s';
-function sealSw(){const n=tg.s&&tg.o?2:tg.s?1:0;if(n==sc)return;sc=n;const o=document.createElement('img');o.src=SS[n];o.alt=SN[n];o.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease';SI.parentNode.style.position='relative';SI.parentNode.appendChild(o);requestAnimationFrame(()=>requestAnimationFrame(()=>{o.style.opacity=1}));SC.textContent=SN[n];setTimeout(()=>{SI.src=SS[n];SI.alt=SN[n];o.remove()},750)}
-function tgu(){sealSw();sstU();$('#c1').classList.toggle('on',!!tg.s);$('#c2').classList.toggle('on',!!tg.o);$('#c3').classList.toggle('on',!!(tg.s&&tg.o));$('#t1').classList.toggle('on',!!tg.s);$('#t2').classList.toggle('on',!!tg.o);const b=$('#tgs');b.classList.toggle('go',tg.s&&tg.o);b.innerHTML=tg.s&&tg.o?'<b style="color:var(--pu2)">Condições atendidas</b><br>O excedente desencadeia a Forsaken Rupture.<br><button class="abtn" style="margin-top:10px" onclick="show(3)">Ver Forsaken Rupture →</button>':tg.s?'Selos removidos, mas sem diferencial. Falta acumular energia até a Sobrecarga.':tg.o?'Sobrecarga com os selos ativos: há apenas vazamento, sem transformação.':'Selos ativos. O poder fica dentro dos limites convencionais.'}
-$('#t1').onclick=()=>{tg.s^=1;tgu()};$('#t2').onclick=()=>{tg.o^=1;tgu()};tgu();
+const sealRoot=SI.closest('.selo'),sealButtons=[$('#t1'),$('#t2')];let sealBusy=false;
+function warmSeals(){SS.forEach(url=>decodedImage(url).catch(()=>{}))}
+tabHooks.push(k=>{if(k===2){SI.loading='eager';warmSeals()}});
+async function sealToggle(key){
+ if(sealBusy)return;const next={...tg,[key]:tg[key]^1},n=next.s&&next.o?2:next.s?1:0;
+ if(n===sc){Object.assign(tg,next);tgu();return}
+ sealBusy=true;sealButtons.forEach(b=>b.disabled=true);sealRoot.setAttribute('aria-busy','true');mediaNotice(sealRoot.querySelector('.tgw'),'');
+ let o=null;
+ try{
+  const [target]=await Promise.all([decodedImage(SS[n]),decodedImage(SS[sc])]);
+  // A imagem decodificada é a própria camada da sobreposição.
+  o=target;o.alt=SN[n];o.setAttribute('aria-hidden','true');o.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease;pointer-events:none';
+  SI.parentNode.style.position='relative';SI.parentNode.appendChild(o);await nextPaint();
+  Object.assign(tg,next);tgu();SC.textContent=SN[n];
+  await new Promise(resolve=>{let t;const done=e=>{if(e&&e.propertyName!=='opacity')return;clearTimeout(t);o.removeEventListener('transitionend',done);resolve()};o.addEventListener('transitionend',done);t=setTimeout(done,760);o.style.opacity='1'});
+  SI.src=SS[n];SI.alt=SN[n];if(SI.decode)await SI.decode().catch(()=>{});sc=n;await nextPaint();
+ }catch(err){mediaNotice(sealRoot.querySelector('.tgw'),'Não foi possível preparar a imagem. Tente novamente.');}
+ finally{if(o){o.remove();o.removeAttribute('style');o.removeAttribute('aria-hidden')}sealBusy=false;sealButtons.forEach(b=>b.disabled=false);sealRoot.removeAttribute('aria-busy')}
+}
+function tgu(){sstU();$('#c1').classList.toggle('on',!!tg.s);$('#c2').classList.toggle('on',!!tg.o);$('#c3').classList.toggle('on',!!(tg.s&&tg.o));$('#t1').classList.toggle('on',!!tg.s);$('#t2').classList.toggle('on',!!tg.o);const b=$('#tgs');b.classList.toggle('go',tg.s&&tg.o);b.innerHTML=tg.s&&tg.o?'<b style="color:var(--pu2)">Condições atendidas</b><br>O excedente desencadeia a Forsaken Rupture.<br><button class="abtn" style="margin-top:10px" onclick="show(3)">Ver Forsaken Rupture →</button>':tg.s?'Selos removidos, mas sem diferencial. Falta acumular energia até a Sobrecarga.':tg.o?'Sobrecarga com os selos ativos: há apenas vazamento, sem transformação.':'Selos ativos. O poder fica dentro dos limites convencionais.'}
+$('#t1').onclick=()=>sealToggle('s');$('#t2').onclick=()=>sealToggle('o');tgu();
 function zoomer(fig,H,face,dc,vb){const fr=fig.querySelector('.fr'),cap=fig.querySelector('figcaption')||document.createElement('figcaption'),bd=fig.querySelector('.badge'),zv=document.createElement('div'),zi=document.createElement('img');zv.className='zv';zv.appendChild(zi);fr.appendChild(zv);const dcap=dc||cap.textContent,I=[];let cur=-1,zvid=null;
 if(vb){zvid=document.createElement('video');zvid.muted=true;zvid.defaultMuted=true;zvid.volume=0;zvid.loop=true;zvid.playsInline=true;zvid.controls=false;zvid.preload='none';zvid.disablePictureInPicture=true;zvid.disableRemotePlayback=true;['muted','playsinline','webkit-playsinline','loop'].forEach(a=>zvid.setAttribute(a,''));zvid.setAttribute('aria-hidden','true');zvid.tabIndex=-1;zvid.style.display='none';zv.appendChild(zvid)}
 function hide(){zv.classList.remove('on');I.forEach(o=>o.el.classList.remove('on'));cur=-1;cap.textContent=dcap;if(zvid)setTimeout(()=>{if(cur<0)zvid.pause()},550)}
@@ -557,42 +590,55 @@ const EYE_RATE=2.2,EYE_FADE=.24;
 function eyeVid(sel,items,VID,HINT){
  VID=VID||EV;HINT=HINT||EH;
  const w=$(sel),fr=w.querySelector('.fr'),im=w.querySelector('.ei'),en=w.querySelector('.en'),et=w.querySelector('.et'),pv=w.querySelector('.ep'),nx=w.querySelector('.nx');
- const section=w.closest('section'),MAP={'0>1':0,'1>2':1,'2>1':2,'1>0':3},stateImages=[];
- let i=0,busy=false,back=0,near=false;
+ const section=w.closest('section'),MAP={'0>1':0,'1>2':1,'2>1':2,'1>0':3};
+ let i=0,busy=false,back=0,warming=false;
  const eh=document.createElement('p');eh.className='eh';eh.hidden=true;eh.textContent=HINT;et.after(eh);
  function set(){en.textContent=items[i].n;et.textContent=items[i].t;eh.hidden=!(back&&i==1);pv.disabled=busy||i==0;nx.disabled=busy||i==items.length-1}
- function imageReady(j){
-  if(!stateImages[j]){const img=new Image();img.decoding='async';const ready=new Promise(resolve=>{img.onload=()=>resolve(true);img.onerror=()=>resolve(false);img.src=items[j].i});stateImages[j]={img,ready:ready.then(ok=>ok&&img.decode?img.decode().then(()=>true,()=>img.naturalWidth>0):ok)}}
-  return stateImages[j].ready;
- }
  const vs=VID.map(()=>{const v=document.createElement('video');v.className='ev';v.muted=true;v.defaultMuted=true;v.volume=0;v.playsInline=true;v.controls=false;v.loop=false;v.preload='none';v.disablePictureInPicture=true;v.disableRemotePlayback=true;
  ['muted','playsinline','webkit-playsinline','disablepictureinpicture','disableremoteplayback'].forEach(a=>v.setAttribute(a,''));v.setAttribute('aria-hidden','true');v.tabIndex=-1;fr.appendChild(v);return v});
- function prepare(k){const v=vs[k];v.preload='auto';vsrc(v,VID[k]);v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;return v}
- function warm(){if(!near||busy||!section.classList.contains('on'))return;for(const j of [i-1,i+1])if(j>=0&&j<items.length){imageReady(j);prepare(MAP[i+'>'+j])}}
+ const prepared=[];
+ function prepare(k){
+  if(!prepared[k]){
+   const v=vs[k];let blobURL='';const ac=new AbortController(),timeout=setTimeout(()=>ac.abort(),45000);
+   // Os clipes curtos são transferidos integralmente antes da reprodução.
+   const task=(async()=>{try{const r=await fetch(VID[k],{signal:ac.signal});if(!r.ok)throw new Error('Vídeo indisponível');const blob=await r.blob();blobURL=URL.createObjectURL(blob);v.preload='auto';v.src=blobURL;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;
+    await mediaTimeout(new Promise((resolve,reject)=>{const clean=()=>{v.removeEventListener('loadeddata',ok);v.removeEventListener('canplay',ok);v.removeEventListener('error',fail)};const ok=()=>{if(v.readyState>=2){clean();resolve()}};const fail=()=>{clean();reject(new Error('Vídeo inválido'))};v.addEventListener('loadeddata',ok);v.addEventListener('canplay',ok);v.addEventListener('error',fail);ok()}));return v;
+   }finally{clearTimeout(timeout)}})();
+   prepared[k]=task.catch(err=>{v.pause();v.removeAttribute('src');v.load();if(blobURL)URL.revokeObjectURL(blobURL);delete prepared[k];throw err});
+  }return prepared[k];
+ }
+ async function warm(){if(warming||!section.classList.contains('on'))return;warming=true;
+  items.forEach(e=>decodedImage(e.i).catch(()=>{}));
+  try{const preferred=[i+1,i-1].filter(j=>j>=0&&j<items.length).map(j=>MAP[i+'>'+j]);for(const k of new Set([...preferred,0,1,2,3])){if(!section.classList.contains('on'))break;try{await prepare(k)}catch(_){}}}finally{warming=false}
+ }
  tabHooks.push(()=>{if(section.classList.contains('on')){if(!im.hasAttribute('src')){im.src=items[i].i;im.alt=items[i].n}warm()}});
- const observer=new IntersectionObserver(entries=>{near=entries[0].isIntersecting;warm()},{rootMargin:'250px 0px'});observer.observe(w);
- function go(d){if(busy)return;const j=i+d;if(j<0||j>=items.length)return;
-  const from=i,e=items[j],v=prepare(MAP[i+'>'+j]);busy=true;set();w.setAttribute('aria-busy','true');
-  let finished=false,shown=false,ready=false,raf=0,frame=0,timer=0,labelTimer=0,swapped=false;
-  const target=imageReady(j);
-  const label=()=>{i=j;back=from==2&&j==1?1:0;set();w.classList.remove('tx')};
-  function swap(){if(swapped)return;swapped=true;im.src=e.i;im.alt=e.n}
-  function revealTarget(){return target.then(ok=>{if(!ok)return false;swap();return im.decode?im.decode().then(()=>true,()=>im.naturalWidth>0):true})}
-  function fade(){if(finished||!shown)return;const dur=v.duration;
-   if(ready&&Number.isFinite(dur)&&dur>0){const t=Math.max(0,Math.min(1,(dur-v.currentTime)/(EYE_FADE*EYE_RATE)));v.style.opacity=String(t*t*(3-2*t))}
-   raf=requestAnimationFrame(fade);
-  }
-  function showFrame(){if(shown||finished)return;shown=true;v.style.transition='none';v.style.opacity='1';w.classList.add('tx');labelTimer=setTimeout(label,400);revealTarget().then(ok=>{ready=ok});raf=requestAnimationFrame(fade)}
-  function release(){v.style.opacity='0';v.style.transition='';busy=false;w.removeAttribute('aria-busy');w.classList.remove('tx');set();warm()}
-  function finish(){if(finished)return;finished=true;cancelAnimationFrame(raf);clearTimeout(timer);clearTimeout(labelTimer);if(frame&&v.cancelVideoFrameCallback)v.cancelVideoFrameCallback(frame);v.removeEventListener('ended',finish);v.removeEventListener('error',finish);v.removeEventListener('playing',onPlaying);v.pause();
-   // Keep the last video frame visible until the destination image is decoded.
-   revealTarget().then(ok=>{if(!ok){i=from;im.src=items[from].i;im.alt=items[from].n;release();return}label();if(shown&&Number(v.style.opacity)>.01){v.style.transition='opacity '+EYE_FADE+'s ease-out';requestAnimationFrame(()=>{v.style.opacity='0'});setTimeout(release,EYE_FADE*1000+30)}else release()});
-  }
-  function onPlaying(){if(!v.requestVideoFrameCallback)requestAnimationFrame(showFrame)}
-  v.style.opacity='0';v.style.transition='none';v.addEventListener('ended',finish);v.addEventListener('error',finish);v.addEventListener('playing',onPlaying);
-  if(v.requestVideoFrameCallback)frame=v.requestVideoFrameCallback(showFrame);
-  timer=setTimeout(finish,20000);
-  try{if(v.currentTime>0)v.currentTime=0;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;const p=v.play();if(p&&p.catch)p.catch(finish)}catch(_){finish()}
+ async function go(d){if(busy)return;const j=i+d;if(j<0||j>=items.length)return;
+  const from=i,e=items[j],k=MAP[i+'>'+j];busy=true;set();w.setAttribute('aria-busy','true');mediaNotice(w,'');
+  let v=null,shown=false,ready=false,raf=0,frame=0,labelTimer=0,stall=0,ended=false,swapped=false,cleanup=()=>{};
+  const oldBack=back;
+  function label(){i=j;back=from==2&&j==1?1:0;set();w.classList.remove('tx')}
+  async function revealTarget(){if(swapped)return;swapped=true;im.src=e.i;im.alt=e.n;if(im.decode)await im.decode();ready=true}
+  function fade(){if(ended||!shown)return;const dur=v.duration;if(ready&&Number.isFinite(dur)&&dur>0){const t=Math.max(0,Math.min(1,(dur-v.currentTime)/(EYE_FADE*EYE_RATE)));v.style.opacity=String(t*t*(3-2*t))}raf=requestAnimationFrame(fade)}
+  try{
+   [v]=await Promise.all([prepare(k),decodedImage(e.i),decodedImage(items[from].i)]);
+   if(!section.classList.contains('on'))return;
+   v.style.opacity='0';v.style.transition='none';v.currentTime=0;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;
+   await new Promise((resolve,reject)=>{
+    const fail=()=>reject(new Error('Reprodução interrompida'));
+    const resetStall=()=>{clearTimeout(stall);stall=setTimeout(fail,45000)};
+    const showFrame=()=>{if(shown||ended)return;shown=true;v.style.opacity='1';w.classList.add('tx');labelTimer=setTimeout(label,400);revealTarget().catch(fail);raf=requestAnimationFrame(fade)};
+    const playing=()=>{if(!v.requestVideoFrameCallback)requestAnimationFrame(showFrame)};
+    const finish=()=>{if(!shown){fail();return}resolve()};
+    v.addEventListener('ended',finish);v.addEventListener('error',fail);v.addEventListener('playing',playing);v.addEventListener('timeupdate',resetStall);
+    cleanup=()=>{v.removeEventListener('ended',finish);v.removeEventListener('error',fail);v.removeEventListener('playing',playing);v.removeEventListener('timeupdate',resetStall)};
+    if(v.requestVideoFrameCallback)frame=v.requestVideoFrameCallback(showFrame);
+    resetStall();try{const p=v.play();if(p&&p.catch)p.catch(fail)}catch(_){fail()}
+   });
+   ended=true;cancelAnimationFrame(raf);clearTimeout(labelTimer);
+   if(!ready){im.src=e.i;im.alt=e.n;if(im.decode)await im.decode();ready=true}
+   label();if(Number(v.style.opacity)>.01){v.style.transition='opacity '+EYE_FADE+'s ease-out';await nextPaint();v.style.opacity='0';await new Promise(r=>setTimeout(r,EYE_FADE*1000+30))}
+  }catch(err){i=from;back=oldBack;im.src=items[from].i;im.alt=items[from].n;mediaNotice(w,'Não foi possível reproduzir a transição. Tente novamente.')}
+  finally{ended=true;cancelAnimationFrame(raf);clearTimeout(stall);clearTimeout(labelTimer);cleanup();if(v){if(frame&&v.cancelVideoFrameCallback)v.cancelVideoFrameCallback(frame);v.pause();v.style.opacity='0';v.style.transition=''}busy=false;w.removeAttribute('aria-busy');w.classList.remove('tx');set();warm()}
  }
  pv.onclick=()=>go(-1);nx.onclick=()=>go(1);im.alt=items[0].n;set();
 }
