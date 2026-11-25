@@ -253,7 +253,7 @@ nav button{text-transform:uppercase;letter-spacing:.04em}
 .fr .alt{will-change:opacity;transform:translateZ(0)}
 #c3.on{color:#fff;text-shadow:0 0 6px #fff,0 0 14px #fff,0 0 24px #ffffffaa}.eqn span span.notranslate{border:0;padding:0;margin:0;background:none;box-shadow:none;border-radius:0;color:inherit;font-size:inherit;flex:none;transition:none}
 #qor{grid-template-columns:minmax(0,1fr)!important;margin:6px 0 14px}#qor .q{min-height:0;padding:12px 16px;border-radius:10px}#qor .q b{font-size:.95rem;margin:0 0 2px;line-height:1.25}#qor .q .t{font-size:.8rem}#qor .q i{margin-top:4px;font-size:.68rem}#qor .q .d{font-size:.9rem;line-height:1.7}
-.ev{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;background:transparent}.eh{font-size:.82rem;font-style:italic;line-height:1.5;color:var(--mut);opacity:.85;max-width:46ch;margin:6px auto 0;transition:opacity .22s ease}.eye.tx .eh{opacity:0}
+.ev{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;opacity:0;pointer-events:none;background:transparent}.eye .ei{width:100%;height:auto;aspect-ratio:1080/808;object-fit:fill}#eyeR .ei{aspect-ratio:760/568}.eh{font-size:.82rem;font-style:italic;line-height:1.5;color:var(--mut);opacity:.85;max-width:46ch;margin:6px auto 0;transition:opacity .22s ease}.eye.tx .eh{opacity:0}
 #eyeP .en,#eyeP .et,#eyeP .eh,#eyeR .en,#eyeR .et,#eyeR .eh{transition:opacity .35s ease,transform .35s ease}#eyeP.tx .en,#eyeP.tx .et,#eyeP.tx .eh,#eyeR.tx .en,#eyeR.tx .et,#eyeR.tx .eh{transform:translateY(6px)}
 /* Títulos principais maiores (bem mais no desktop), sempre numa linha só; respiro no "Dinamismo dos olhos" para o zoom não cobrir título nem controles */
 section>h2{font-size:min(calc((100vw - 28px)/15.5),2.8rem)!important}
@@ -549,6 +549,7 @@ const EH='O roxo aqui indica a energia diminuindo: a Sobrecarga só termina quan
 const EVR=["assets/video/mascara-normal-reserva.mp4","assets/video/mascara-reserva-sobrecarga.mp4","assets/video/mascara-sobrecarga-reserva.mp4","assets/video/mascara-reserva-normal.mp4"];
 const EHR='O roxo aqui indica a energia diminuindo: a Sobrecarga só termina quando a reserva chega a zero e a órbita volta a ficar escura.';
 function eyeVid(sel,items,VID,HINT){VID=VID||EV;HINT=HINT||EH;const w=$(sel),fr=w.querySelector('.fr'),im=w.querySelector('.ei'),en=w.querySelector('.en'),et=w.querySelector('.et'),pv=w.querySelector('.ep'),nx=w.querySelector('.nx');
+const stateImages=items.map(e=>{const img=new Image();img.src=e.i;return img});
 let i=0,busy=0,back=0;const MAP={'0>1':0,'1>2':1,'2>1':2,'1>0':3};
 const eh=document.createElement('p');eh.className='eh';eh.hidden=true;eh.textContent=HINT;et.after(eh);
 const set=()=>{en.textContent=items[i].n;et.textContent=items[i].t;eh.hidden=!(back&&i==1);pv.disabled=i==0;nx.disabled=i==items.length-1};
@@ -558,13 +559,14 @@ const v=document.createElement('video');v.className='ev';v.muted=true;v.defaultM
 ['muted','playsinline','webkit-playsinline','disablepictureinpicture','disableremoteplayback'].forEach(a=>v.setAttribute(a,''));v.setAttribute('aria-hidden','true');v.tabIndex=-1;
 vsrc(v,b);fr.appendChild(v);return v});
 function go(d){if(busy)return;const j=i+d;if(j<0||j>=items.length)return;const v=vs[MAP[i+'>'+j]],e=items[j],from=i;busy=1;
-let fin=0,shown=0,tm=0,tw=0,ts=0,vOK=0,tOK=0,imDone=0,imP=null;
+let fin=0,shown=0,tm=0,tw=0,ts=0,vOK=0,tOK=0,imDone=0,imP=null,imReady=false,raf=0;
 const rel=()=>{if(vOK&&tOK){v.style.transition='';try{v.pause()}catch(_){}busy=0}};
 const anim=()=>{if(ts)return;ts=1;w.classList.add('tx');setTimeout(()=>{i=j;back=from==2&&j==1?1:0;set();w.classList.remove('tx');setTimeout(()=>{tOK=1;rel()},360)},400)};
-const swapImg=()=>{if(!imDone){imDone=1;im.src=e.i;im.alt=e.n;imP=im.decode?im.decode().catch(()=>0):Promise.resolve()}return imP};
-const show=()=>{if(shown||fin)return;shown=1;clearTimeout(tw);v.style.transition='none';v.style.opacity=1;anim();setTimeout(swapImg,350)};
-function finish(){if(fin)return;fin=1;clearTimeout(tm);clearTimeout(tw);v.removeEventListener('ended',finish);v.removeEventListener('error',finish);
-swapImg().then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='opacity .14s linear';v.style.opacity=0;anim();setTimeout(()=>{vOK=1;rel()},190)})))}
+const swapImg=()=>{if(!imDone){imDone=1;im.src=e.i;im.alt=e.n;imP=(im.decode?im.decode().catch(()=>0):Promise.resolve()).then(()=>{imReady=true})}return imP};
+const fade=()=>{if(fin||!shown)return;const dur=v.duration;if(imReady&&isFinite(dur)&&dur>0){const t=Math.max(0,Math.min(1,(dur-v.currentTime)/.24));v.style.opacity=String(t*t*(3-2*t))}raf=requestAnimationFrame(fade)};
+const show=()=>{if(shown||fin)return;shown=1;clearTimeout(tw);v.style.transition='none';v.style.opacity=1;anim();setTimeout(swapImg,350);raf=requestAnimationFrame(fade)};
+function finish(){if(fin)return;fin=1;cancelAnimationFrame(raf);clearTimeout(tm);clearTimeout(tw);v.removeEventListener('ended',finish);v.removeEventListener('error',finish);
+swapImg().then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='opacity .20s ease-out';v.style.opacity=0;anim();setTimeout(()=>{vOK=1;rel()},240)})))}
 v.addEventListener('ended',finish);v.addEventListener('error',finish);
 const start=()=>{if(fin)return;const p=v.play();if(p&&p.catch)p.catch(finish);if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(show);else v.addEventListener('playing',()=>requestAnimationFrame(show),{once:true})};
 tw=setTimeout(()=>{if(!shown)finish()},1500);tm=setTimeout(finish,4500+(isFinite(v.duration)&&v.duration?v.duration:3.1)*1000);
