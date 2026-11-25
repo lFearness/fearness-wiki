@@ -64,8 +64,13 @@ h2{text-shadow:0 0 18px #8a3ffc88}
 .eye #eyeimg,.eye #en,.eye #et{transition:opacity .22s ease,transform .22s ease}
 .eye.sw #eyeimg{opacity:0;transform:translateX(var(--d,0px))}.eye.sw #en,.eye.sw #et{opacity:0}
 .ctl button{transition:transform .2s,background .2s,opacity .3s}.ctl button:not(:disabled):hover{transform:scale(1.15);background:var(--pu)}.ctl button:not(:disabled):active{transform:scale(.92)}
-/* Dinamismo dos olhos: impede que o fundo roxo do hover permaneça após o toque. */
+/* Dinamismo dos olhos: destaque circular apenas durante o pressionamento. */
+.eye .ctl button{border-radius:50%;-webkit-tap-highlight-color:transparent;transition:transform .2s,opacity .3s}
 .eye .ctl button:not(:disabled):hover{background:#000}
+@media(hover:none){.eye .ctl button:not(:disabled):hover{transform:none}}
+.eye .ctl button:focus{outline:none}
+.eye .ctl button:focus-visible{box-shadow:0 0 0 3px var(--pu2)}
+.eye .ctl button:not(:disabled):active{background:var(--pu);transform:scale(.92)}
 .ring{animation:dash 2.5s linear infinite}@keyframes dash{to{stroke-dashoffset:-11}}
 .nd{transition:transform .25s ease,background .25s,box-shadow .25s}.nd:hover{transform:translate(-50%,-50%) scale(1.12)}.nd.on{box-shadow:0 0 16px #8a3ffc}
 .box.a{animation:up .45s ease both}
