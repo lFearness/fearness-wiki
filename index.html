@@ -102,8 +102,8 @@ h2{text-shadow:0 0 18px #8a3ffc88}
 @keyframes shk{50%{transform:translateX(1.5px)}}@keyframes fk{50%{opacity:.6}}
 /* A instabilidade permanece em toda a energia armazenada durante a Sobrecarga. */
 #b2.ov .fl,.end-reserves .ov .fl{animation:fk .18s steps(2) infinite;filter:brightness(1.9) saturate(.45)}
-#b3,#q3 .end-reserves .bar{will-change:opacity}
-#q3 .end-reserves{display:grid;gap:24px;margin-top:18px;padding-top:16px;border-top:1px dashed #3a3558}
+#b3,#q3 .end-reserves .bar{will-change:auto}
+#q3 .end-reserves{display:grid;gap:40px;margin-top:18px;padding-top:16px;border-top:1px dashed #3a3558}
 #q3 .end-reserves .end-topic{display:grid;gap:12px;min-width:0}
 #q3 .end-reserves .bar{margin:0;min-width:0}
 #q3 .end-reserves .bl{align-items:flex-start;flex-wrap:wrap;gap:4px 10px;font:.72rem/1.45 sans-serif;letter-spacing:.55px}
@@ -392,6 +392,14 @@ h3{color:var(--pu-section)}
 .q > b,.ref > b{color:var(--pu-title)}
 .q,.ref{-webkit-tap-highlight-color:transparent}
 .q:active,.ref:active,.ref.open,#qib .q.open,#qib .q:active{border-color:var(--pu);box-shadow:0 0 22px #8a3ffc55}
+
+/* Contorno individual dos números romanos. */
+#q0 .q .n,#q2 .q .n,#q3 .q .n{color:#fff;-webkit-text-stroke:1.8px var(--pu);paint-order:stroke fill;text-shadow:0 0 14px #8a3ffc99}
+/* Em telas de toque, o fundo mantém a atmosfera sem filtros de tela inteira. */
+@media(hover:none) and (pointer:coarse){nav{backdrop-filter:none;-webkit-backdrop-filter:none;background:#0a0418f5}#fx{filter:none}}
+/* Barras fora da área visível não executam efeitos de instabilidade. */
+.bar:not(.running) .trk,.bar:not(.running) .fl,.bar:not(.running) .ex{animation-play-state:paused}
+#b1.hold:not(.running) .fl{animation-play-state:paused}
 </style></head><body>
 <div id="bg"></div><h1>FEARNESS</h1><p class="sub">O Fragmento Funesto</p>
 <nav id="nav" aria-label="Seções de Fearness" role="tablist"></nav>
@@ -506,7 +514,7 @@ function clearVideo(v,url){v.pause();v.removeAttribute('src');v.load();const src
 const net=()=>navigator.connection||navigator.mozConnection||navigator.webkitConnection;
 function bgAllowed(){const c=net();return !document.hidden&&navigator.onLine!==false&&!(c&&(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'')||(typeof c.downlink==='number'&&c.downlink<2)))}
 function bgSchedule(ms=1200){clearTimeout(bgTimer);bgTimer=setTimeout(bgStep,ms)}
-function bgYield(ms=2200){bgAfter=Date.now()+ms;if(bgJob)bgJob.controller.abort();bgSchedule(ms)}
+function bgYield(ms=2200,interrupt=false){bgAfter=Math.max(bgAfter,Date.now()+ms);if(interrupt&&bgJob)bgJob.controller.abort();bgSchedule(ms)}
 function foreground(task){fgPending.add(task);const done=()=>{fgPending.delete(task);bgSchedule()};task.then(done,done);return task}
 function bgKnown(url){if(bgDone.has(url)||videoRequested.has(url)||bgVideo.has(url))return true;return [...document.querySelectorAll('img[src]')].some(im=>im.getAttribute('src')===url&&im.complete&&im.naturalWidth>0)}
 function bgForegroundVisible(){const section=document.querySelector('section.on');if(!section)return false;return [...section.querySelectorAll('img[src],video.bv[src]')].some(el=>{const r=el.getBoundingClientRect();return r.height>0&&r.bottom>0&&r.top<innerHeight&&(el.tagName==='IMG'?!el.complete:el.readyState<3&&el.networkState!==3)})}
@@ -524,7 +532,7 @@ async function bgStep(){
   bgDone.add(url);bgRetry.delete(url);
  }catch(e){if(!controller.signal.aborted)bgRetry.set(url,Date.now()+30000)}finally{clearTimeout(timer);if(bgJob===job)bgJob=null;releaseBodyWarm();bgSchedule(1200)}
 }
-function vsrc(v,url){if(!v.hasAttribute('src')){if(bgJob?.url===url)bgYield();videoRequested.add(url);v.src=takeVideo(url,v)||url}}
+function vsrc(v,url){if(!v.hasAttribute('src')){if(bgJob?.url===url)bgYield(2200,true);videoRequested.add(url);v.src=takeVideo(url,v)||url}}
 function bgResume(){if(bgAllowed())bgSchedule(1500);else if(bgJob)bgJob.controller.abort();if(!document.hidden)releaseBodyWarm()}
 document.addEventListener('visibilitychange',bgResume);addEventListener('online',bgResume);addEventListener('offline',bgResume);net()?.addEventListener?.('change',bgResume);
 document.addEventListener('pointerdown',e=>{if(e.target.closest('button,.badge,.hs,.q'))bgYield()}, {passive:true,capture:true});
@@ -545,7 +553,7 @@ function mediaNotice(root,message){let n=root.querySelector('.media-notice');if(
 function waitNotice(root,message){const timer=setTimeout(()=>mediaNotice(root,message),250);return()=>{clearTimeout(timer);mediaNotice(root,'')}}
 const nextPaint=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
 
-function activateMedia(i){bgYield(3000);const sec=$('#s'+i);sec.querySelectorAll('img[data-src]:not(.qi)').forEach(loadImg);sec.querySelectorAll('video[data-poster]').forEach(v=>{v.poster=v.dataset.poster;delete v.dataset.poster});tabHooks.forEach(fn=>fn(i))}
+function activateMedia(i){bgYield(3000,true);const sec=$('#s'+i);sec.querySelectorAll('img[data-src]:not(.qi)').forEach(loadImg);sec.querySelectorAll('video[data-poster]').forEach(v=>{v.poster=v.dataset.poster;delete v.dataset.poster});tabHooks.forEach(fn=>fn(i))}
 const tabs=['Personagem','Poder','Restrição','Transformação'];
 let INIT=true;const dq=matchMedia('(min-width:1000px)');
 function navH(){const n=document.getElementById('nav');const h=n?n.offsetHeight:92;document.documentElement.style.setProperty('--nh',h+'px');return h}
@@ -566,10 +574,11 @@ function pick(i){CUR=i;if(window.pw)pw(i);[...cy.querySelectorAll('.nd')].forEac
 pick(0);
 document.querySelectorAll('figure,.eye .fr').forEach(e=>e.classList.add('z'));
 const touch=matchMedia('(hover:none)').matches,zs=[...document.querySelectorAll('.z')];let tick=false;
-function zoom(){tick=false;if(reduced.matches||document.hidden)return;const vh=innerHeight;zs.forEach(el=>{const r=el.getBoundingClientRect();if(!r.height||r.bottom<-80||r.top>vh+80)return;const d=Math.min(1,Math.abs(r.top+r.height/2-vh/2)/(vh/2));el.style.transform='scale('+(1.08-.18*d).toFixed(3)+')'})}
+const zoomValues=new WeakMap();
+function zoom(){tick=false;if(reduced.matches||document.hidden)return;const vh=innerHeight,section=document.querySelector('section.on'),updates=[];if(!section)return;for(const el of zs){if(!section.contains(el))continue;const r=el.getBoundingClientRect();if(!r.height||r.bottom<-80||r.top>vh+80)continue;const d=Math.min(1,Math.abs(r.top+r.height/2-vh/2)/(vh/2)),value=Math.round((1.08-.18*d)*100)/100;if(zoomValues.get(el)!==value)updates.push([el,value])}for(const [el,value] of updates){zoomValues.set(el,value);el.style.transform='scale('+value+')'}}
 if(touch){zs.forEach(e=>e.classList.add('t'));addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(zoom)}},{passive:true});addEventListener('resize',zoom)}
-(function(){const cv=document.createElement('canvas');cv.id='fx';cv.setAttribute('aria-hidden','true');document.body.prepend(cv);const x=cv.getContext('2d');if(!x)return;let W,H,bolt=null,next=performance.now()+1500;
-function rs(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0)}rs();addEventListener('resize',rs);
+(function(){const cv=document.createElement('canvas');cv.id='fx';cv.setAttribute('aria-hidden','true');document.body.prepend(cv);const x=cv.getContext('2d');if(!x)return;let W,H,bolt=null,next=performance.now()+1500,fxLast=0,fxTimer=0,fxFrame=0,scrollingUntil=0;const mobileFX=matchMedia("(hover:none) and (pointer:coarse)").matches;
+function rs(){const d=Math.min(devicePixelRatio||1,mobileFX?1:1.5);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0)}rs();addEventListener('resize',rs);
 function mk(){const pts=[[W*(.1+Math.random()*.8),-10]],br=[],end=H*(.65+Math.random()*.4);let px=pts[0][0],py=-10;while(py<end){py+=18+Math.random()*26;px+=(Math.random()-.5)*60;pts.push([px,py]);if(Math.random()<.12){const b=[[px,py]],dir=Math.random()<.5?-1:1,c=4+Math.random()*4|0;let bx=px,by=py;for(let k=0;k<c;k++){by+=14+Math.random()*18;bx+=dir*(8+Math.random()*28);b.push([bx,by])}br.push(b)}}const dkk=document.body.dataset.t==='3';return{pts,br,t0:0,dark:dkk,ph:[Math.random()*6.3,Math.random()*6.3,Math.random()*6.3,Math.random()*6.3],fl:dkk?[[prep(pts),1]].concat(br.map(b=>[prep(b),.5])):null}}
 function prep(p){let q=p;for(let it=0;it<1;it++){const r=[q[0]];for(let i=0;i<q.length-1;i++){const a=q[i],b=q[i+1];r.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75])}r.push(q[q.length-1]);q=r}
 const c=[0];for(let i=1;i<q.length;i++)c.push(c[i-1]+Math.hypot(q[i][0]-q[i-1][0],q[i][1]-q[i-1][1]));const L=c[c.length-1],A=[];let j=0;
@@ -581,9 +590,10 @@ for(const q of A){if(q.s>Lg)break;const env=Math.min(1,(Lg-q.s)/42+.05)*Math.pow
 if(Lp.length<2)return null;const P=Lp.concat(Rp.reverse()),o=new Path2D();o.moveTo((P[0][0]+P[P.length-1][0])/2,(P[0][1]+P[P.length-1][1])/2);
 for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];o.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2)}o.closePath();return o}
 function path(p,n){x.beginPath();for(let i=0;i<Math.min(p.length,n);i++)i?x.lineTo(p[i][0],p[i][1]):x.moveTo(p[i][0],p[i][1])}
-function f(t){requestAnimationFrame(f);if(document.hidden||reduced.matches){if(bolt)x.clearRect(0,0,W,H);bolt=null;next=t+2500;return}if(!bolt&&t<=next)return;x.clearRect(0,0,W,H);
-if(!bolt&&t>next){bolt=mk();bolt.t0=t;sfx.thunder()}if(!bolt)return;
-const e=t-bolt.t0,g=Math.min(1,e/220),fade=e<220?1:Math.max(0,1-(e-220)/900);if(fade<=0){next=bolt.t0+2900;bolt=null;return}
+function wakeFX(delay=0){clearTimeout(fxTimer);if(fxFrame)cancelAnimationFrame(fxFrame);fxFrame=0;if(document.hidden||reduced.matches)return;if(delay>0){fxTimer=setTimeout(()=>{fxFrame=requestAnimationFrame(f)},delay)}else fxFrame=requestAnimationFrame(f)}
+function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H);bolt=null;next=t+2500;return}if(mobileFX&&t<scrollingUntil){if(bolt)x.clearRect(0,0,W,H);bolt=null;next=scrollingUntil+350;wakeFX(next-t);return}if(!bolt&&t<next){wakeFX(next-t);return}if(t-fxLast<33){wakeFX();return}fxLast=t;x.clearRect(0,0,W,H);
+if(!bolt&&t>=next){bolt=mk();bolt.t0=t;sfx.thunder()}if(!bolt){wakeFX();return}
+const e=t-bolt.t0,g=Math.min(1,e/220),fade=e<220?1:Math.max(0,1-(e-220)/900);if(fade<=0){next=bolt.t0+2900;bolt=null;wakeFX(Math.max(0,next-t));return}
 const a=fade*(e>220&&e<500&&Math.sin(e/25)<0?.55:1),all=[[bolt.pts,1]].concat(bolt.br.map(b=>[b,.5])),dk=bolt.dark,yE=bolt.pts[bolt.pts.length-1][1];x.lineJoin=x.lineCap='round';x.shadowBlur=0;
 for(let i=0;i<Math.ceil(bolt.pts.length*g);i+=3){const q=bolt.pts[i],r=x.createRadialGradient(q[0],q[1],0,q[0],q[1],190);r.addColorStop(0,dk?'rgba(120,70,220,'+.035*a+')':'rgba(160,110,255,'+.05*a+')');r.addColorStop(1,'rgba(150,100,255,0)');x.fillStyle=r;x.fillRect(q[0]-190,q[1]-190,380,380)}
 const G=(rgb,al)=>{const k=x.createLinearGradient(0,0,0,Math.max(yE,H*.5));k.addColorStop(0,'rgba('+rgb+','+al*a+')');k.addColorStop(1,'rgba('+rgb+','+al*a*.45+')');return k};
@@ -595,15 +605,16 @@ for(const[o]of fs){x.shadowBlur=0;x.fillStyle=G('0,0,0',1);x.fill(o)}
 for(const[p,w]of all){path(p,Math.ceil(p.length*g));x.shadowColor='#8a3ffc';x.shadowBlur=8;x.strokeStyle=G('150,90,255',.95);x.lineWidth=8*w;x.stroke()}
 for(const[p,w]of all){path(p,Math.ceil(p.length*g));x.shadowBlur=0;x.strokeStyle=G('255,255,255',.38);x.lineWidth=1.2*w;x.stroke()}
 }
-}requestAnimationFrame(f)})();
+ wakeFX();
+}if(mobileFX)addEventListener('scroll',()=>{scrollingUntil=performance.now()+220},{passive:true});function fxVisibility(){if(document.hidden||reduced.matches){clearTimeout(fxTimer);cancelAnimationFrame(fxFrame);fxFrame=0;bolt=null;x.clearRect(0,0,W,H)}else{next=performance.now()+350;wakeFX(350)}}document.addEventListener('visibilitychange',fxVisibility);reduced.addEventListener('change',fxVisibility);wakeFX(1500)})();
 function mkbar(id,l){const w=$('#'+id);w.className='bar';w.innerHTML='<div class="bl"><span>'+l+'</span><b class="bs"></b></div><div class="trk"><div class="zn"></div><div class="fl"></div><div class="ex"></div><div class="mk"></div></div>';const q=s=>w.querySelector(s);return{fl:q('.fl'),ex:q('.ex'),zn:q('.zn'),mk:q('.mk'),bs:q('.bs'),w}}
 const p1=mkbar('b1','RESERVA DE ENERGIA'),p2=mkbar('b2','RESERVA × LIMITE'),p3=mkbar('b3','RESERVA DA RUPTURE');
 p1.zn.style.display=p1.ex.style.display=p1.mk.style.display='none';p1.w.classList.add('sm');
-const clip=(e,l,r)=>e.style.clipPath='inset(0 '+(100-r)+'% 0 '+l+'%)';
+const clip=(e,l,r)=>{const v='inset(0 '+(100-r).toFixed(1)+'% 0 '+l.toFixed(1)+'%)';if(e.style.clipPath!==v)e.style.clipPath=v};
 let lvl=40;
 window.AU={t:null,a:0,c:0};
 function autoStop(){if(AU.t){clearInterval(AU.t);AU.t=null;$('#auto').textContent='▶ Reproduzir ciclo'}}
-window.pw=i=>{if(!AU.a)autoStop();AU.c=i;const m=['stay','up','stay','glow','down'][i];if(m==='up')lvl=Math.max(lvl,90);if(m==='down')lvl=10;clip(p1.fl,0,lvl);p1.bs.textContent=['= Sem alteração','↑ Subindo','= Mantendo','✦ Brilhando','↓ Reduzindo'][i];p1.w.classList.toggle('hold',m==='glow')};
+window.pw=i=>{if(!AU.a)autoStop();AU.c=i;const m=['stay','up','stay','glow','down'][i];if(m==='up')lvl=100;if(m==='down')lvl=10;clip(p1.fl,0,lvl);p1.bs.textContent=['= Sem alteração','↑ Subindo','= Mantendo','✦ Brilhando','↓ Reduzindo'][i];p1.w.classList.toggle('hold',m==='glow')};
 $('#auto').onclick=()=>{if(AU.t){autoStop();return}$('#auto').textContent='❚❚ Pausar';const step=()=>{AU.a=1;pick((AU.c+1)%5);AU.a=0};step();AU.t=setInterval(step,2600)};
 tabHooks.push(k=>{if(k!==1)autoStop()});document.addEventListener('visibilitychange',()=>{if(document.hidden)autoStop()});
 pw(0);
@@ -611,10 +622,11 @@ const ez=x=>x*x*(3-2*x);
 // Quantidades ilustrativas: a instabilidade é um estado, independente do nível de energia.
 const lerp=(a,b,x)=>a+(b-a)*ez(Math.max(0,Math.min(1,x)));
 function paintReserve(p,v,limit,unstable,label,alpha=1,expansion=0){
- const N=p===p2?.75:.6;
- clip(p.fl,0,Math.min(v,N)*100);clip(p.ex,N*100,Math.max(v,N)*100);
- clip(p.zn,N*100,100);p.zn.style.opacity=String(1-expansion);
- p.mk.style.left=Math.min(limit*100,99.4)+'%';
+ const N=p===p2?.75:.6,stableOnly=p===p3||p.w.id==='end-bar-0'||p.w.id==='end-bar-2',scale=stableOnly?1/R:1;
+ const pct=x=>Math.max(0,Math.min(100,x*scale*100));
+ clip(p.fl,0,pct(Math.min(v,N)));clip(p.ex,pct(N),pct(Math.max(v,N)));
+ clip(p.zn,pct(N),100);p.zn.style.opacity=String(1-expansion);
+ p.mk.style.left='min('+pct(limit)+'%, calc(100% - 3px))';
  p.ex.style.filter=unstable?'brightness(1.9) saturate(.45)':`brightness(${1+1.1*(1-expansion)}) saturate(${.35+.65*expansion})`;
  p.w.classList.toggle('ov',unstable);p.w.style.opacity=String(alpha);
  if(p.bs.textContent!==label)p.bs.textContent=label;
@@ -633,55 +645,64 @@ function activationState(t){
  if(m<3100)return [N,N,false,'Limite convencional',1,0];
  if(m<3500)return [lerp(N,.64,(m-3100)/400),N,false,'Concluindo absorção',1,0];
  if(m<4700){const c=ez((m-3500)/1200);return [.64,.64+(R-.64)*c,false,'Excedente sustentando a Rupture',1,c];}
- if(m<6900)return [lerp(.64,.88,(m-4700)/2200),R,false,'Reserva expandida',1,1];
- if(m<8500)return [.88,R,false,'Reserva expandida',1,1];
- if(m<8900)return [.88,R,false,'Reserva expandida',1-ez((m-8500)/400),1];
+ if(m<6900)return [lerp(.64,R,(m-4700)/2200),R,false,'Reserva expandida',1,1];
+ if(m<8500)return [R,R,false,'Reserva expandida',1,1];
+ if(m<8900)return [R,R,false,'Reserva expandida',1-ez((m-8500)/400),1];
  return [0,N,false,'Reserva convencional',ez((m-8900)/500),0];
 }
 // Cada encerramento possui sua própria demonstração, sem descarregar imagens ou vídeos.
 function voluntaryState(t){
  const m=t%7200;
- if(m<1100)return [.88,R,false,'Rupture estável',1,1];
- if(m<3900)return [lerp(.88,N,(m-1100)/2800),R,false,'Dissipando o excedente',1,1];
+ if(m<1100)return [R,R,false,'Rupture estável',1,1];
+ if(m<3900)return [lerp(R,N,(m-1100)/2800),R,false,'Dissipando o excedente',1,1];
  if(m<4500){const c=1-ez((m-3900)/600);return [N,N+(R-N)*c,false,'Transformação encerrada',1,c];}
  if(m<6300)return [N,N,false,'Reserva convencional estável',1,0];
  if(m<6750)return [N,N,false,'Reserva convencional estável',1-ez((m-6300)/450),0];
- return [.88,R,false,'Rupture estável',ez((m-6750)/450),1];
+ return [R,R,false,'Rupture estável',ez((m-6750)/450),1];
 }
 function ruptureOverloadState(t){
  const m=t%10800;
- if(m<1100)return [.88,R,false,'Rupture estável',1,1];
- if(m<2100){const v=lerp(.88,1,(m-1100)/1000);return [v,R,false,v>R?'Concluindo absorção':'Reserva expandida',1,1];}
+ if(m<1100)return [R,R,false,'Rupture estável',1,1];
+ if(m<2100){const v=lerp(R,1,(m-1100)/1000);return [v,R,false,v>R?'Concluindo absorção':'Reserva expandida',1,1];}
  if(m<2700)return [1,R,true,'SOBRECARGA: vazamento',1,1];
  if(m<4900)return [lerp(1,N,(m-2700)/2200),R,true,'SOBRECARGA: vazamento',1,1];
  if(m<5500){const c=1-ez((m-4900)/600);return [N,N+(R-N)*c,true,'Rupture encerrada · Sobrecarga',1,c];}
  if(m<8400)return [lerp(N,0,(m-5500)/2900),N,true,'SOBRECARGA: vazamento',1,0];
  if(m<9900)return [0,N,false,'Estabilidade restabelecida',1,0];
  if(m<10350)return [0,N,false,'Estabilidade restabelecida',1-ez((m-9900)/450),0];
- return [.88,R,false,'Rupture estável',ez((m-10350)/450),1];
+ return [R,R,false,'Rupture estável',ez((m-10350)/450),1];
 }
 function metabolicState(t){
  const m=t%7400;
- if(m<1300)return [.88,R,false,'Rupture ativa',1,1];
- if(m<3000)return [.88,R,false,'Instabilidade metabólica crescente',1,1];
- if(m<3600)return [.88,R,false,'Limite metabólico atingido',1,1];
- if(m<4350){const c=1-ez((m-3600)/750);return [.88*c,N+(R-N)*c,false,'Colapso do reservatório',1,c];}
+ if(m<1300)return [R,R,false,'Rupture ativa',1,1];
+ if(m<3000)return [R,R,false,'Instabilidade metabólica crescente',1,1];
+ if(m<3600)return [R,R,false,'Limite metabólico atingido',1,1];
+ if(m<4350){const c=1-ez((m-3600)/750);return [R*c,N+(R-N)*c,false,'Colapso do reservatório',1,c];}
  if(m<6500)return [0,N,false,'Reserva esvaziada',1,0];
  if(m<6950)return [0,N,false,'Reserva esvaziada',1-ez((m-6500)/450),0];
- return [.88,R,false,'Rupture ativa',ez((m-6950)/450),1];
+ return [R,R,false,'Rupture ativa',ez((m-6950)/450),1];
 }
-let endBars=[],barTab='',barElapsed=0,endElapsed=0,wasEndOpen=false,barLast=0;
-function bars(t){
- requestAnimationFrame(bars);if(t-barLast<32)return;const k=document.body.dataset.t,dt=Math.min(100,Math.max(0,t-barLast));barLast=t;const primary=k==='2'?p2:k==='3'?p3:null;const active=primary&&isVisible(primary.w);
- if(k!==barTab){barTab=k;barElapsed=0;endElapsed=0;wasEndOpen=false}else if(active)barElapsed+=dt;
- if(k==='2'){const state=overloadState(barElapsed);if(active)paintReserve(p2,...state);sfx.hum(.012+.035*state[0]+(state[2]?.03:0));sfx.humf(90+state[0]*260)}
- else if(k==='3'){const state=activationState(barElapsed);if(active)paintReserve(p3,...state);sfx.hum(.012+.04*state[0]);sfx.humf(90+state[0]*300);
-  const open=!!document.querySelector('#q3 .end-quad.open');
-  if(open){if(!wasEndOpen)endElapsed=0;else if(endBars.some(p=>isVisible(p.w)))endElapsed+=dt;const states=[voluntaryState,ruptureOverloadState,metabolicState];endBars.forEach((p,i)=>{if(isVisible(p.w))paintReserve(p,...states[i](endElapsed))});}else endElapsed=0;
-  wasEndOpen=open;
- }else sfx.hum(0);
+let endBars=[];
+const reserveClocks=new Map(),visibleBars=new Set();let barsFrame=0,barsLast=0;
+function runBars(t){
+ barsFrame=0;if(document.hidden||!visibleBars.size)return;
+ if(t-barsLast<32){barsFrame=requestAnimationFrame(runBars);return}
+ const dt=barsLast?Math.min(100,t-barsLast):0;barsLast=t;
+ for(const p of visibleBars){const clock=reserveClocks.get(p);if(!clock)continue;if(p===p1)continue;if(!reduced.matches)clock.t+=dt;paintReserve(p,...clock.state(clock.t))}
+ if(!reduced.matches&&[...visibleBars].some(p=>p!==p1))barsFrame=requestAnimationFrame(runBars);
 }
-requestAnimationFrame(bars);
+function syncBarClock(){if(document.hidden||!visibleBars.size){if(barsFrame)cancelAnimationFrame(barsFrame);barsFrame=0;barsLast=0;return}if(!barsFrame&&[...visibleBars].some(p=>p!==p1)){barsLast=0;barsFrame=requestAnimationFrame(runBars)}}
+function initBarClocks(){
+ const configs=[[p1,null],[p2,overloadState],[p3,activationState],...endBars.map((p,i)=>[p,[voluntaryState,ruptureOverloadState,metabolicState][i]])];
+ const byElement=new Map(configs.map(([p,state])=>{reserveClocks.set(p,{state,t:0});return [p.w,p]}));
+ const observer=new IntersectionObserver(entries=>{for(const entry of entries){const p=byElement.get(entry.target);if(!p)continue;const on=entry.isIntersecting&&entry.intersectionRatio>0&&p.w.closest('section.on')&&(!p.w.closest('.end-quad')||p.w.closest('.end-quad.open'));if(on){visibleBars.add(p);p.w.classList.add('running')}else{visibleBars.delete(p);p.w.classList.remove('running')}}syncBarClock()},{threshold:0});
+ for(const [p,state] of configs){observer.observe(p.w);if(state)paintReserve(p,...state(0))}
+ tabHooks.push(()=>{for(const p of visibleBars){if(!p.w.closest('section.on')){visibleBars.delete(p);p.w.classList.remove('running')}}syncBarClock()});
+ document.addEventListener('visibilitychange',()=>{for(const p of visibleBars)p.w.classList.toggle('running',!document.hidden);syncBarClock()});
+ reduced.addEventListener('change',syncBarClock);
+ // As demonstrações recomeçam ao abrir novamente o quadrante de encerramento.
+ document.querySelector('#q3 .end-quad').addEventListener('click',()=>{if(!document.querySelector('#q3 .end-quad.open')){for(const p of endBars){reserveClocks.get(p).t=0;visibleBars.delete(p);p.w.classList.remove('running');paintReserve(p,...reserveClocks.get(p).state(0))}syncBarClock()}});
+}
 const KW=['forsaken rupture','reserva adicional','ausência de propósito','sem propósito','vencer para não perder','fúria sombria','autodestruição','instabilidade metabólica','limite metabólico','anulação','absorção','conversão','dissipação','sobrecarga','excedente','selos','solidão','obsessão','derrotado','derrota','sacrificar','vazamento','Reset','vencer','anulá-la','neutraliza','aprimoramentos','aprimoramento','capacidade convencional','entidade','ritual','assimilação','constituição','reservatório expandido','instabilidade energética','configuração expandida','contenção energética','Rupture'].sort((a,b)=>b.length-a.length);
 const KR=new RegExp('(^|[^\\p{L}])('+KW.join('|')+')(?![\\p{L}])','giu');
 const KV=new RegExp('(^|[^\\p{L}])(obsessão|vencer|derrotado|derrota|fúria|ódio)(?![\\p{L}])','giu');
@@ -708,13 +729,13 @@ endQuad.querySelector('.d').appendChild(endGroup);
 const endTitles=['Encerramento voluntário','Encerramento por Sobrecarga','Encerramento por limite metabólico'];
 const endDescriptions=['Em condições estáveis, Fearness pode encerrar voluntariamente a transformação dissipando o excedente que a sustenta, retornando à sua condição convencional com a reserva estável.','Durante a Sobrecarga da transformação, o esgotamento do excedente encerra a Rupture, e a instabilidade energética mantém o vazamento passivo até a reserva chegar a zero.','Ao atingir o limite metabólico crítico, a instabilidade do organismo compromete a contenção energética, provocando o colapso do reservatório e a dissipação involuntária de toda a energia armazenada, o que encerra a transformação.'];
 endTitles.forEach((title,i)=>{const topic=document.createElement('div');topic.className='end-topic';const desc=document.createElement('div');desc.className='end-description';desc.innerHTML=hl(endDescriptions[i]);topic.appendChild(desc);const el=document.createElement('div');el.id='end-bar-'+i;topic.appendChild(el);endGroup.appendChild(topic);endBars.push(mkbar(el.id,title));});
-endBars.forEach((p,i)=>paintReserve(p,...[voluntaryState,ruptureOverloadState,metabolicState][i](0)));
+initBarClocks();
 const tg={s:0,o:0};const SI=document.querySelector('img[alt="Selo: faixas do antebraço"]'),SC=SI.parentNode.parentNode.querySelector('figcaption'),SS=[SI.dataset.src||SI.src,'assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],SN=['Selo','Selos removidos','Forsaken Rupture'];let sc=0;SI.style.transition='opacity .25s';
 const sealRoot=SI.closest('.selo'),sealButtons=[$('#t1'),$('#t2')];let sealBusy=false;
 function warmSeals(){SS.forEach(url=>decodedImage(url).catch(()=>{}))}
 tabHooks.push(k=>{if(k===2){SI.loading='eager';afterMainBodies('seals',()=>{if(document.body.dataset.t==='2')warmSeals()})}});
 async function sealToggle(key){
- if(sealBusy)return;bgYield();const next={...tg,[key]:tg[key]^1},n=next.s&&next.o?2:next.s?1:0;
+ if(sealBusy)return;bgYield(2200,true);const next={...tg,[key]:tg[key]^1},n=next.s&&next.o?2:next.s?1:0;
  if(n===sc){Object.assign(tg,next);tgu();return}
  sealBusy=true;sealButtons.forEach(b=>b.disabled=true);sealRoot.setAttribute('aria-busy','true');mediaNotice(sealRoot.querySelector('.tgw'),'');
  let o=null;const stopWaiting=waitNotice(sealRoot.querySelector('.tgw'),'Preparando imagem…');
@@ -783,7 +804,7 @@ function eyeVid(sel,items,VID,HINT){
   if(!prepared[k]){
    const v=vs[k];let blobURL='';const ac=new AbortController(),timeout=setTimeout(()=>ac.abort(),45000);
    // Os clipes curtos são transferidos integralmente antes da reprodução.
-   const task=(async()=>{try{const url=VID[k];if(bgJob?.url===url)bgYield();videoRequested.add(url);let source=takeVideo(url,v);if(!source){const r=await fetch(url,{signal:ac.signal});if(!r.ok)throw new Error('Vídeo indisponível');const blob=await r.blob();blobURL=URL.createObjectURL(blob);ownedVideo.set(v,blobURL);source=blobURL}v.preload='auto';v.src=source;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;
+   const task=(async()=>{try{const url=VID[k];if(bgJob?.url===url)bgYield(2200,true);videoRequested.add(url);let source=takeVideo(url,v);if(!source){const r=await fetch(url,{signal:ac.signal});if(!r.ok)throw new Error('Vídeo indisponível');const blob=await r.blob();blobURL=URL.createObjectURL(blob);ownedVideo.set(v,blobURL);source=blobURL}v.preload='auto';v.src=source;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;
     await mediaTimeout(new Promise((resolve,reject)=>{const clean=()=>{v.removeEventListener('loadeddata',ok);v.removeEventListener('canplay',ok);v.removeEventListener('error',fail)};const ok=()=>{if(v.readyState>=2){clean();resolve()}};const fail=()=>{clean();reject(new Error('Vídeo inválido'))};v.addEventListener('loadeddata',ok);v.addEventListener('canplay',ok);v.addEventListener('error',fail);ok()}));return v;
    }finally{clearTimeout(timeout)}})();
    prepared[k]=foreground(task.catch(err=>{clearVideo(v,VID[k]);delete prepared[k];throw err}));
@@ -795,7 +816,7 @@ function eyeVid(sel,items,VID,HINT){
  }
  function releaseInactive(){clearTimeout(releaseTimer);if(!section.classList.contains('on')&&!busy&&!warming){vs.forEach((v,k)=>{if(v.hasAttribute('src'))clearVideo(v,VID[k]);delete prepared[k]})}else if(!section.classList.contains('on'))releaseTimer=setTimeout(releaseInactive,10000)}
  tabHooks.push(()=>{clearTimeout(releaseTimer);if(!section.classList.contains('on')){cancelPlayback?.();releaseTimer=setTimeout(releaseInactive,30000);return}if(section.classList.contains('on')){if(!im.hasAttribute('src')){im.src=items[i].i;im.alt=items[i].n}afterMainBodies(sel,()=>{if(section.classList.contains('on'))warm()})}});
- async function go(d){if(busy)return;bgYield();const j=i+d;if(j<0||j>=items.length)return;
+ async function go(d){if(busy)return;bgYield(2200,true);const j=i+d;if(j<0||j>=items.length)return;
   const from=i,e=items[j],k=MAP[i+'>'+j];busy=true;set();w.setAttribute('aria-busy','true');mediaNotice(w,'');const stopWaiting=waitNotice(w,'Preparando transição…');
   let v=null,shown=false,ready=false,raf=0,frame=0,labelTimer=0,stall=0,ended=false,swapped=false,cleanup=()=>{};
   const oldBack=back;
@@ -846,16 +867,16 @@ sstU();
 document.querySelectorAll('.eye').forEach(e=>{const h=e.previousElementSibling;if(h&&h.tagName==='H3')h.style.textAlign='center'});
 quads('qor',[['Origem da Forsaken Rupture','O ritual subterrâneo e a assimilação interrompida.','Em uma antiga estrutura ritualística subterrânea, Fearness encontrou uma entidade aprisionada por extensas faixas negras. Capaz de ultrapassar seus limites naturais, a criatura representava uma ameaça crescente. Após um confronto quase fatal, Fearness conseguiu derrotá-la utilizando suas próprias capacidades.<br><br>Com a derrota, o ritual iniciou a assimilação da constituição da entidade, transformando progressivamente Fearness. Em meio à dor extrema, ele interrompeu o processo ao agarrar as faixas negras, que posteriormente se tornariam seus selos. Fora da estrutura, a assimilação cessou definitivamente, mantendo apenas parte da constituição da entidade integrada a ele.<br><br>Essa integração parcial deu origem à Forsaken Rupture, permitindo que Fearness ultrapasse temporariamente sua capacidade convencional de armazenamento energético.']]);
 quads('qib',[['Informações base','','<div class="ibr"><span>Idade</span><b>20 anos</b></div><div class="ibr"><span>Sexo</span><b>Masculino</b></div><div class="ibr"><span>Altura</span><b>1,77 m (177 cm)</b></div>']]);
-document.querySelectorAll('img.alt').forEach(i=>{i.decoding='sync';i.loading='eager';if(i.decode)i.decode().catch(()=>{})});
+document.querySelectorAll('img.alt').forEach(i=>{i.decoding='async'});
 show(0);navH();INIT=false;bgAfter=0;bgSchedule(0);
 </script><script>
 /* Protege os nomes próprios/conceitos da tradução automática (translate="no") */
 (function(){const R=/(Forsaken Rupture|Fearness|Forsaken|Rupture|Reset)/gi;
-const W=['Poder','Selo','Selos','I','II','III'];function sh(){document.querySelectorAll('nav button,.q .n,.q b,h2,h3,figcaption').forEach(e=>{if(W.includes(e.textContent.trim()))e.setAttribute('translate','no')})}
+const W=['Poder','Selo','Selos','I','II','III'];const protectedSelector='nav button,.q .n,.q b,h2,h3,figcaption';function sh(root=document.body){if(root.matches?.(protectedSelector)&&W.includes(root.textContent.trim()))root.setAttribute('translate','no');root.querySelectorAll?.(protectedSelector).forEach(e=>{if(W.includes(e.textContent.trim()))e.setAttribute('translate','no')})}
 function ok(n){for(let p=n.parentNode;p;p=p.parentNode){if(p.nodeType===1&&(p.getAttribute('translate')==='no'||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName)))return false}return true}
 function prot(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),L=[];let n;while(n=w.nextNode()){R.lastIndex=0;if(R.test(n.nodeValue)&&ok(n))L.push(n)}
 L.forEach(t=>{const f=document.createDocumentFragment();t.nodeValue.split(R).forEach((p,i)=>{if(i%2){const e=document.createElement('span');e.setAttribute('translate','no');e.className='notranslate';e.textContent=p;f.appendChild(e)}else if(p)f.appendChild(document.createTextNode(p))});t.parentNode.replaceChild(f,t)})}
-let busy=0;const pending=new Set();const mo=new MutationObserver(records=>{for(const rec of records){if(rec.type==='characterData')pending.add(rec.target.parentElement);else for(const n of rec.addedNodes)pending.add(n.nodeType===1?n:n.parentElement)}if(busy)return;busy=1;requestAnimationFrame(()=>{mo.disconnect();sh();for(const el of pending)if(el?.isConnected)prot(el);pending.clear();mo.observe(document.body,{childList:true,subtree:true,characterData:true});busy=0})});
+let busy=0;const pending=new Set();const mo=new MutationObserver(records=>{for(const rec of records){if(rec.type==='characterData')pending.add(rec.target.parentElement);else for(const n of rec.addedNodes)pending.add(n.nodeType===1?n:n.parentElement)}if(busy)return;busy=1;requestAnimationFrame(()=>{mo.disconnect();for(const el of pending)if(el?.isConnected){sh(el);prot(el)};pending.clear();mo.observe(document.body,{childList:true,subtree:true,characterData:true});busy=0})});
 sh();prot(document.body);mo.observe(document.body,{childList:true,subtree:true,characterData:true});
 document.documentElement.setAttribute('lang','pt-BR')})();
 </script>
