@@ -270,7 +270,7 @@ nav button{text-transform:uppercase;letter-spacing:.04em}
 .g2.selo #tgs{margin:0}
 }
 .fr .alt{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;opacity:0;pointer-events:none}.fig-alt .fr .alt{opacity:1}.fig-alt .fr .m1{visibility:hidden}
-#qib{grid-template-columns:minmax(0,300px)!important;margin:0 0 14px}
+#qib{grid-template-columns:minmax(0,1fr)!important;width:100%;margin:0 0 14px}
 #qib .q{min-height:0;padding:10px 16px;border-radius:10px;border-color:#26233a;box-shadow:none}
 #qib .q b{font-size:.85rem;margin:0 0 2px}#qib .q .t{font-size:.8rem}#qib .q .d{font-size:.88rem;line-height:1.7}#qib .q i{margin-top:4px;font-size:.68rem}
 #qib .q .t{display:none}
@@ -279,7 +279,8 @@ nav button{text-transform:uppercase;letter-spacing:.04em}
 #qib .q i{display:none}
 #qib .q{padding:12px 16px}#qib .q b{margin:0;line-height:1.2}
 #qib .q:not(.open) .d{padding:0;margin:0;border:0}
-#qib .q.open .d{margin-top:8px}
+#qib .q.open .d{margin-top:8px;width:100%}
+#qib .ibr{width:100%}
 .ibr{padding:8px 4px}.ibr span{font-size:.62rem}.ibr b{font-size:.82rem}
 .q .ibr b{font-family:Georgia,serif!important;text-transform:none!important;letter-spacing:0!important;font-weight:600!important;font-size:.82rem!important;margin:0!important;color:#fff!important}
 .fr .alt{will-change:opacity;transform:translateZ(0)}
@@ -700,7 +701,7 @@ function metabolicState(t){
  if(m<1300)return [R,R,false,'Rupture ativa',1,1];
  if(m<3000)return [R,R,false,'Instabilidade metabólica crescente',1,1];
  if(m<3600)return [R,R,false,'Limite metabólico atingido',1,1];
- if(m<4350){const c=1-ez((m-3600)/750);return [R*c,N+(R-N)*c,false,'Colapso do reservatório',1,c];}
+ if(m<4350){const c=1-ez((m-3600)/750),v=R*c;return [v,Math.max(N,v),false,'Colapso do reservatório',1,c];}
  if(m<6500)return [0,N,false,'Reserva esvaziada',1,0];
  if(m<6950)return [0,N,false,'Reserva esvaziada',1-ez((m-6500)/450),0];
  return [R,R,false,'Rupture ativa',ez((m-6950)/450),1];
@@ -826,7 +827,7 @@ function eyeVid(sel,items,VID,HINT){
  const section=w.closest('section'),MAP={'0>1':0,'1>2':1,'2>1':2,'1>0':3};
  let i=0,busy=false,back=0,warming=false,cancelPlayback=null,releaseTimer=0;
  const eh=document.createElement('p');eh.className='eh';eh.hidden=true;eh.textContent=HINT;et.after(eh);
- function set(){const draining=!!(back&&i===1);en.textContent=draining?'Sobrecarga — dissipação':items[i].n;et.textContent=draining?(sel==='#eyeR'?'O vórtice roxo acompanha a redução do excedente energético.':'Os olhos recuperam a coloração roxa conforme a energia diminui.'):items[i].t;eh.hidden=!draining;pv.disabled=busy||i==0;nx.disabled=busy||i==items.length-1}
+ function set(){const draining=!!(back&&i===1);en.textContent=draining?'Vazamento':items[i].n;et.textContent=draining?(sel==='#eyeR'?'O vórtice roxo acompanha a redução do excedente energético.':'Os olhos recuperam a coloração roxa conforme a energia diminui.'):items[i].t;eh.hidden=!draining;pv.disabled=busy||i==0;nx.disabled=busy||i==items.length-1}
  const vs=VID.map(()=>{const v=document.createElement('video');v.className='ev';v.muted=true;v.defaultMuted=true;v.volume=0;v.playsInline=true;v.controls=false;v.loop=false;v.preload='none';v.disablePictureInPicture=true;v.disableRemotePlayback=true;
  ['muted','playsinline','webkit-playsinline','disablepictureinpicture','disableremoteplayback'].forEach(a=>v.setAttribute(a,''));v.setAttribute('aria-hidden','true');v.tabIndex=-1;fr.appendChild(v);return v});
  const prepared=[];
@@ -884,7 +885,7 @@ function set(b){sg.classList.toggle('b',b);bt.forEach((x,k)=>x.classList.toggle(
 bt[0].onclick=()=>set(false);bt[1].onclick=()=>set(true);cs.forEach(c=>c.onclick=()=>{c.firstChild.style.transitionDelay='0ms';c.classList.toggle('b')})}
 function tl(id,S){const w=$('#'+id);w.className='tl';w.innerHTML='<div class="tn"></div><div class="box td"></div>';const n=w.querySelector('.tn'),d=w.querySelector('.td');S.forEach((s,i)=>{const b=document.createElement('button');b.innerHTML='<span>'+(i+1)+'</span>'+s[0];b.onclick=()=>{[...n.children].forEach((x,k)=>x.classList.toggle('on',k==i));d.classList.remove('a');void d.offsetWidth;d.classList.add('a');d.innerHTML='<b style="color:var(--pu2)">'+s[0]+'</b><br>'+hl(s[1])};n.appendChild(b)});n.children[0].click()}
 quads('q0b',[['Roupa base','Camisa e calça pretas, sem casaco nem cinto.','A base do visual de Fearness: camisa preta de gola em V e calça preta larga, com botas. É o que ele veste por baixo do casaco; o casaco e o cinto entram por cima dela.','assets/img/roupa-base.webp'],
-['Casaco e gola','Longo, preto, com bordas brancas.','Casaco longo preto com faixas brancas verticais e barra pontiaguda, ombreiras hexagonais com borda branca e uma gola de pelo branco que cobre ombros e nuca.','assets/img/casaco-gola.webp'],
+['Sobretudo','Longo, preto, com bordas brancas.','Sobretudo longo preto com faixas brancas verticais e barra pontiaguda, ombreiras hexagonais com borda branca e uma gola de pelo branco que cobre ombros e nuca.','assets/img/casaco-gola.webp'],
 ['Acessório de obsidiana','Acessório na região do peitoral.','Ornamentos negros com borda prateada, em forma de dragão com um olho branco, presos na região do peitoral, junto à gola de pelo.','assets/img/acessorio-obsidiana.webp'],
 ['Selos','Faixas negras nos antebraços.','As faixas negras dos antebraços atuam como selos que restringem o acesso à Forsaken Rupture e, consequentemente, à sua capacidade adicional de armazenamento energético. Na transformação, os braços apresentam marcas negras e brilhantes.','assets/img/selos-antebraco.webp'],
 ['Cinto','Largo e preto.','Um cinto largo e preto na cintura, que separa o casaco da calça. As faixas brancas do casaco descem dos dois lados dele.','assets/img/cinto.webp'],
