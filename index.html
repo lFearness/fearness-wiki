@@ -500,12 +500,12 @@ const isVisible=el=>{const r=el.getBoundingClientRect();return isActive(el)&&r.w
 const imageSizes={"assets/img/acessorio-obsidiana.webp":[1305,1386],"assets/img/botas.webp":[1443,1572],"assets/img/casaco-gola.webp":[1024,1536],"assets/img/ciclo-fearness.webp":[1536,1536],"assets/img/cinto.webp":[1596,1386],"assets/img/costas.webp":[1024,1536],"assets/img/dissipacao.webp":[1536,1536],"assets/img/lado.webp":[1025,1536],"assets/img/manifestacao-sombria.webp":[1536,1536],"assets/img/marcas-negras.webp":[948,1606],"assets/img/mascara-normal.webp":[1536,1149],"assets/img/mascara-ossea.webp":[1536,1536],"assets/img/mascara-reserva.webp":[1536,1149],"assets/img/mascara-sobrecarga.webp":[1536,1149],"assets/img/olhos-normal.webp":[1536,1149],"assets/img/olhos-reserva.webp":[1536,1149],"assets/img/olhos-sobrecarga.webp":[1536,1149],"assets/img/poster-corpo-frente.webp":[1080,1920],"assets/img/poster-corpo-rupture.webp":[1080,1920],"assets/img/poster-corpo-sobrecarga.webp":[1080,1920],"assets/img/rosto-frente.webp":[1536,1536],"assets/img/rosto-rupture.webp":[1536,1536],"assets/img/rosto-sobrecarga.webp":[1536,1536],"assets/img/roupa-base.webp":[936,1536],"assets/img/selo-removido.webp":[1200,1311],"assets/img/selo-rupture.webp":[1406,1536],"assets/img/selo.webp":[1200,1311],"assets/img/selos-antebraco.webp":[1200,1311],"assets/img/zoom-rosto-frente.webp":[1536,1536],"assets/img/zoom-rosto-rupture.webp":[1536,1536]};
 function loadImg(img){if(img.dataset.src){const url=img.dataset.src,size=imageSizes[url];if(size){img.width=size[0];img.height=size[1]}img.decoding="async";if(img.closest(".badge"))img.fetchPriority="high";img.src=url;delete img.dataset.src}}
 // Fila progressiva: um download secundário por vez, sem alterar os arquivos.
-const mediaGroups=[["assets/img/poster-corpo-frente.webp","assets/img/rosto-frente.webp","assets/video/corpo-frente.mp4","assets/img/lado.webp","assets/img/costas.webp","assets/img/roupa-base.webp","assets/img/casaco-gola.webp","assets/img/acessorio-obsidiana.webp","assets/img/selos-antebraco.webp","assets/img/cinto.webp","assets/img/botas.webp","assets/img/zoom-rosto-frente.webp","assets/video/zoom-rosto-frente.mp4"],["assets/img/olhos-normal.webp","assets/img/olhos-reserva.webp","assets/img/olhos-sobrecarga.webp","assets/video/olhos-normal-reserva.mp4","assets/video/olhos-reserva-normal.mp4","assets/video/olhos-reserva-sobrecarga.mp4","assets/video/olhos-sobrecarga-reserva.mp4","assets/img/ciclo-fearness.webp","assets/img/dissipacao.webp"],["assets/img/selo.webp","assets/img/selo-removido.webp","assets/img/selo-rupture.webp","assets/img/poster-corpo-sobrecarga.webp","assets/img/rosto-sobrecarga.webp","assets/video/corpo-sobrecarga.mp4","assets/video/zoom-rosto-sobrecarga.mp4"],["assets/img/mascara-normal.webp","assets/img/mascara-reserva.webp","assets/img/mascara-sobrecarga.webp","assets/video/mascara-normal-reserva.mp4","assets/video/mascara-reserva-normal.mp4","assets/video/mascara-reserva-sobrecarga.mp4","assets/video/mascara-sobrecarga-reserva.mp4","assets/img/poster-corpo-rupture.webp","assets/img/rosto-rupture.webp","assets/video/corpo-rupture.mp4","assets/img/mascara-ossea.webp","assets/img/marcas-negras.webp","assets/img/manifestacao-sombria.webp","assets/img/zoom-rosto-rupture.webp","assets/video/zoom-rosto-rupture.mp4"]];
+const mediaGroups=[["assets/img/poster-corpo-frente.webp","assets/img/rosto-frente.webp","assets/video/corpo-frente.mp4?v=fps2","assets/img/lado.webp","assets/img/costas.webp","assets/img/roupa-base.webp","assets/img/casaco-gola.webp","assets/img/acessorio-obsidiana.webp","assets/img/selos-antebraco.webp","assets/img/cinto.webp","assets/img/botas.webp","assets/img/zoom-rosto-frente.webp","assets/video/zoom-rosto-frente.mp4?v=fps2"],["assets/img/olhos-normal.webp","assets/img/olhos-reserva.webp","assets/img/olhos-sobrecarga.webp","assets/video/olhos-normal-reserva.mp4?v=fps2","assets/video/olhos-reserva-normal.mp4?v=fps2","assets/video/olhos-reserva-sobrecarga.mp4?v=fps2","assets/video/olhos-sobrecarga-reserva.mp4?v=fps2","assets/img/ciclo-fearness.webp","assets/img/dissipacao.webp"],["assets/img/selo.webp","assets/img/selo-removido.webp","assets/img/selo-rupture.webp","assets/video/selo-sem-selo.mp4?v=fps2","assets/video/selo-sem-selo-inverso.mp4?v=fps2","assets/video/selo-rupture.mp4?v=fps2","assets/video/selo-rupture-inverso.mp4?v=fps2","assets/img/poster-corpo-sobrecarga.webp","assets/img/rosto-sobrecarga.webp","assets/video/corpo-sobrecarga.mp4?v=fps2","assets/video/zoom-rosto-sobrecarga.mp4?v=fps2"],["assets/img/mascara-normal.webp","assets/img/mascara-reserva.webp","assets/img/mascara-sobrecarga.webp","assets/video/mascara-normal-reserva.mp4?v=fps2","assets/video/mascara-reserva-normal.mp4?v=fps2","assets/video/mascara-reserva-sobrecarga.mp4?v=fps2","assets/video/mascara-sobrecarga-reserva.mp4?v=fps2","assets/img/poster-corpo-rupture.webp","assets/img/rosto-rupture.webp","assets/video/corpo-rupture.mp4?v=fps2","assets/img/mascara-ossea.webp","assets/img/marcas-negras.webp","assets/img/manifestacao-sombria.webp","assets/img/zoom-rosto-rupture.webp","assets/video/zoom-rosto-rupture.mp4?v=fps2"]];
 // Os três corpos principais têm prioridade global, mesmo fora da aba ativa.
 const mainBodies=[
- {tab:0,poster:'assets/img/poster-corpo-frente.webp',video:'assets/video/corpo-frente.mp4'},
- {tab:2,poster:'assets/img/poster-corpo-sobrecarga.webp',video:'assets/video/corpo-sobrecarga.mp4'},
- {tab:3,poster:'assets/img/poster-corpo-rupture.webp',video:'assets/video/corpo-rupture.mp4'}
+ {tab:0,poster:'assets/img/poster-corpo-frente.webp',video:'assets/video/corpo-frente.mp4?v=fps2'},
+ {tab:2,poster:'assets/img/poster-corpo-sobrecarga.webp',video:'assets/video/corpo-sobrecarga.mp4?v=fps2'},
+ {tab:3,poster:'assets/img/poster-corpo-rupture.webp',video:'assets/video/corpo-rupture.mp4?v=fps2'}
 ];
 const mainBodyURLs=new Set(mainBodies.flatMap(b=>[b.poster,b.video]));
 const bodyVideoURLs=new Set(mainBodies.map(b=>b.video));
@@ -517,9 +517,9 @@ const exposedMedia=[
  ['assets/img/poster-corpo-rupture.webp','assets/img/rosto-rupture.webp','assets/img/mascara-normal.webp']
 ];
 const interactionMedia=[[],[
- 'assets/img/olhos-reserva.webp','assets/video/olhos-normal-reserva.mp4','assets/img/olhos-sobrecarga.webp','assets/video/olhos-reserva-sobrecarga.mp4','assets/video/olhos-sobrecarga-reserva.mp4','assets/video/olhos-reserva-normal.mp4'
- ],['assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],[
- 'assets/img/mascara-reserva.webp','assets/video/mascara-normal-reserva.mp4','assets/img/mascara-sobrecarga.webp','assets/video/mascara-reserva-sobrecarga.mp4','assets/video/mascara-sobrecarga-reserva.mp4','assets/video/mascara-reserva-normal.mp4'
+ 'assets/img/olhos-reserva.webp','assets/video/olhos-normal-reserva.mp4?v=fps2','assets/img/olhos-sobrecarga.webp','assets/video/olhos-reserva-sobrecarga.mp4?v=fps2','assets/video/olhos-sobrecarga-reserva.mp4?v=fps2','assets/video/olhos-reserva-normal.mp4?v=fps2'
+ ],['assets/img/selo-removido.webp','assets/video/selo-sem-selo.mp4?v=fps2','assets/img/selo-rupture.webp','assets/video/selo-rupture.mp4?v=fps2','assets/video/selo-sem-selo-inverso.mp4?v=fps2','assets/video/selo-rupture-inverso.mp4?v=fps2'],[
+ 'assets/img/mascara-reserva.webp','assets/video/mascara-normal-reserva.mp4?v=fps2','assets/img/mascara-sobrecarga.webp','assets/video/mascara-reserva-sobrecarga.mp4?v=fps2','assets/video/mascara-sobrecarga-reserva.mp4?v=fps2','assets/video/mascara-reserva-normal.mp4?v=fps2'
  ]];
 const essentialURLs=new Set([...exposedMedia.flat(),...bodyVideoURLs,...interactionMedia.flat()]);
 const interactiveURLs=new Set([...interactionMedia.flat().filter(u=>u.endsWith('.webp')),'assets/img/olhos-normal.webp','assets/img/mascara-normal.webp','assets/img/selo.webp']);
@@ -534,7 +534,7 @@ function essentialOrder(i){
 // Uma fila para recursos especulativos; MP4 longos usam o carregador nativo.
 const bgDone=new Set(),fgPending=new Set(),bgRetry=new Map(),ownedVideo=new WeakMap();
 const nativeMedia=new Map(),clipCache=new Map(),clipPending=new Map(),bodyWarmQueue=new Map();
-const shortClip=u=>/\/(olhos|mascara)-.*\.mp4$/.test(u);
+const shortClip=u=>/\/(olhos|mascara|selo)-.*\.mp4(?:\?[^#]*)?$/.test(u);
 const net=()=>navigator.connection||navigator.mozConnection||navigator.webkitConnection;
 const lowMemory=typeof navigator.deviceMemory==='number'&&navigator.deviceMemory<=4;
 const CLIP_LIMIT=(lowMemory?12:24)*1024*1024;
@@ -805,25 +805,61 @@ const endTitles=['Encerramento voluntário','Encerramento por Sobrecarga','Encer
 const endDescriptions=['Em condições estáveis, Fearness pode encerrar voluntariamente a transformação dissipando o excedente que a sustenta, retornando à sua condição convencional com a reserva estável.','Durante a Sobrecarga da transformação, o esgotamento do excedente encerra a Rupture, e a instabilidade energética mantém o vazamento passivo até a reserva chegar a zero.','Ao atingir o limite metabólico crítico, a instabilidade do organismo compromete a contenção energética, provocando o colapso do reservatório e a dissipação involuntária de toda a energia armazenada, o que encerra a transformação.'];
 endTitles.forEach((title,i)=>{const topic=document.createElement('div');topic.className='end-topic';const desc=document.createElement('div');desc.className='end-description';desc.innerHTML=hl(endDescriptions[i]);topic.appendChild(desc);const el=document.createElement('div');el.id='end-bar-'+i;topic.appendChild(el);endGroup.appendChild(topic);endBars.push(mkbar(el.id,title));});
 initBarClocks();
-const tg={s:0,o:0};const SI=document.querySelector('img[alt="Selo: faixas do antebraço"]'),SC=SI.parentNode.parentNode.querySelector('figcaption'),SS=[SI.dataset.src||SI.src,'assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],SN=['Selo','Selos removidos','Forsaken Rupture'];let sc=0;SI.style.transition='opacity .25s';
-const sealRoot=SI.closest('.selo'),sealButtons=[$('#t1'),$('#t2')];let sealBusy=false;
-tabHooks.push(k=>{if(k===2)SI.loading='eager'});
+const tg={s:0,o:0};const SI=document.querySelector('img[alt="Selo: faixas do antebraço"]'),SC=SI.parentNode.parentNode.querySelector('figcaption'),SS=[SI.dataset.src||SI.src,'assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],SN=['Selo','Selos removidos','Forsaken Rupture'];let sc=0;SI.style.transition='none';
+const sealRoot=SI.closest('.selo'),sealButtons=[$('#t1'),$('#t2')],sealFrame=SI.parentNode;
+const SEAL_VIDEOS={"0>1":"assets/video/selo-sem-selo.mp4?v=fps2","1>0":"assets/video/selo-sem-selo-inverso.mp4?v=fps2","1>2":"assets/video/selo-rupture.mp4?v=fps2","2>1":"assets/video/selo-rupture-inverso.mp4?v=fps2"};
+let sealBusy=false,sealSession=null;
+sealFrame.style.position='relative';
+function cancelSeal(){if(sealSession){sealSession.cancelled=true;sealSession.stop?.()}}
+tabHooks.push(k=>{if(k===2)SI.loading='eager';else cancelSeal()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelSeal()});
+function sealCheck(session){if(session.cancelled||!isActive(sealRoot))throw Error('cancelled')}
+async function sealPrepare(url){
+ const blob=await getClip(url),v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.controls=false;v.loop=false;v.disablePictureInPicture=true;v.disableRemotePlayback=true;v.setAttribute('aria-hidden','true');v.tabIndex=-1;
+ v.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;opacity:0;pointer-events:none';
+ sealFrame.appendChild(v);ownedVideo.set(v,URL.createObjectURL(blob));
+ try{await mediaTimeout(new Promise((resolve,reject)=>{const ok=()=>{if(v.readyState>=2){clean();resolve()}};const fail=()=>{clean();reject(Error('Vídeo indisponível'))};const clean=()=>{v.removeEventListener('loadeddata',ok);v.removeEventListener('canplay',ok);v.removeEventListener('error',fail)};v.addEventListener('loadeddata',ok);v.addEventListener('canplay',ok);v.addEventListener('error',fail);v.preload='auto';v.src=ownedVideo.get(v);ok()}),15000);return v}
+ catch(err){clearVideo(v,url);v.remove();throw err}
+}
+function sealPlay(v,rate,session){return new Promise((resolve,reject)=>{
+ let timer=0,frame=0,done=false;
+ const finish=(error)=>{if(done)return;done=true;clearTimeout(timer);v.removeEventListener('ended',ended);v.removeEventListener('error',fail);v.removeEventListener('playing',playing);if(frame&&v.cancelVideoFrameCallback)v.cancelVideoFrameCallback(frame);session.stop=null;error?reject(error):resolve()};
+ const ended=()=>finish(),fail=()=>finish(Error('Vídeo indisponível')),show=()=>{if(!done&&!session.cancelled)v.style.opacity='1'},playing=()=>{if(!v.requestVideoFrameCallback)show()};
+ session.stop=()=>finish(Error('cancelled'));v.addEventListener('ended',ended);v.addEventListener('error',fail);v.addEventListener('playing',playing);v.currentTime=0;v.defaultPlaybackRate=rate;v.playbackRate=rate;
+ if(v.requestVideoFrameCallback)frame=v.requestVideoFrameCallback(show);
+ timer=setTimeout(fail,6000);try{v.play().catch(fail)}catch(_){fail()}
+})}
+async function sealStill(n){SI.src=SS[n];SI.alt=SN[n];if(SI.decode)await mediaTimeout(SI.decode(),5000)}
 async function sealToggle(key){
  if(sealBusy)return;bgYield(2200,true);const next={...tg,[key]:tg[key]^1},n=next.s&&next.o?2:next.s?1:0;
  if(n===sc){Object.assign(tg,next);tgu();return}
- sealBusy=true;sealButtons.forEach(b=>b.disabled=true);sealRoot.setAttribute('aria-busy','true');mediaNotice(sealRoot.querySelector('.tgw'),'');
- let o=null;const stopWaiting=waitNotice(sealRoot.querySelector('.tgw'),'Preparando imagem…');
+ const from=sc,session={cancelled:false,stop:null};sealSession=session;sealBusy=true;sealButtons.forEach(b=>b.disabled=true);sealRoot.setAttribute('aria-busy','true');mediaNotice(sealRoot.querySelector('.tgw'),'');
+ const stopWaiting=waitNotice(sealRoot.querySelector('.tgw'),'Preparando transição…'),videos=[];
+ let targetReady=false;
  try{
-  const [target]=await Promise.all([decodedImage(SS[n]),decodedImage(SS[sc])]);
-  stopWaiting();if(!isActive(sealRoot))return;
-  // A imagem decodificada é a própria camada da sobreposição.
-  o=target;o.alt=SN[n];o.setAttribute('aria-hidden','true');o.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease;pointer-events:none';
-  SI.parentNode.style.position='relative';SI.parentNode.appendChild(o);await nextPaint();
-  Object.assign(tg,next);tgu();SC.textContent=SN[n];
-  await new Promise(resolve=>{let t;const done=e=>{if(e&&e.propertyName!=='opacity')return;clearTimeout(t);o.removeEventListener('transitionend',done);resolve()};o.addEventListener('transitionend',done);t=setTimeout(done,760);o.style.opacity='1'});
-  SI.src=SS[n];SI.alt=SN[n];if(SI.decode)await SI.decode().catch(()=>{});sc=n;await nextPaint();
- }catch(err){stopWaiting();mediaNotice(sealRoot.querySelector('.tgw'),'Não foi possível preparar a imagem. Tente novamente.');}
- finally{if(o){o.remove();o.removeAttribute('style');o.removeAttribute('aria-hidden')}sealBusy=false;sealButtons.forEach(b=>b.disabled=false);sealRoot.removeAttribute('aria-busy')}
+  const steps=Math.abs(n-from)===2?[from,1,n]:[from,n];
+  const keys=steps.slice(1).map((v,i)=>steps[i]+'>'+v);
+  await Promise.all(steps.map(i=>decodedImage(SS[i])));targetReady=true;sealCheck(session);
+  if(!reduced.matches){
+   // Os clipes de 1,2 s já contêm os quadros das imagens estáticas nas extremidades.
+   // Em uma mudança direta entre selo e Rupture, usar dois clipes a 2x (1,2 s no total).
+   const results=await Promise.allSettled(keys.map(k=>foreground(sealPrepare(SEAL_VIDEOS[k]))));
+   for(const r of results)if(r.status==='fulfilled')videos.push(r.value);
+   if(results.some(r=>r.status==='rejected'))throw Error('Vídeo indisponível');
+   stopWaiting();sealCheck(session);
+   for(let i=0;i<videos.length;i++){
+    const v=videos[i];await sealPlay(v,videos.length,session);sealCheck(session);
+    // Revelar a imagem de destino já decodificada antes de retirar o último quadro.
+    await sealStill(steps[i+1]);sealCheck(session);v.style.opacity='0';
+   }
+  }else{stopWaiting();await sealStill(n);sealCheck(session)}
+  Object.assign(tg,next);sc=n;SC.textContent=SN[n];tgu();
+ }catch(err){
+  stopWaiting();
+  if(err.message!=='cancelled'&&!session.cancelled&&isActive(sealRoot)&&targetReady){
+   try{await sealStill(n);sealCheck(session);Object.assign(tg,next);sc=n;SC.textContent=SN[n];tgu()}catch(_){SI.src=SS[from];SI.alt=SN[from];mediaNotice(sealRoot.querySelector('.tgw'),'Não foi possível preparar a imagem. Tente novamente.')}
+  }else{SI.src=SS[from];SI.alt=SN[from];if(err.message!=='cancelled'&&!session.cancelled)mediaNotice(sealRoot.querySelector('.tgw'),'Não foi possível preparar a transição. Tente novamente.')}
+ }finally{if(!sealRoot.querySelector('.media-notice')||sealRoot.querySelector('.media-notice').textContent==='Preparando transição…')stopWaiting();for(const v of videos){clearVideo(v);v.remove()}sealSession=null;sealBusy=false;sealButtons.forEach(b=>b.disabled=false);sealRoot.removeAttribute('aria-busy');bgSchedule(100)}
 }
 function tgu(){sstU();$('#t1').setAttribute('aria-pressed',String(!!tg.s));$('#t2').setAttribute('aria-pressed',String(!!tg.o));$('#c1').classList.toggle('on',!!tg.s);$('#c2').classList.toggle('on',!!tg.o);$('#c3').classList.toggle('on',!!(tg.s&&tg.o));$('#t1').classList.toggle('on',!!tg.s);$('#t2').classList.toggle('on',!!tg.o);const b=$('#tgs');b.classList.toggle('go',tg.s&&tg.o);b.innerHTML=tg.s&&tg.o?'<b style="color:var(--pu2)">Condições atendidas</b><br>O excedente desencadeia a Forsaken Rupture.<br><button class="abtn" style="margin-top:10px" onclick="show(3)">Ver Forsaken Rupture →</button>':tg.s?'Selos removidos. A ativação depende da presença de excedente energético.':tg.o?'Sobrecarga com os selos ativos: a energia armazenada vaza e a transformação permanece bloqueada.':'Selos ativos. O poder fica dentro dos limites convencionais.'}
 $('#t1').onclick=()=>sealToggle('s');$('#t2').onclick=()=>sealToggle('o');tgu();
@@ -836,7 +872,7 @@ H.forEach(h=>{const b=document.createElement('button');b.className='hs';b.setAtt
 I.push({n:'Rosto',s:face,el:bd});bd.tabIndex=0;bd.setAttribute('role','button');bd.setAttribute('aria-label','Ampliar rosto');bd.setAttribute('aria-expanded','false');bd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cur<0?sh(I.length-1):hide()}else if(e.key==='Escape'){hide()}});bd.addEventListener('blur',hide);document.addEventListener('visibilitychange',()=>{if(document.hidden)hide()});const faceObserver=new IntersectionObserver(es=>{if(!es[0].isIntersecting)hide()},{threshold:.01});faceObserver.observe(fig);
 I.forEach((o,i)=>{if(touch){o.el.onclick=ev=>{ev.stopPropagation();cur==i?hide():sh(i)}}else{o.el.onmouseenter=()=>sh(i);o.el.onmouseleave=hide}});
 if(touch)fig.onclick=hide;tabHooks.push(()=>{if(!fig.closest('section').classList.contains('on')){hide();if(zvid)zvid.pause()}});hide()}
-const BV=["assets/video/corpo-frente.mp4","assets/video/corpo-sobrecarga.mp4","assets/video/corpo-rupture.mp4"];
+const BV=["assets/video/corpo-frente.mp4?v=fps2","assets/video/corpo-sobrecarga.mp4?v=fps2","assets/video/corpo-rupture.mp4?v=fps2"];
 document.querySelectorAll('video.bv').forEach(v=>{v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.disablePictureInPicture=true;v.playbackRate=1});
 const bodyVideos=[...document.querySelectorAll('video.bv')];
 bodyVideos.forEach(v=>registerNative(BV[+v.dataset.v],v));
@@ -846,9 +882,9 @@ function syncBodies(){for(const v of bodyVideos){const active=isActive(v)&&bodyV
 const bio=new IntersectionObserver(es=>{for(const e of es)bodyVisibility.set(e.target,e.isIntersecting&&e.intersectionRatio>=.01);syncBodies()},{threshold:.01});bodyVideos.forEach(v=>bio.observe(v));
 tabHooks.push(syncBodies);document.addEventListener('visibilitychange',syncBodies);reduced.addEventListener('change',syncBodies);
 
-zoomer($('#bigf'),[],'assets/img/zoom-rosto-frente.webp',undefined,'assets/video/zoom-rosto-frente.mp4');
-zoomer(document.querySelector('#s2 .hl figure'),[],'assets/img/rosto-sobrecarga.webp',undefined,'assets/video/zoom-rosto-sobrecarga.mp4');
-zoomer(document.querySelector('#s3 .hl figure'),[],'assets/img/zoom-rosto-rupture.webp',undefined,'assets/video/zoom-rosto-rupture.mp4');
+zoomer($('#bigf'),[],'assets/img/zoom-rosto-frente.webp',undefined,'assets/video/zoom-rosto-frente.mp4?v=fps2');
+zoomer(document.querySelector('#s2 .hl figure'),[],'assets/img/rosto-sobrecarga.webp',undefined,'assets/video/zoom-rosto-sobrecarga.mp4?v=fps2');
+zoomer(document.querySelector('#s3 .hl figure'),[],'assets/img/zoom-rosto-rupture.webp',undefined,'assets/video/zoom-rosto-rupture.mp4?v=fps2');
 let sg=0;
 document.addEventListener('click',e=>{const el=e.target.closest('.q,.nd,.ref,nav button,.ctl button,.abtn,.tgl');if(!el)return;sfx.tick();if(el.classList.contains('tgl'))setTimeout(()=>{const b=tg.s&&tg.o;if(b&&!sg)sfx.surge();sg=b?1:0},0)});
 const EP=[{n:'Normal',i:'assets/img/olhos-normal.webp',t:'Os olhos permanecem cinzentos enquanto o reservatório energético está vazio.'},{n:'Reserva',i:'assets/img/olhos-reserva.webp',t:'Olhos roxos. Há energia na reserva, seja logo após absorver, seja enquanto ela é usada.'},{n:'Sobrecarga',i:'assets/img/olhos-sobrecarga.webp',t:'Olho branco brilhante com raios roxos. A energia ultrapassou o limite e vaza de forma instável.'}];
@@ -862,12 +898,12 @@ w.classList.add('tx');setTimeout(txt,250);
 const tr='transform .65s cubic-bezier(.65,0,.25,1)';ov.style.transition=im.style.transition=tr;ov.style.transform='translateX(0)';im.style.transform='translateX('+(-d*100)+'%)';
 fin=()=>{ov.style.transition=im.style.transition='none';im.src=e.i;im.alt=e.n;im.style.transform='translateX(0)';ov.style.opacity=0;ov.style.transform='translateX(100%)'};tm=setTimeout(done,690)}
 pv.onclick=()=>{if(i>0){i--;go(-1)}};nx.onclick=()=>{if(i<items.length-1){i++;go(1)}};go()}
-const EV=["assets/video/olhos-normal-reserva.mp4","assets/video/olhos-reserva-sobrecarga.mp4","assets/video/olhos-sobrecarga-reserva.mp4","assets/video/olhos-reserva-normal.mp4"];
+const EV=["assets/video/olhos-normal-reserva.mp4?v=fps2","assets/video/olhos-reserva-sobrecarga.mp4?v=fps2","assets/video/olhos-sobrecarga-reserva.mp4?v=fps2","assets/video/olhos-reserva-normal.mp4?v=fps2"];
 const EH='O roxo aqui indica a energia diminuindo: a Sobrecarga só termina quando a reserva chega a zero e o olho fica cinza.';
-const EVR=["assets/video/mascara-normal-reserva.mp4","assets/video/mascara-reserva-sobrecarga.mp4","assets/video/mascara-sobrecarga-reserva.mp4","assets/video/mascara-reserva-normal.mp4"];
+const EVR=["assets/video/mascara-normal-reserva.mp4?v=fps2","assets/video/mascara-reserva-sobrecarga.mp4?v=fps2","assets/video/mascara-sobrecarga-reserva.mp4?v=fps2","assets/video/mascara-reserva-normal.mp4?v=fps2"];
 const EHR='O roxo indica a redução do excedente energético. Ao esgotá-lo, a transformação termina; a Sobrecarga permanece até a reserva total chegar a zero.';
-// 2,2x: 3,04 s -> ~1,38 s; a mistura final usa tempo real, não tempo do arquivo.
-const EYE_RATE=2.2,EYE_FADE=.24;
+// Clipes de olhos a 60 FPS já exportados na duração final (~1,38 s).
+const EYE_RATE=1,EYE_FADE=.24;
 function eyeVid(sel,items,VID,HINT){
  VID=VID||EV;HINT=HINT||EH;
  const w=$(sel),fr=w.querySelector('.fr'),im=w.querySelector('.ei'),en=w.querySelector('.en'),et=w.querySelector('.et'),pv=w.querySelector('.ep'),nx=w.querySelector('.nx');
