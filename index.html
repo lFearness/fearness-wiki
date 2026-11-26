@@ -2,9 +2,21 @@
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fearness — O Fragmento Funesto</title>
+<meta name="description" content="Referência oficial de Fearness — O Fragmento Funesto: personagem, Forsaken, restrições e Forsaken Rupture.">
+<link rel="canonical" href="https://lfearness.github.io/fearness-wiki/">
+<link rel="icon" type="image/webp" href="assets/img/rosto-frente.webp">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fearness — O Fragmento Funesto">
+<meta property="og:description" content="Personagem, poder, restrições e transformação.">
+<meta property="og:url" content="https://lfearness.github.io/fearness-wiki/">
+<meta property="og:image" content="https://lfearness.github.io/fearness-wiki/assets/img/ciclo-fearness.webp">
+<meta property="og:image:alt" content="Fearness, O Fragmento Funesto">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050507;--card:#0e0d14;--fg:#ecebf2;--mut:#a9a6b8;--pu:#8a3ffc;--pu2:#b78bff;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#050507;--card:#0e0d14;--fg:#ecebf2;--mut:#a9a6b8;--pu:#8a3ffc;--pu2:#b78bff;--pu-title:#b295e4;--pu-section:#9e6af0;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
 html{background:#050507}body{margin:0;background:transparent;color:var(--fg);font:16px/1.65 Georgia,serif}
 h1,h2,h3{font-family:'Permanent Marker',Impact,sans-serif;font-weight:400;margin:0}
@@ -50,7 +62,7 @@ figure{margin:0}
 #bg{position:fixed;inset:0;z-index:-2;background-color:#170a2e;transition:background-color .9s ease}
 #bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,#8a3ffc10,transparent 62%),radial-gradient(ellipse at 50% 120%,#000000aa,transparent 60%)}
 body[data-t="0"] #bg{background-color:#020005}body[data-t="1"] #bg{background-color:#04000b}body[data-t="2"] #bg{background-color:#010003}body[data-t="3"] #bg{background-color:#040009}
-#fx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.59;filter:blur(.8px)}
+#fx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.42;filter:blur(.8px)}
 p,li,h3{text-shadow:0 1px 8px #000c}
 nav{background:#0a0418dd;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 nav button{transition:all .3s ease}nav button:hover{border-color:var(--pu);color:#fff}
@@ -74,7 +86,7 @@ h2{text-shadow:0 0 18px #8a3ffc88}
 .ring{animation:dash 2.5s linear infinite}@keyframes dash{to{stroke-dashoffset:-11}}
 .nd{transition:transform .25s ease,background .25s,box-shadow .25s}.nd:hover{transform:translate(-50%,-50%) scale(1.12)}.nd.on{box-shadow:0 0 16px #8a3ffc}
 .box.a{animation:up .45s ease both}
-.ref{transition:transform .3s ease,border-color .3s,box-shadow .3s}.ref:hover{transform:translateY(-3px);border-color:var(--pu);box-shadow:0 6px 22px #8a3ffc33}
+.ref{transition:transform .3s ease,border-color .3s,box-shadow .3s}@media(hover:hover) and (pointer:fine){.ref:hover{transform:translateY(-3px)}}
 .ref .more{display:block;max-height:0;opacity:0;overflow:hidden;margin-top:0;padding-top:0;border-top-width:0;transition:max-height .5s ease,opacity .4s ease,margin .4s,padding .4s}
 .ref.open .more{max-height:360px;opacity:1;margin-top:10px;padding-top:10px;border-top-width:1px}
 .bar{margin:16px 0}
@@ -83,15 +95,24 @@ h2{text-shadow:0 0 18px #8a3ffc88}
 .trk>div{position:absolute;inset:0}
 .fl,.ex{background:linear-gradient(90deg,#4b1d9c,#8a3ffc 60%,#c6a3ff);clip-path:inset(0 100% 0 0)}
 .zn{background:repeating-linear-gradient(135deg,#ffffff26 0 4px,transparent 4px 9px)}
-.mk{inset:0 auto 0 0!important;width:3px;background:#fff;box-shadow:0 0 8px #fff}
+.mk{inset:0 auto 0 0;width:3px;background:#fff;box-shadow:0 0 8px #fff}
 .sm .fl{transition:clip-path 1.8s cubic-bezier(.4,0,.2,1)}
 .hold .fl{animation:pul 1.3s ease-in-out infinite}@keyframes pul{50%{filter:brightness(1.4)}}
 .ov .trk{animation:shk .12s linear infinite;border-color:#d9c2ff}.ov .ex{animation:fk .18s steps(2) infinite}
 @keyframes shk{50%{transform:translateX(1.5px)}}@keyframes fk{50%{opacity:.6}}
+/* A instabilidade permanece em toda a energia armazenada durante a Sobrecarga. */
+#b2.ov .fl,.end-reserves .ov .fl{animation:fk .18s steps(2) infinite;filter:brightness(1.9) saturate(.45)}
+#b3,#q3 .end-reserves .bar{will-change:opacity}
+#q3 .end-reserves{display:grid;gap:14px;margin-top:18px;padding-top:16px;border-top:1px dashed #3a3558}
+#q3 .end-reserves .bar{margin:0;min-width:0}
+#q3 .end-reserves .bl{align-items:flex-start;flex-wrap:wrap;gap:4px 10px;font:.72rem/1.45 sans-serif;letter-spacing:.55px}
+#q3 .end-reserves .bl b{font:inherit;color:var(--pu2);margin:0;text-align:left}
+#q3 .q.end-quad.open .d{max-height:2600px}
+
 .abtn{background:#000;border:2px solid var(--pu);color:#fff;border-radius:20px;padding:8px 16px;font:.85rem sans-serif;cursor:pointer;margin:2px 0 12px;transition:background .25s,transform .2s}.abtn:hover{background:var(--pu);transform:scale(1.05)}
 .qg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;align-items:start;margin:12px 0}
 .q{background:var(--card);border:1px solid #2d2945;border-radius:12px;padding:14px 16px;cursor:pointer;text-align:left;color:var(--fg);font:inherit;display:block;width:100%;transition:transform .3s,border-color .3s,box-shadow .3s}
-.q:hover{transform:translateY(-3px);border-color:var(--pu);box-shadow:0 8px 24px #8a3ffc33}
+@media(hover:hover) and (pointer:fine){.q:hover{transform:translateY(-3px)}}
 .q .n{font:.7rem sans-serif;color:var(--pu2);letter-spacing:2px}
 .q b{display:block;font-family:'Permanent Marker',Impact,sans-serif;font-weight:400;color:var(--pu2);font-size:1.15rem;margin:2px 0 4px}
 .q .t{color:var(--mut);font-size:.9rem;display:block}
@@ -213,7 +234,7 @@ h2{font-size:clamp(2.1rem,8.5vw,3.4rem)!important;margin:28px 0 18px!important}
 .eqn{flex-wrap:nowrap;gap:4px}.eqn span{flex:1;text-align:center;padding:6px 3px;font-size:.66rem}.eqn i{font-size:1rem}
 }
 .prg .ctl{position:relative;justify-content:center}.prg .ctl .pn{position:absolute;right:6px;top:50%;transform:translateY(-50%);min-width:0!important;font-family:'Cinzel',Georgia,serif;font-size:.95rem!important;color:var(--pu2)}
-section>h2{color:var(--pu2)!important;font-size:clamp(1.2rem,5.4vw,2.5rem)!important;letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 18px #8a3ffc88}
+section>h2{color:var(--pu)!important;font-size:clamp(1.2rem,5.4vw,2.5rem)!important;letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 18px #8a3ffc88}
 @media(max-width:700px){#fil{flex-wrap:nowrap;gap:4px}#fil .tgf{flex:1 1 auto;padding:7px 3px;font-size:.64rem;white-space:nowrap;text-align:center}}
 #fc{flex-wrap:nowrap}
 @media(max-width:700px){#fc{gap:4px}#fc .tgf{flex:1 1 auto;padding:7px 3px;font-size:clamp(.5rem,2.6vw,.66rem);white-space:nowrap;text-align:center}}
@@ -352,9 +373,27 @@ h1{line-height:1.12!important}.sub{line-height:1.4!important}section>h2{line-hei
 .hl .zv.on{transform:translate(-50%,0) scale(1)}
 }
 .cyc .c{width:56%;background:#000}.cyc .c img{width:100%;height:100%;aspect-ratio:1;object-fit:cover;display:block;pointer-events:none}
+/* Refinamento funcional: foco de teclado e preferência de movimento. */
+button:focus-visible,.badge:focus-visible,[role="button"]:focus-visible{outline:2px solid var(--pu2);outline-offset:3px}
+.badge:focus-visible{opacity:1!important;z-index:6}
+.media-notice{font:.8rem/1.4 sans-serif;color:var(--mut);margin:6px 0;text-align:center}
+.media-notice[hidden]{display:none!important}
+.eye .fr{position:relative}
+@media(min-width:1000px){.eye .media-notice{grid-column:2;grid-row:5}}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+ .z,.z:hover{transform:none!important}#fx{display:none!important}
+ .bar.ov .trk,.bar.ov .fl,.bar.ov .ex{animation:none!important}
+}
+/* Hierarquia cromática e destaque dos quadrantes somente durante a interação. */
+h3{color:var(--pu-section)}
+@media(max-width:700px){section>h2{font-size:clamp(1.5rem,7vw,2.8rem)!important;white-space:normal;text-wrap:balance}}
+.q > b,.ref > b{color:var(--pu-title)}
+.q,.ref{-webkit-tap-highlight-color:transparent}
+.q:active,.ref:active,.ref.open,#qib .q.open,#qib .q:active{border-color:var(--pu);box-shadow:0 0 22px #8a3ffc55}
 </style></head><body>
 <div id="bg"></div><h1>FEARNESS</h1><p class="sub">O Fragmento Funesto</p>
-<nav id="nav"></nav>
+<nav id="nav" aria-label="Seções de Fearness" role="tablist"></nav>
 <main>
 
 <section id="s0">
@@ -402,17 +441,17 @@ h1{line-height:1.12!important}.sub{line-height:1.4!important}section>h2{line-hei
 <figure><div class="fr"><video class="bv" data-v="1" data-poster="assets/img/poster-corpo-sobrecarga.webp" muted loop playsinline preload="none" disablepictureinpicture aria-label="Sobrecarga, corpo inteiro"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-sobrecarga.webp" alt="Sobrecarga, rosto"></div><figcaption>Fearness em Sobrecarga</figcaption></figure>
 </div><div class="hr">
 <h3>Sobrecarga</h3>
-<p class="key">Quando a energia passa da capacidade máxima, ela vaza e Fearness perde a anulação e a absorção até a reserva chegar a zero.</p>
-<div id="b2"></div><p style="color:var(--mut);font-size:.85rem">A linha branca marca o limite da reserva. O que passa dela é o excedente da Sobrecarga.</p>
+<p class="key">Quando a energia ultrapassa a capacidade de armazenamento estável, o reservatório se torna instável e a energia armazenada vaza progressivamente. A anulação e a absorção ficam indisponíveis até a reserva chegar a zero.</p>
+<div id="b2"></div><p style="color:var(--mut);font-size:.85rem">A linha branca marca o limite de armazenamento estável. O excedente desencadeia a Sobrecarga, que permanece até o esvaziamento completo do reservatório.</p>
 <div class="qg" id="q2"></div>
 </div></div>
 <h3>Selo</h3>
 <div class="g2 selo"><figure><div class="fr"><img loading="lazy" decoding="async" data-src="assets/img/selo.webp" alt="Selo: faixas do antebraço"></div><figcaption>Selo</figcaption></figure>
-<div><p>As faixas dos antebraços são os selos que controlam o acesso à Forsaken Rupture. A retirada dos selos libera o acesso à Forsaken Rupture, cuja ativação depende da energia excedente produzida pela Sobrecarga. Ative as duas condições abaixo:</p>
-<div class="eqn"><span id="c1">Selos removidos</span><i>+</i><span id="c2">Sobrecarga</span><i>=</i><span id="c3">Forsaken Rupture</span></div>
+<div><p>As faixas negras dos antebraços restringem o acesso à Forsaken Rupture e à sua capacidade adicional de armazenamento energético. A retirada dos selos libera o acesso à transformação, cuja ativação depende da presença de energia excedente à capacidade convencional. Ative as duas condições abaixo:</p>
+<div class="eqn"><span id="c1">Selos removidos</span><i>+</i><span id="c2">Excedente energético</span><i>=</i><span id="c3">Forsaken Rupture</span></div>
 <div class="tgw"><button class="tgl" id="t1"><span class="sw2"></span>Remover os selos</button>
-<button class="tgl" id="t2"><span class="sw2"></span>Acumular energia até a Sobrecarga</button></div>
-<div class="box" id="tgs"></div></div></div>
+<button class="tgl" id="t2"><span class="sw2"></span>Acumular energia excedente</button></div>
+<div class="box" id="tgs"></div><div class="sst" id="sst"></div></div></div>
 </section>
 
 <section id="s3">
@@ -421,7 +460,7 @@ h1{line-height:1.12!important}.sub{line-height:1.4!important}section>h2{line-hei
 <figure><div class="fr"><video class="bv" data-v="2" data-poster="assets/img/poster-corpo-rupture.webp" muted loop playsinline preload="none" disablepictureinpicture aria-label="Forsaken Rupture, corpo inteiro"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-rupture.webp" alt="Forsaken Rupture, rosto"></div><figcaption>Fearness em Forsaken Rupture</figcaption></figure>
 </div><div class="hr">
 <div class="qg" id="qor"></div>
-<h3>Barra de reserva</h3><div id="b3"></div><p style="color:var(--mut);font-size:.85rem">Durante a Rupture, a reserva adicional amplia a capacidade convencional, permitindo armazenar o excedente energético que sustenta a transformação.</p>
+<h3>Barra de reserva</h3><div id="b3"></div><p style="color:var(--mut);font-size:.85rem">Com os selos removidos, o excedente energético desencadeia a Forsaken Rupture. A expansão estabiliza esse excedente, que passa a sustentar a transformação e permite acumular mais energia na reserva adicional.</p>
 <div class="qg" id="q3"></div>
 </div></div>
 <h3>Mudanças visuais</h3>
@@ -437,7 +476,11 @@ h1{line-height:1.12!important}.sub{line-height:1.4!important}section>h2{line-hei
 const $=s=>document.querySelector(s);
 // Recursos visuais: nenhuma fonte de vídeo é atribuída antes de ser necessária.
 const tabHooks=[];
-function loadImg(img){if(img.dataset.src){img.src=img.dataset.src;delete img.dataset.src}}
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const isActive=el=>!document.hidden&&!!el.closest('section.on');
+const isVisible=el=>{const r=el.getBoundingClientRect();return isActive(el)&&r.width>0&&r.height>0&&r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth};
+const imageSizes={"assets/img/acessorio-obsidiana.webp":[1305,1386],"assets/img/botas.webp":[1443,1572],"assets/img/casaco-gola.webp":[1024,1536],"assets/img/ciclo-fearness.webp":[1536,1536],"assets/img/cinto.webp":[1596,1386],"assets/img/costas.webp":[1024,1536],"assets/img/dissipacao.webp":[1536,1536],"assets/img/lado.webp":[1025,1536],"assets/img/manifestacao-sombria.webp":[1536,1536],"assets/img/marcas-negras.webp":[948,1606],"assets/img/mascara-normal.webp":[1536,1149],"assets/img/mascara-ossea.webp":[1536,1536],"assets/img/mascara-reserva.webp":[1536,1149],"assets/img/mascara-sobrecarga.webp":[1536,1149],"assets/img/olhos-normal.webp":[1536,1149],"assets/img/olhos-reserva.webp":[1536,1149],"assets/img/olhos-sobrecarga.webp":[1536,1149],"assets/img/poster-corpo-frente.webp":[1080,1920],"assets/img/poster-corpo-rupture.webp":[1080,1920],"assets/img/poster-corpo-sobrecarga.webp":[1080,1920],"assets/img/rosto-frente.webp":[1536,1536],"assets/img/rosto-rupture.webp":[1536,1536],"assets/img/rosto-sobrecarga.webp":[1536,1536],"assets/img/roupa-base.webp":[936,1536],"assets/img/selo-removido.webp":[1200,1311],"assets/img/selo-rupture.webp":[1406,1536],"assets/img/selo.webp":[1200,1311],"assets/img/selos-antebraco.webp":[1200,1311],"assets/img/zoom-rosto-frente.webp":[1536,1536],"assets/img/zoom-rosto-rupture.webp":[1536,1536]};
+function loadImg(img){if(img.dataset.src){const size=imageSizes[img.dataset.src];if(size){img.width=size[0];img.height=size[1]}img.src=img.dataset.src;delete img.dataset.src}}
 // Fila progressiva: um download secundário por vez, sem alterar os arquivos.
 const mediaGroups=[["assets/img/poster-corpo-frente.webp","assets/img/rosto-frente.webp","assets/video/corpo-frente.mp4","assets/img/lado.webp","assets/img/costas.webp","assets/img/roupa-base.webp","assets/img/casaco-gola.webp","assets/img/acessorio-obsidiana.webp","assets/img/selos-antebraco.webp","assets/img/cinto.webp","assets/img/botas.webp","assets/img/zoom-rosto-frente.webp","assets/video/zoom-rosto-frente.mp4"],["assets/img/olhos-normal.webp","assets/img/olhos-reserva.webp","assets/img/olhos-sobrecarga.webp","assets/video/olhos-normal-reserva.mp4","assets/video/olhos-reserva-normal.mp4","assets/video/olhos-reserva-sobrecarga.mp4","assets/video/olhos-sobrecarga-reserva.mp4","assets/img/ciclo-fearness.webp","assets/img/dissipacao.webp"],["assets/img/selo.webp","assets/img/selo-removido.webp","assets/img/selo-rupture.webp","assets/img/poster-corpo-sobrecarga.webp","assets/img/rosto-sobrecarga.webp","assets/video/corpo-sobrecarga.mp4","assets/video/zoom-rosto-sobrecarga.mp4"],["assets/img/mascara-normal.webp","assets/img/mascara-reserva.webp","assets/img/mascara-sobrecarga.webp","assets/video/mascara-normal-reserva.mp4","assets/video/mascara-reserva-normal.mp4","assets/video/mascara-reserva-sobrecarga.mp4","assets/video/mascara-sobrecarga-reserva.mp4","assets/img/poster-corpo-rupture.webp","assets/img/rosto-rupture.webp","assets/video/corpo-rupture.mp4","assets/img/mascara-ossea.webp","assets/img/marcas-negras.webp","assets/img/manifestacao-sombria.webp","assets/img/zoom-rosto-rupture.webp","assets/video/zoom-rosto-rupture.mp4"]];
 // Os três corpos principais têm prioridade global, mesmo fora da aba ativa.
@@ -450,9 +493,15 @@ const mainBodyURLs=new Set(mainBodies.flatMap(b=>[b.poster,b.video]));
 function bodyOrder(){const i=Number(document.body.dataset.t)||0;const bodies=[...mainBodies].sort((a,b)=>Number(b.tab===i)-Number(a.tab===i));return [...bodies.map(b=>b.poster),...bodies.map(b=>b.video)]}
 const bodyWarmQueue=new Map();
 function afterMainBodies(key,fn){bodyWarmQueue.set(key,fn);releaseBodyWarm()}
-function releaseBodyWarm(){if(bgAllowed()&&bodyOrder().some(url=>!bgKnown(url)))return;const pending=[...bodyWarmQueue.values()];bodyWarmQueue.clear();pending.forEach(fn=>fn())}
+function releaseBodyWarm(){if(document.hidden)return;if(bgAllowed()&&bodyOrder().some(url=>!bgKnown(url)))return;const pending=[...bodyWarmQueue.values()];bodyWarmQueue.clear();pending.forEach(fn=>fn())}
 const bgDone=new Set(),fgPending=new Set(),videoRequested=new Set(),bgVideo=new Map();
 let bgJob=null,bgTimer=0,bgAfter=0;
+const bgSizes=new Map(),bgRetry=new Map(),ownedVideo=new WeakMap();
+const BG_LIMIT=64*1024*1024;
+function dropCached(url){const src=bgVideo.get(url);if(src)URL.revokeObjectURL(src);bgVideo.delete(url);bgSizes.delete(url)}
+function cacheVideo(url,blob){while([...bgSizes.values()].reduce((a,b)=>a+b,0)+blob.size>BG_LIMIT&&bgVideo.size){const k=[...bgVideo.keys()].find(k=>!mainBodyURLs.has(k))||bgVideo.keys().next().value;dropCached(k)}if(blob.size<=BG_LIMIT){bgVideo.set(url,URL.createObjectURL(blob));bgSizes.set(url,blob.size)}}
+function takeVideo(url,v){const source=bgVideo.get(url);if(source){bgVideo.delete(url);bgSizes.delete(url);ownedVideo.set(v,source)}return source}
+function clearVideo(v,url){v.pause();v.removeAttribute('src');v.load();const src=ownedVideo.get(v);if(src){URL.revokeObjectURL(src);ownedVideo.delete(v)}videoRequested.delete(url)}
 const net=()=>navigator.connection||navigator.mozConnection||navigator.webkitConnection;
 function bgAllowed(){const c=net();return !document.hidden&&navigator.onLine!==false&&!(c&&(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'')||(typeof c.downlink==='number'&&c.downlink<2)))}
 function bgSchedule(ms=1200){clearTimeout(bgTimer);bgTimer=setTimeout(bgStep,ms)}
@@ -466,16 +515,16 @@ async function bgStep(){
  if(Date.now()<bgAfter||fgPending.size||document.querySelector('section.on [aria-busy="true"]')||bgForegroundVisible()){bgSchedule(1000);return}
  const i=Number(document.body.dataset.t)||0;
  const order=[i,...mediaGroups.map((_,k)=>k).filter(k=>k!==i).sort((a,b)=>Math.abs(a-i)-Math.abs(b-i))];
- const url=[...bodyOrder(),...order.flatMap(k=>mediaGroups[k]).filter(u=>!mainBodyURLs.has(u))].find(u=>!bgKnown(u));if(!url)return;
+ const url=[...bodyOrder(),...order.flatMap(k=>mediaGroups[k]).filter(u=>!mainBodyURLs.has(u))].find(u=>!bgKnown(u)&&(!bgRetry.has(u)||bgRetry.get(u)<Date.now()));if(!url){if(bgRetry.size)bgSchedule(15000);return;}
  const controller=new AbortController(),job={url,controller};bgJob=job;
  const timer=setTimeout(()=>controller.abort(),90000);
  try{const r=await fetch(url,{signal:controller.signal,cache:'default',priority:mainBodyURLs.has(url)?'high':'low'});if(!r.ok)throw Error('Recurso indisponível');const b=await r.blob();if(controller.signal.aborted)return;
-  if(url.endsWith('.mp4')&&!videoRequested.has(url))bgVideo.set(url,URL.createObjectURL(b));
-  bgDone.add(url);
- }catch(e){if(!controller.signal.aborted)bgDone.add(url)}finally{clearTimeout(timer);if(bgJob===job)bgJob=null;releaseBodyWarm();bgSchedule(1200)}
+  if(url.endsWith('.mp4')&&!videoRequested.has(url))cacheVideo(url,b);
+  bgDone.add(url);bgRetry.delete(url);
+ }catch(e){if(!controller.signal.aborted)bgRetry.set(url,Date.now()+30000)}finally{clearTimeout(timer);if(bgJob===job)bgJob=null;releaseBodyWarm();bgSchedule(1200)}
 }
-function vsrc(v,url){if(!v.hasAttribute('src')){if(bgJob?.url===url)bgYield();videoRequested.add(url);v.src=bgVideo.get(url)||url}}
-function bgResume(){if(bgAllowed())bgSchedule(1500);else if(bgJob)bgJob.controller.abort();releaseBodyWarm()}
+function vsrc(v,url){if(!v.hasAttribute('src')){if(bgJob?.url===url)bgYield();videoRequested.add(url);v.src=takeVideo(url,v)||url}}
+function bgResume(){if(bgAllowed())bgSchedule(1500);else if(bgJob)bgJob.controller.abort();if(!document.hidden)releaseBodyWarm()}
 document.addEventListener('visibilitychange',bgResume);addEventListener('online',bgResume);addEventListener('offline',bgResume);net()?.addEventListener?.('change',bgResume);
 document.addEventListener('pointerdown',e=>{if(e.target.closest('button,.badge,.hs,.q'))bgYield()}, {passive:true,capture:true});
 
@@ -492,6 +541,7 @@ function decodedImage(url){
  return interactiveImages.get(url);
 }
 function mediaNotice(root,message){let n=root.querySelector('.media-notice');if(!n){n=document.createElement('p');n.className='media-notice';n.setAttribute('role','status');n.style.cssText='font-size:.8rem;color:var(--mut);margin:6px 0';n.hidden=true;root.appendChild(n)}n.textContent=message;n.hidden=!message}
+function waitNotice(root,message){const timer=setTimeout(()=>mediaNotice(root,message),250);return()=>{clearTimeout(timer);mediaNotice(root,'')}}
 const nextPaint=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
 
 function activateMedia(i){bgYield(3000);const sec=$('#s'+i);sec.querySelectorAll('img[data-src]:not(.qi)').forEach(loadImg);sec.querySelectorAll('video[data-poster]').forEach(v=>{v.poster=v.dataset.poster;delete v.dataset.poster});tabHooks.forEach(fn=>fn(i))}
@@ -499,12 +549,13 @@ const tabs=['Personagem','Poder','Restrição','Transformação'];
 let INIT=true;const dq=matchMedia('(min-width:1000px)');
 function navH(){const n=document.getElementById('nav');const h=n?n.offsetHeight:92;document.documentElement.style.setProperty('--nh',h+'px');return h}
 function offY(e){let y=0;while(e){y+=e.offsetTop;e=e.offsetParent}return y}
-function goTop(i){let y=0;if(!INIT&&dq.matches){const h=document.querySelector('#s'+i+' .hero');if(h)y=Math.max(0,offY(h)-navH()-12)}scrollTo({top:y,behavior:INIT?'auto':'smooth'})}
+function goTop(i){let y=0;if(!INIT&&dq.matches){const h=document.querySelector('#s'+i+' .hero');if(h)y=Math.max(0,offY(h)-navH()-12)}scrollTo({top:y,behavior:INIT||reduced.matches?'auto':'smooth'})}
 addEventListener('resize',navH);addEventListener('load',navH);
 const nav=$('#nav');
-function show(i){tabs.forEach((_,k)=>{$('#s'+k).classList.toggle('on',k==i);nav.children[k].classList.toggle('on',k==i)});document.body.dataset.t=i;activateMedia(i);sfx.tab(i);if(window.tipRe)setTimeout(window.tipRe,0);[...$('#s'+i).children].forEach((c,n)=>c.style.setProperty('--i',Math.min(n,9)));nav.children[i].scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});goTop(i);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(typeof touch!=='undefined'&&touch)setTimeout(zoom,80)}
-tabs.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>show(i);nav.appendChild(b)});
-const C=[['ANULAÇÃO','O contato direto com a manifestação ativa de um poder a neutraliza. É o ponto de partida do ciclo e só funciona fora da Sobrecarga.'],['ABSORÇÃO','A energia anulada é absorvida por Fearness. Com energia na reserva, seus olhos ficam roxos.'],['RESERVA','A energia absorvida fica armazenada temporariamente, até o limite da capacidade atual. Acima dele ocorre a Sobrecarga.'],['CONVERSÃO','A energia armazenada vira aprimoramento físico e motor, que Fearness distribui livremente entre força, velocidade, reação, resistência e aceleração.'],['DISSIPAÇÃO','A energia convertida é consumida durante a ação, liberando espaço na reserva. É o Reset. Com espaço livre, Fearness volta a poder anular e absorver.']];
+function show(i){tabs.forEach((_,k)=>{$('#s'+k).classList.toggle('on',k==i);nav.children[k].classList.toggle('on',k==i);nav.children[k].setAttribute('aria-selected',String(k===i));nav.children[k].tabIndex=k===i?0:-1});document.body.dataset.t=i;activateMedia(i);sfx.tab(i);if(window.tipRe)setTimeout(window.tipRe,0);[...$('#s'+i).children].forEach((c,n)=>c.style.setProperty('--i',Math.min(n,9)));nav.children[i].scrollIntoView({inline:'center',block:'nearest',behavior:reduced.matches?'auto':'smooth'});goTop(i);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(typeof touch!=='undefined'&&touch)setTimeout(zoom,80)}
+tabs.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.id='tab'+i;b.setAttribute('role','tab');b.setAttribute('aria-controls','s'+i);b.setAttribute('aria-selected','false');b.tabIndex=-1;const panel=$('#s'+i);panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',b.id);b.onclick=()=>show(i);nav.appendChild(b)});
+nav.addEventListener('keydown',e=>{const i=tabs.findIndex((_,k)=>nav.children[k]===e.target);if(i<0)return;const next={ArrowRight:(i+1)%tabs.length,ArrowLeft:(i+tabs.length-1)%tabs.length,Home:0,End:tabs.length-1}[e.key];if(next===undefined)return;e.preventDefault();show(next);nav.children[next].focus({preventScroll:true})});
+const C=[['ANULAÇÃO','O contato direto com um poder manifestado externamente permite sua anulação parcial ou integral, conforme a escolha de Fearness. Durante a Sobrecarga, essa função fica indisponível.'],['ABSORÇÃO','A energia anulada é absorvida por Fearness. Com energia na reserva estável, seus olhos ficam roxos.'],['RESERVA','A energia absorvida fica armazenada temporariamente. Ultrapassar a capacidade de armazenamento estável ao concluir uma absorção desencadeia a Sobrecarga.'],['CONVERSÃO','A energia armazenada vira aprimoramento físico e motor, que Fearness distribui livremente entre força, velocidade, reação, resistência e aceleração.'],['DISSIPAÇÃO','A energia convertida é consumida durante a ação, reduzindo a quantidade armazenada no reservatório. Esse processo é o Reset.']];
 const cy=$('#cyc');
 C.forEach((c,i)=>{const a=(-90+i*360/C.length)*Math.PI/180,b=document.createElement('button');b.className='nd';b.textContent=c[0];b.style.left=50+41*Math.cos(a)+'%';b.style.top=50+41*Math.sin(a)+'%';b.onclick=()=>pick(i);cy.appendChild(b)});
 let CUR=0;const mq=matchMedia('(min-width:1000px)');
@@ -514,9 +565,9 @@ function pick(i){CUR=i;if(window.pw)pw(i);[...cy.querySelectorAll('.nd')].forEac
 pick(0);
 document.querySelectorAll('figure,.eye .fr').forEach(e=>e.classList.add('z'));
 const touch=matchMedia('(hover:none)').matches,zs=[...document.querySelectorAll('.z')];let tick=false;
-function zoom(){tick=false;const vh=innerHeight;zs.forEach(el=>{const r=el.getBoundingClientRect();if(!r.height||r.bottom<-80||r.top>vh+80)return;const d=Math.min(1,Math.abs(r.top+r.height/2-vh/2)/(vh/2));el.style.transform='scale('+(1.08-.18*d).toFixed(3)+')'})}
+function zoom(){tick=false;if(reduced.matches||document.hidden)return;const vh=innerHeight;zs.forEach(el=>{const r=el.getBoundingClientRect();if(!r.height||r.bottom<-80||r.top>vh+80)return;const d=Math.min(1,Math.abs(r.top+r.height/2-vh/2)/(vh/2));el.style.transform='scale('+(1.08-.18*d).toFixed(3)+')'})}
 if(touch){zs.forEach(e=>e.classList.add('t'));addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(zoom)}},{passive:true});addEventListener('resize',zoom)}
-(function(){const cv=document.createElement('canvas');cv.id='fx';document.body.prepend(cv);const x=cv.getContext('2d');let W,H,bolt=null,next=performance.now()+1500;
+(function(){const cv=document.createElement('canvas');cv.id='fx';cv.setAttribute('aria-hidden','true');document.body.prepend(cv);const x=cv.getContext('2d');if(!x)return;let W,H,bolt=null,next=performance.now()+1500;
 function rs(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0)}rs();addEventListener('resize',rs);
 function mk(){const pts=[[W*(.1+Math.random()*.8),-10]],br=[],end=H*(.65+Math.random()*.4);let px=pts[0][0],py=-10;while(py<end){py+=18+Math.random()*26;px+=(Math.random()-.5)*60;pts.push([px,py]);if(Math.random()<.12){const b=[[px,py]],dir=Math.random()<.5?-1:1,c=4+Math.random()*4|0;let bx=px,by=py;for(let k=0;k<c;k++){by+=14+Math.random()*18;bx+=dir*(8+Math.random()*28);b.push([bx,by])}br.push(b)}}const dkk=document.body.dataset.t==='3';return{pts,br,t0:0,dark:dkk,ph:[Math.random()*6.3,Math.random()*6.3,Math.random()*6.3,Math.random()*6.3],fl:dkk?[[prep(pts),1]].concat(br.map(b=>[prep(b),.5])):null}}
 function prep(p){let q=p;for(let it=0;it<1;it++){const r=[q[0]];for(let i=0;i<q.length-1;i++){const a=q[i],b=q[i+1];r.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75])}r.push(q[q.length-1]);q=r}
@@ -529,7 +580,7 @@ for(const q of A){if(q.s>Lg)break;const env=Math.min(1,(Lg-q.s)/42+.05)*Math.pow
 if(Lp.length<2)return null;const P=Lp.concat(Rp.reverse()),o=new Path2D();o.moveTo((P[0][0]+P[P.length-1][0])/2,(P[0][1]+P[P.length-1][1])/2);
 for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];o.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2)}o.closePath();return o}
 function path(p,n){x.beginPath();for(let i=0;i<Math.min(p.length,n);i++)i?x.lineTo(p[i][0],p[i][1]):x.moveTo(p[i][0],p[i][1])}
-function f(t){requestAnimationFrame(f);x.clearRect(0,0,W,H);if(document.hidden){bolt=null;next=t+2500;return}
+function f(t){requestAnimationFrame(f);if(document.hidden||reduced.matches){if(bolt)x.clearRect(0,0,W,H);bolt=null;next=t+2500;return}if(!bolt&&t<=next)return;x.clearRect(0,0,W,H);
 if(!bolt&&t>next){bolt=mk();bolt.t0=t;sfx.thunder()}if(!bolt)return;
 const e=t-bolt.t0,g=Math.min(1,e/220),fade=e<220?1:Math.max(0,1-(e-220)/900);if(fade<=0){next=bolt.t0+2900;bolt=null;return}
 const a=fade*(e>220&&e<500&&Math.sin(e/25)<0?.55:1),all=[[bolt.pts,1]].concat(bolt.br.map(b=>[b,.5])),dk=bolt.dark,yE=bolt.pts[bolt.pts.length-1][1];x.lineJoin=x.lineCap='round';x.shadowBlur=0;
@@ -553,32 +604,109 @@ window.AU={t:null,a:0,c:0};
 function autoStop(){if(AU.t){clearInterval(AU.t);AU.t=null;$('#auto').textContent='▶ Reproduzir ciclo'}}
 window.pw=i=>{if(!AU.a)autoStop();AU.c=i;const m=['stay','up','stay','glow','down'][i];if(m==='up')lvl=Math.max(lvl,90);if(m==='down')lvl=10;clip(p1.fl,0,lvl);p1.bs.textContent=['= Sem alteração','↑ Subindo','= Mantendo','✦ Brilhando','↓ Reduzindo'][i];p1.w.classList.toggle('hold',m==='glow')};
 $('#auto').onclick=()=>{if(AU.t){autoStop();return}$('#auto').textContent='❚❚ Pausar';const step=()=>{AU.a=1;pick((AU.c+1)%5);AU.a=0};step();AU.t=setInterval(step,2600)};
+tabHooks.push(k=>{if(k!==1)autoStop()});document.addEventListener('visibilitychange',()=>{if(document.hidden)autoStop()});
 pw(0);
 const ez=x=>x*x*(3-2*x);
-function bars(t){requestAnimationFrame(bars);const k=document.body.dataset.t;
-if(k==='2'){const p=(t%7000)/7000,v=ez(p<.5?p*2:(1-p)*2),L=.75,o=v>L;clip(p2.fl,0,Math.min(v,L)*100);clip(p2.ex,L*100,Math.max(v,L)*100);clip(p2.zn,L*100,100);p2.mk.style.left=L*100+'%';p2.ex.style.filter='brightness(1.9) saturate(.45)';p2.w.classList.toggle('ov',o);p2.bs.textContent=o?'⚠ SOBRECARGA: excedente vazando':v>.6?'Perto do limite':'Dentro do limite';sfx.hum(.012+.035*v+(o?.03:0));sfx.humf(90+v*260)}
-else if(k==='3'){const m=t%10000,N=.6;let v,c;v=m<2800?ez(m/2800)*N:m<5200?N+.4*ez((m-2800)/2400):m<6600?1:m<9200?1-ez((m-6600)/2600):0;c=m<2800?0:m<4000?(m-2800)/1200:m<7600?1:m<8800?1-(m-7600)/1200:0;
-clip(p3.fl,0,Math.min(v,N)*100);clip(p3.ex,N*100,Math.max(v,N)*100);p3.ex.style.filter='brightness('+(1+1.1*(1-c)).toFixed(2)+') saturate('+(.35+.65*c).toFixed(2)+')';clip(p3.zn,N*100,100);p3.zn.style.opacity=(1-c).toFixed(2);p3.mk.style.left=Math.min((N+.4*c)*100,99.4)+'%';p3.bs.textContent=c>=1?'Reserva expandida: excedente mesclado':c>0?(m<6600?'Excedente se convertendo…':'Voltando ao normal'):'Reserva normal';sfx.hum(.012+.04*v);sfx.humf(90+v*300)}else sfx.hum(0)}
+// Quantidades ilustrativas: a instabilidade é um estado, independente do nível de energia.
+const lerp=(a,b,x)=>a+(b-a)*ez(Math.max(0,Math.min(1,x)));
+function paintReserve(p,v,limit,unstable,label,alpha=1,expansion=0){
+ const N=p===p2?.75:.6;
+ clip(p.fl,0,Math.min(v,N)*100);clip(p.ex,N*100,Math.max(v,N)*100);
+ clip(p.zn,N*100,100);p.zn.style.opacity=String(1-expansion);
+ p.mk.style.left=Math.min(limit*100,99.4)+'%';
+ p.ex.style.filter=unstable?'brightness(1.9) saturate(.45)':`brightness(${1+1.1*(1-expansion)}) saturate(${.35+.65*expansion})`;
+ p.w.classList.toggle('ov',unstable);p.w.style.opacity=String(alpha);
+ if(p.bs.textContent!==label)p.bs.textContent=label;
+}
+function overloadState(t){
+ const m=t%9000,L=.75;
+ if(m<3000){const v=lerp(0,1,m/3000);return [v,L,false,v>L?'Concluindo absorção':v>.6?'Perto do limite':'Dentro do limite'];}
+ if(m<3700)return [1,L,true,'SOBRECARGA: vazamento'];
+ if(m<7900)return [lerp(1,0,(m-3700)/4200),L,true,'SOBRECARGA: vazamento'];
+ return [0,L,false,'Reservatório vazio'];
+}
+const N=.6,R=.94;
+function activationState(t){
+ const m=t%9400;
+ if(m<2600)return [lerp(0,N,m/2600),N,false,'Reserva convencional',1,0];
+ if(m<3100)return [N,N,false,'Limite convencional',1,0];
+ if(m<3500)return [lerp(N,.64,(m-3100)/400),N,false,'Concluindo absorção',1,0];
+ if(m<4700){const c=ez((m-3500)/1200);return [.64,.64+(R-.64)*c,false,'Excedente sustentando a Rupture',1,c];}
+ if(m<6900)return [lerp(.64,.88,(m-4700)/2200),R,false,'Reserva expandida',1,1];
+ if(m<8500)return [.88,R,false,'Reserva expandida',1,1];
+ if(m<8900)return [.88,R,false,'Reserva expandida',1-ez((m-8500)/400),1];
+ return [0,N,false,'Reserva convencional',ez((m-8900)/500),0];
+}
+// Cada encerramento possui sua própria demonstração, sem descarregar imagens ou vídeos.
+function voluntaryState(t){
+ const m=t%7200;
+ if(m<1100)return [.88,R,false,'Rupture estável',1,1];
+ if(m<3900)return [lerp(.88,N,(m-1100)/2800),R,false,'Dissipando o excedente',1,1];
+ if(m<4500){const c=1-ez((m-3900)/600);return [N,N+(R-N)*c,false,'Transformação encerrada',1,c];}
+ if(m<6300)return [N,N,false,'Reserva convencional estável',1,0];
+ if(m<6750)return [N,N,false,'Reserva convencional estável',1-ez((m-6300)/450),0];
+ return [.88,R,false,'Rupture estável',ez((m-6750)/450),1];
+}
+function ruptureOverloadState(t){
+ const m=t%10800;
+ if(m<1100)return [.88,R,false,'Rupture estável',1,1];
+ if(m<2100){const v=lerp(.88,1,(m-1100)/1000);return [v,R,false,v>R?'Concluindo absorção':'Reserva expandida',1,1];}
+ if(m<2700)return [1,R,true,'SOBRECARGA: vazamento',1,1];
+ if(m<4900)return [lerp(1,N,(m-2700)/2200),R,true,'SOBRECARGA: vazamento',1,1];
+ if(m<5500){const c=1-ez((m-4900)/600);return [N,N+(R-N)*c,true,'Rupture encerrada · Sobrecarga',1,c];}
+ if(m<8400)return [lerp(N,0,(m-5500)/2900),N,true,'SOBRECARGA: vazamento',1,0];
+ if(m<9900)return [0,N,false,'Estabilidade restabelecida',1,0];
+ if(m<10350)return [0,N,false,'Estabilidade restabelecida',1-ez((m-9900)/450),0];
+ return [.88,R,false,'Rupture estável',ez((m-10350)/450),1];
+}
+function metabolicState(t){
+ const m=t%7400;
+ if(m<1300)return [.88,R,false,'Rupture ativa',1,1];
+ if(m<3000)return [.88,R,false,'Instabilidade metabólica crescente',1,1];
+ if(m<3600)return [.88,R,false,'Limite metabólico atingido',1,1];
+ if(m<4350){const c=1-ez((m-3600)/750);return [.88*c,N+(R-N)*c,false,'Colapso do reservatório',1,c];}
+ if(m<6500)return [0,N,false,'Reserva esvaziada',1,0];
+ if(m<6950)return [0,N,false,'Reserva esvaziada',1-ez((m-6500)/450),0];
+ return [.88,R,false,'Rupture ativa',ez((m-6950)/450),1];
+}
+let endBars=[],barTab='',barElapsed=0,endElapsed=0,wasEndOpen=false,barLast=0;
+function bars(t){
+ requestAnimationFrame(bars);if(t-barLast<32)return;const k=document.body.dataset.t,dt=Math.min(100,Math.max(0,t-barLast));barLast=t;const primary=k==='2'?p2:k==='3'?p3:null;const active=primary&&isVisible(primary.w);
+ if(k!==barTab){barTab=k;barElapsed=0;endElapsed=0;wasEndOpen=false}else if(active)barElapsed+=dt;
+ if(k==='2'){const state=overloadState(barElapsed);if(active)paintReserve(p2,...state);sfx.hum(.012+.035*state[0]+(state[2]?.03:0));sfx.humf(90+state[0]*260)}
+ else if(k==='3'){const state=activationState(barElapsed);if(active)paintReserve(p3,...state);sfx.hum(.012+.04*state[0]);sfx.humf(90+state[0]*300);
+  const open=!!document.querySelector('#q3 .end-quad.open');
+  if(open){if(!wasEndOpen)endElapsed=0;else if(endBars.some(p=>isVisible(p.w)))endElapsed+=dt;const states=[voluntaryState,ruptureOverloadState,metabolicState];endBars.forEach((p,i)=>{if(isVisible(p.w))paintReserve(p,...states[i](endElapsed))});}else endElapsed=0;
+  wasEndOpen=open;
+ }else sfx.hum(0);
+}
 requestAnimationFrame(bars);
 const KW=['forsaken rupture','reserva adicional','ausência de propósito','sem propósito','vencer para não perder','fúria sombria','autodestruição','instabilidade metabólica','limite metabólico','anulação','absorção','conversão','dissipação','sobrecarga','excedente','selos','solidão','obsessão','derrotado','derrota','sacrificar','vazamento','Reset','vencer','anulá-la','neutraliza','aprimoramentos','aprimoramento','capacidade convencional','entidade','ritual','assimilação','constituição','reservatório expandido','instabilidade energética','configuração expandida','contenção energética','Rupture'].sort((a,b)=>b.length-a.length);
 const KR=new RegExp('(^|[^\\p{L}])('+KW.join('|')+')(?![\\p{L}])','giu');
 const KV=new RegExp('(^|[^\\p{L}])(obsessão|vencer|derrotado|derrota|fúria|ódio)(?![\\p{L}])','giu');
 const KP=new RegExp('(^|[^\\p{L}])(anulá-la|neutralizá-la|limite máximo|reserva temporária|anul\\p{L}*|neutraliz\\p{L}*|absor\\p{L}*|convers\\p{L}*|convert\\p{L}*|dissip\\p{L}*|reset|sobrecarga|aprimoramentos)(?![\\p{L}])','giu');
 function hl(s,r){try{return s.replace(r||KR,(m,a,b)=>a+'<span class="k">'+b+'</span>')}catch(e){return s}}
-function quads(id,D){const g=$('#'+id);D.forEach((d,i)=>{const b=document.createElement('button');b.className='q';b.innerHTML=(['q0','q2','q3'].includes(id)?'<span class="n">'+['I','II','III'][i]+'</span>':'')+'<b>'+d[0]+'</b><span class="t">'+d[1]+'</span><i></i><div class="d">'+(d[3]?'<img class="qi" decoding="async" data-src="'+d[3]+'" alt="'+d[0]+'">':'')+hl(d[2],d[4])+'</div>';b.onclick=()=>{const o=b.classList.contains('open');g.querySelectorAll('.q').forEach(x=>x.classList.remove('open'));if(!o){b.querySelectorAll('img[data-src]').forEach(loadImg);b.classList.add('open')}};g.appendChild(b)})}
+function quads(id,D){const g=$('#'+id);D.forEach((d,i)=>{const b=document.createElement('button');b.className='q';b.setAttribute('aria-expanded','false');b.innerHTML=(['q0','q2','q3'].includes(id)?'<span class="n">'+['I','II','III'][i]+'</span>':'')+'<b>'+d[0]+'</b><span class="t">'+d[1]+'</span><i></i><div class="d">'+(d[3]?'<img class="qi" decoding="async" data-src="'+d[3]+'" alt="'+d[0]+'">':'')+hl(d[2],d[4])+'</div>';b.onclick=()=>{const o=b.classList.contains('open');g.querySelectorAll('.q').forEach(x=>{x.classList.remove('open');x.setAttribute('aria-expanded','false');x.querySelector('.d')?.setAttribute('aria-hidden','true')});if(!o){b.querySelectorAll('img[data-src]').forEach(loadImg);b.classList.add('open');b.setAttribute('aria-expanded','true');b.querySelector('.d')?.setAttribute('aria-hidden','false')}};const detail=b.querySelector('.d');detail.id=id+'-detail-'+i;detail.setAttribute('aria-hidden','true');b.setAttribute('aria-controls',detail.id);g.appendChild(b)})}
 quads('q0',[['Personalidade','Solitário, sereno e sem propósito.','Fearness é pouco comunicativo, sereno e indiferente à maior parte do que acontece ao seu redor. Não tem uma ambição que organize sua existência e segue seu caminho sem precisar de um sentido maior.<br><br>Encontra conforto na solidão, que não é sofrimento nem ressentimento. Pode criar vínculos e cooperar, mas não depende da companhia ou do reconhecimento alheio.<br><br>Não ter propósito não é ser incapaz de desejar: diante de situações específicas, ele pode desenvolver desejos intensos, ainda que sem direção permanente.'],
 ['Vencer para não perder','Uma direção imediata que surge na luta.','Fearness tem uma obsessão em vencer para não ser derrotado. Ela não é ambição constante nem busca por glória, reconhecimento ou superioridade: aparece com intensidade diante de uma luta.<br><br>A dificuldade do combate e a proximidade da derrota intensificam sua concentração e despertam uma fúria contida. Quando a derrota se impõe, nasce em Fearness um ódio profundo contra si mesmo, alimentado pelo sentimento de sua própria incapacidade. Ele não precisa entender por que perder lhe é tão intolerável, nem ter uma justificativa proporcional aos sacrifícios que aceita fazer.<br><br>A obsessão não preenche sua ausência de propósito: só oferece uma direção imediata, poderosa o bastante para conduzi-lo.',0,KV],
 ['Jornada de autodestruição','Vitórias que não preenchem nada.','Sua trajetória não é de superação ou realização. Sua força evolui e suas vitórias podem ser gloriosas para a obra, mas não lhe dão satisfação duradoura nem um sentido para existir.<br><br>Vencer apenas permite que ele continue perseguindo a mesma obsessão, o que consome progressivamente sua integridade. Ele não deseja a própria destruição nem procura a morte: a autodestruição nasce da disposição de sacrificar cada vez mais para não ser derrotado.<br><br>O que parece uma conquista extraordinária é, para ele, só mais um passo em uma jornada sem destino.']]);
-quads('q1',[['Anulação','O contato direto neutraliza o poder.','A anulação ocorre quando Fearness entra em contato direto com a manifestação ativa de um poder. Ao neutralizá-la, ele dá início ao funcionamento do poder.<br><br>Durante a Sobrecarga, a anulação deixa de funcionar.',0,KP],
-['Absorção','A energia anulada vira reserva.','A energia correspondente ao poder anulado é absorvida e convertida em uma reserva temporária.<br><br>No estado normal existe um limite máximo de armazenamento: a quantidade acumulada define o potencial de conversão e a capacidade do reservatório define o que ele consegue manter sob controle. Passar desse limite causa a Sobrecarga.',0,KP],
-['Conversão','Energia vira aprimoramento físico e motor.','A energia armazenada é convertida instantaneamente em aprimoramentos físicos e motores, distribuídos entre força bruta, velocidade, tempo de reação, resistência, aceleração e outras funções.<br><br>Quanto mais energia em uma ação, maior seu potencial, dentro da reserva disponível. Fearness adapta a distribuição durante o combate, alternando entre potência, mobilidade, reação e resistência.',0,KP],
-['Dissipação (Reset)','Gastar energia libera espaço.','Cada movimento que exige esforço mecânico converte parte da reserva em desempenho e a dissipa. Golpes, saltos e acelerações aumentam a potência da ação e liberam espaço no reservatório.<br><br>Esse processo, o Reset, mantém o poder em funcionamento contínuo durante o combate. Fearness controla quanta energia gasta em cada movimento, equilibrando potência, consumo e capacidade para aproveitar novas absorções.<br><br>A energia dissipada se manifesta como um efeito roxo de aspecto semelhante a um raio, mostrado na imagem. Apesar da aparência, ele não possui as características de um raio elétrico: é apenas o design visual da manifestação da dissipação.','assets/img/dissipacao.webp',KP]]);
-quads('q2',[['O que é','A energia passa do limite máximo.','A Sobrecarga ocorre quando a energia armazenada ultrapassa a capacidade que Fearness comporta na configuração atual.<br><br>Isso acontece ao absorver uma manifestação maior que o espaço disponível ou ao acumular energia mais rápido do que consegue dissipar.'],
-['Efeitos','Vazamento instável e danos progressivos.','Fearness mantém o controle, mas o excedente vaza passivamente de forma instável, com consequências físicas e metabólicas e danos progressivos ao corpo.<br><br>Anulação e absorção ficam indisponíveis. A intensidade das consequências depende do excedente e do esforço empregado.'],
-['Como termina','Quando a reserva chega a zero.','A Sobrecarga termina quando toda a energia acumulada é dissipada e a reserva volta a zero. Como ela também desestabiliza o reservatório energético, sua estabilidade só é restaurada com essa dissipação completa.<br><br>Por isso, controlar a dissipação é decisivo para sua sobrevivência e eficiência em combate.']]);
-quads('q3',[['Transformação e ativação','Selos removidos + Sobrecarga.','A Forsaken Rupture é ativada quando Fearness, com os selos removidos, atinge a Sobrecarga. A energia excedente sustenta a transformação, que amplia temporariamente a capacidade de armazenamento por meio de uma reserva adicional.<br><br>Com isso, Fearness mantém a reserva convencional e consegue acumular e utilizar mais energia, podendo anular, absorver e converter em maior volume, prolongando seus aprimoramentos e intensificando suas ações.'],
-['Sobrecarga na transformação','Um limite próprio, maior que o normal.','A Forsaken Rupture possui um limite de armazenamento superior ao convencional. Quando esse limite é ultrapassado, a Sobrecarga desestabiliza o reservatório expandido, provocando o vazamento progressivo da energia acumulada.<br><br>Ao retornar à capacidade convencional, o excedente que sustenta a transformação se esgota, fazendo a máscara desaparecer e as marcas negras recuarem. A instabilidade energética permanece, mantendo a Sobrecarga ativa até a dissipação completa da reserva.'],
-['Consequências e encerramento','Instabilidade metabólica crescente.','A transformação provoca instabilidade metabólica que cresce quanto mais tempo ele permanece nela. Isso ocorre porque sustentar uma reserva energética acima da capacidade convencional exige um esforço metabólico contínuo, cuja intensidade crescente provoca a instabilidade do organismo.<br><br>Ela pode ser encerrada voluntariamente, dissipando o excedente que a sustenta, ou à força, quando o organismo chega ao limite metabólico crítico, mesmo que ainda haja energia adicional. Ao atingir esse limite, a instabilidade do organismo compromete a contenção energética, provocando o colapso do reservatório e a dissipação involuntária de toda a energia armazenada, o que encerra a transformação.']]);
+quads('q1',[['Anulação','O contato direto permite a anulação parcial ou integral de um poder manifestado.','A anulação ocorre mediante o contato direto com um poder manifestado externamente.<br><br>Fearness controla a extensão da anulação. Pode anular parcialmente uma manifestação para preservar a estabilidade do reservatório, deixando a parcela restante ativa, ou ultrapassar sua capacidade de armazenamento estável ao concluir uma absorção. A instabilidade resultante desencadeia a Sobrecarga e interrompe as funções de anulação e absorção.',0,KP],
+['Absorção','A energia anulada vira reserva.','A energia correspondente ao poder anulado é absorvida e convertida em uma reserva temporária.<br><br>A capacidade convencional representa o limite de armazenamento estável. A quantidade acumulada define o potencial de conversão, e a energia absorvida acima desse limite desencadeia a Sobrecarga.',0,KP],
+['Conversão','Energia vira aprimoramento físico e motor.','A energia armazenada é convertida instantaneamente em aprimoramentos físicos e motores, distribuídos entre força bruta, velocidade, tempo de reação, resistência, aceleração e outras funções.<br><br>Quanto mais energia em uma ação, maior seu potencial, dentro da reserva disponível. Fearness controla a intensidade e a duração dos aprimoramentos conforme a quantidade de energia disponível e sua distribuição durante o combate.',0,KP],
+['Dissipação (Reset)','Gastar energia libera espaço.','Fearness utiliza a energia armazenada para intensificar seus movimentos, dissipando a quantidade convertida em desempenho físico e motor.<br><br>Esse processo, o Reset, reduz a quantidade de energia armazenada no reservatório. Fearness controla quanta energia gasta em cada movimento, equilibrando potência e consumo. Em condições estáveis, o espaço liberado permite novas absorções.<br><br>A energia dissipada apresenta uma manifestação energética roxa de aspecto semelhante a um raio, como mostrado na imagem.','assets/img/dissipacao.webp',KP]]);
+quads('q2',[['O que é','A energia ultrapassa o limite estável.','A Sobrecarga ocorre quando a energia acumulada ultrapassa a capacidade de armazenamento estável do reservatório, podendo resultar de uma absorção excessiva ou de absorções sucessivas sem tempo suficiente para dissipar a energia armazenada. A absorção que desencadeia a Sobrecarga é concluída antes da interrupção da anulação e da absorção.'],
+['Efeitos','Vazamento instável e danos progressivos.','Durante a Sobrecarga, a instabilidade do reservatório provoca o vazamento passivo e progressivo da energia armazenada até seu esvaziamento completo, causando consequências físicas e metabólicas e danos progressivos ao corpo.<br><br>Fearness mantém a capacidade de converter e dissipar a energia restante. Anulação e absorção ficam indisponíveis. A intensidade dos efeitos acompanha a quantidade de energia armazenada e o esforço empregado por Fearness, diminuindo progressivamente conforme o reservatório se esvazia.<br><br>O reservatório possui uma capacidade máxima de tolerância à Sobrecarga. Ultrapassar a tolerância do organismo pode provocar consequências fatais.'],
+['Como termina','Quando a reserva chega a zero.','A Sobrecarga termina quando a reserva chega a zero e o reservatório recupera sua estabilidade. O vazamento passivo esvazia progressivamente a reserva, e Fearness pode acelerar esse processo por meio da dissipação.<br><br>Controlar a dissipação é decisivo para sua sobrevivência e eficiência em combate.']]);
+quads('q3',[['Transformação e ativação','Selos removidos + Excedente energético.','A Forsaken Rupture é ativada quando Fearness, com os selos removidos, possui energia acima da capacidade convencional do reservatório. A energia excedente sustenta a transformação, que amplia temporariamente a capacidade de armazenamento por meio de uma reserva adicional.<br><br>A expansão estabiliza o excedente inicial e restabelece a anulação e a absorção. Fearness mantém a reserva convencional e pode acumular e converter mais energia, prolongando seus aprimoramentos e intensificando suas ações.'],
+['Sobrecarga na transformação','Um limite próprio, maior que o normal.','A Forsaken Rupture possui um limite de armazenamento estável superior ao convencional. Ao concluir uma absorção que ultrapassa esse limite, a Sobrecarga desestabiliza o reservatório expandido, interrompe a anulação e a absorção e provoca o vazamento progressivo da energia acumulada.<br><br>Ao retornar à capacidade convencional, o excedente que sustenta a transformação se esgota, fazendo a máscara desaparecer e as marcas negras recuarem. A instabilidade energética permanece, mantendo a Sobrecarga ativa até a dissipação completa da reserva.'],
+['Consequências e encerramento','Instabilidade metabólica crescente.','A permanência na Forsaken Rupture provoca uma instabilidade metabólica progressiva, decorrente da superação contínua dos limites naturais do organismo. Sua intensidade aumenta conforme o tempo de duração da transformação.<br><br>Em condições estáveis, Fearness pode encerrar voluntariamente a transformação dissipando o excedente que a sustenta, retornando à sua condição convencional com a reserva estável. Durante a Sobrecarga da transformação, o esgotamento do excedente encerra a Rupture, e a instabilidade energética mantém o vazamento passivo até a reserva chegar a zero.<br><br>Ao atingir o limite metabólico crítico, a instabilidade do organismo compromete a contenção energética, provocando o colapso do reservatório e a dissipação involuntária de toda a energia armazenada, o que encerra a transformação.']]);
+// As três barras ficam no quadrante de encerramento já existente.
+const endQuad=document.querySelector('#q3 .q:last-child');endQuad.classList.add('end-quad');
+const endGroup=document.createElement('div');endGroup.className='end-reserves';
+endQuad.querySelector('.d').appendChild(endGroup);
+const endTitles=['Encerramento voluntário','Encerramento por Sobrecarga','Encerramento por limite metabólico'];
+endTitles.forEach((title,i)=>{const el=document.createElement('div');el.id='end-bar-'+i;endGroup.appendChild(el);endBars.push(mkbar(el.id,title));});
+endBars.forEach((p,i)=>paintReserve(p,...[voluntaryState,ruptureOverloadState,metabolicState][i](0)));
 const tg={s:0,o:0};const SI=document.querySelector('img[alt="Selo: faixas do antebraço"]'),SC=SI.parentNode.parentNode.querySelector('figcaption'),SS=[SI.dataset.src||SI.src,'assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],SN=['Selo','Selos removidos','Forsaken Rupture'];let sc=0;SI.style.transition='opacity .25s';
 const sealRoot=SI.closest('.selo'),sealButtons=[$('#t1'),$('#t2')];let sealBusy=false;
 function warmSeals(){SS.forEach(url=>decodedImage(url).catch(()=>{}))}
@@ -587,38 +715,43 @@ async function sealToggle(key){
  if(sealBusy)return;bgYield();const next={...tg,[key]:tg[key]^1},n=next.s&&next.o?2:next.s?1:0;
  if(n===sc){Object.assign(tg,next);tgu();return}
  sealBusy=true;sealButtons.forEach(b=>b.disabled=true);sealRoot.setAttribute('aria-busy','true');mediaNotice(sealRoot.querySelector('.tgw'),'');
- let o=null;
+ let o=null;const stopWaiting=waitNotice(sealRoot.querySelector('.tgw'),'Preparando imagem…');
  try{
   const [target]=await Promise.all([decodedImage(SS[n]),decodedImage(SS[sc])]);
+  stopWaiting();if(!isActive(sealRoot))return;
   // A imagem decodificada é a própria camada da sobreposição.
   o=target;o.alt=SN[n];o.setAttribute('aria-hidden','true');o.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease;pointer-events:none';
   SI.parentNode.style.position='relative';SI.parentNode.appendChild(o);await nextPaint();
   Object.assign(tg,next);tgu();SC.textContent=SN[n];
   await new Promise(resolve=>{let t;const done=e=>{if(e&&e.propertyName!=='opacity')return;clearTimeout(t);o.removeEventListener('transitionend',done);resolve()};o.addEventListener('transitionend',done);t=setTimeout(done,760);o.style.opacity='1'});
   SI.src=SS[n];SI.alt=SN[n];if(SI.decode)await SI.decode().catch(()=>{});sc=n;await nextPaint();
- }catch(err){mediaNotice(sealRoot.querySelector('.tgw'),'Não foi possível preparar a imagem. Tente novamente.');}
+ }catch(err){stopWaiting();mediaNotice(sealRoot.querySelector('.tgw'),'Não foi possível preparar a imagem. Tente novamente.');}
  finally{if(o){o.remove();o.removeAttribute('style');o.removeAttribute('aria-hidden')}sealBusy=false;sealButtons.forEach(b=>b.disabled=false);sealRoot.removeAttribute('aria-busy')}
 }
-function tgu(){sstU();$('#c1').classList.toggle('on',!!tg.s);$('#c2').classList.toggle('on',!!tg.o);$('#c3').classList.toggle('on',!!(tg.s&&tg.o));$('#t1').classList.toggle('on',!!tg.s);$('#t2').classList.toggle('on',!!tg.o);const b=$('#tgs');b.classList.toggle('go',tg.s&&tg.o);b.innerHTML=tg.s&&tg.o?'<b style="color:var(--pu2)">Condições atendidas</b><br>O excedente desencadeia a Forsaken Rupture.<br><button class="abtn" style="margin-top:10px" onclick="show(3)">Ver Forsaken Rupture →</button>':tg.s?'Selos removidos, mas sem diferencial. Falta acumular energia até a Sobrecarga.':tg.o?'Sobrecarga com os selos ativos: há apenas vazamento, sem transformação.':'Selos ativos. O poder fica dentro dos limites convencionais.'}
+function tgu(){sstU();$('#t1').setAttribute('aria-pressed',String(!!tg.s));$('#t2').setAttribute('aria-pressed',String(!!tg.o));$('#c1').classList.toggle('on',!!tg.s);$('#c2').classList.toggle('on',!!tg.o);$('#c3').classList.toggle('on',!!(tg.s&&tg.o));$('#t1').classList.toggle('on',!!tg.s);$('#t2').classList.toggle('on',!!tg.o);const b=$('#tgs');b.classList.toggle('go',tg.s&&tg.o);b.innerHTML=tg.s&&tg.o?'<b style="color:var(--pu2)">Condições atendidas</b><br>O excedente desencadeia a Forsaken Rupture.<br><button class="abtn" style="margin-top:10px" onclick="show(3)">Ver Forsaken Rupture →</button>':tg.s?'Selos removidos. A ativação depende da presença de excedente energético.':tg.o?'Sobrecarga com os selos ativos: a energia armazenada vaza e a transformação permanece bloqueada.':'Selos ativos. O poder fica dentro dos limites convencionais.'}
 $('#t1').onclick=()=>sealToggle('s');$('#t2').onclick=()=>sealToggle('o');tgu();
 function zoomer(fig,H,face,dc,vb){const fr=fig.querySelector('.fr'),cap=fig.querySelector('figcaption')||document.createElement('figcaption'),bd=fig.querySelector('.badge'),zv=document.createElement('div'),zi=document.createElement('img');zv.className='zv';zv.appendChild(zi);fr.appendChild(zv);const dcap=dc||cap.textContent,I=[];let cur=-1,zvid=null;
 if(vb){zvid=document.createElement('video');zvid.muted=true;zvid.defaultMuted=true;zvid.volume=0;zvid.loop=true;zvid.playsInline=true;zvid.controls=false;zvid.preload='none';zvid.disablePictureInPicture=true;zvid.disableRemotePlayback=true;['muted','playsinline','webkit-playsinline','loop'].forEach(a=>zvid.setAttribute(a,''));zvid.setAttribute('aria-hidden','true');zvid.tabIndex=-1;zvid.style.display='none';zv.appendChild(zvid)}
-function hide(){zv.classList.remove('on');I.forEach(o=>o.el.classList.remove('on'));cur=-1;cap.textContent=dcap;if(zvid)setTimeout(()=>{if(cur<0)zvid.pause()},550)}
-function sh(i){const V=zvid&&I[i].el===bd;if(V){zvid.poster=face;vsrc(zvid,vb);zvid.playbackRate=1;zi.style.display='none';zvid.style.display='block';try{zvid.currentTime=0}catch(_){}const p=zvid.play();if(p&&p.catch)p.catch(()=>{})}else{zi.src=I[i].s;zi.alt=I[i].n;zi.style.display='';if(zvid){zvid.style.display='none';zvid.pause()}}zv.classList.add('on');I.forEach((o,k)=>o.el.classList.toggle('on',k==i));cur=i;cap.textContent=I[i].n}
+function hide(){zv.classList.remove('on');I.forEach(o=>o.el.classList.remove('on'));cur=-1;bd.setAttribute('aria-expanded','false');cap.textContent=dcap;if(zvid)setTimeout(()=>{if(cur<0)zvid.pause()},550);if(zvid)setTimeout(()=>{if(cur<0&&zvid.hasAttribute('src'))clearVideo(zvid,vb)},30000)}
+function sh(i){const V=zvid&&I[i].el===bd&&!reduced.matches;if(V){zvid.poster=face;vsrc(zvid,vb);zvid.playbackRate=1;zi.style.display='none';zvid.style.display='block';try{zvid.currentTime=0}catch(_){}const p=zvid.play();if(p&&p.catch)p.catch(()=>{})}else{zi.src=I[i].s;zi.alt=I[i].n;zi.style.display='';if(zvid){zvid.style.display='none';zvid.pause()}}zv.classList.add('on');I.forEach((o,k)=>o.el.classList.toggle('on',k==i));cur=i;bd.setAttribute('aria-expanded','true');cap.textContent=I[i].n}
 H.forEach(h=>{const b=document.createElement('button');b.className='hs';b.setAttribute('aria-label',h[0]);b.style.cssText='left:'+h[1]+'%;top:'+h[2]+'%;width:'+h[3]+'%;height:'+h[4]+'%';fr.appendChild(b);I.push({n:h[0],s:h[5],el:b})});
-I.push({n:'Rosto',s:face,el:bd});
+I.push({n:'Rosto',s:face,el:bd});bd.tabIndex=0;bd.setAttribute('role','button');bd.setAttribute('aria-label','Ampliar rosto');bd.setAttribute('aria-expanded','false');bd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cur<0?sh(I.length-1):hide()}else if(e.key==='Escape'){hide()}});bd.addEventListener('blur',hide);document.addEventListener('visibilitychange',()=>{if(document.hidden)hide()});const faceObserver=new IntersectionObserver(es=>{if(!es[0].isIntersecting)hide()},{threshold:.01});faceObserver.observe(fig);
 I.forEach((o,i)=>{if(touch){o.el.onclick=ev=>{ev.stopPropagation();cur==i?hide():sh(i)}}else{o.el.onmouseenter=()=>sh(i);o.el.onmouseleave=hide}});
 if(touch)fig.onclick=hide;tabHooks.push(()=>{if(!fig.closest('section').classList.contains('on')){hide();if(zvid)zvid.pause()}});hide()}
 const BV=["assets/video/corpo-frente.mp4","assets/video/corpo-sobrecarga.mp4","assets/video/corpo-rupture.mp4"];
 document.querySelectorAll('video.bv').forEach(v=>{v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.disablePictureInPicture=true;v.playbackRate=1});
-const bio=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target;if(e.isIntersecting&&v.closest('section').classList.contains('on')){vsrc(v,BV[+v.dataset.v]);v.playbackRate=1;const p=v.play();if(p&&p.catch)p.catch(()=>{})}else v.pause()}),{threshold:.01});document.querySelectorAll('video.bv').forEach(v=>bio.observe(v));
+const bodyVideos=[...document.querySelectorAll('video.bv')];
+function syncBodies(){for(const v of bodyVideos){if(isVisible(v)&&!reduced.matches){vsrc(v,BV[+v.dataset.v]);v.playbackRate=1;v.play().catch(()=>{})}else v.pause()}}
+const bio=new IntersectionObserver(syncBodies,{threshold:.01});bodyVideos.forEach(v=>bio.observe(v));
+tabHooks.push(syncBodies);document.addEventListener('visibilitychange',syncBodies);reduced.addEventListener('change',syncBodies);
+
 zoomer($('#bigf'),[],'assets/img/zoom-rosto-frente.webp',undefined,'assets/video/zoom-rosto-frente.mp4');
 zoomer(document.querySelector('#s2 .hl figure'),[],'assets/img/rosto-sobrecarga.webp',undefined,'assets/video/zoom-rosto-sobrecarga.mp4');
 zoomer(document.querySelector('#s3 .hl figure'),[],'assets/img/zoom-rosto-rupture.webp',undefined,'assets/video/zoom-rosto-rupture.mp4');
 let sg=0;
 document.addEventListener('click',e=>{const el=e.target.closest('.q,.nd,.ref,nav button,.ctl button,.abtn,.tgl');if(!el)return;sfx.tick();if(el.classList.contains('tgl'))setTimeout(()=>{const b=tg.s&&tg.o;if(b&&!sg)sfx.surge();sg=b?1:0},0)});
-const EP=[{n:'Normal',i:'assets/img/olhos-normal.webp',t:'Olhos cinzentos. Fearness está em repouso, sem energia na reserva.'},{n:'Reserva',i:'assets/img/olhos-reserva.webp',t:'Olhos roxos. Há energia na reserva, seja logo após absorver, seja enquanto ela é usada.'},{n:'Sobrecarga',i:'assets/img/olhos-sobrecarga.webp',t:'Olho branco brilhante com raios roxos. A energia ultrapassou o limite e vaza de forma instável.'}];
-const ER=[{n:'Normal',i:'assets/img/mascara-normal.webp',t:'Máscara em repouso: o vazio das órbitas permanece escuro.'},{n:'Reserva',i:'assets/img/mascara-reserva.webp',t:'Um vórtice roxo se forma dentro da órbita enquanto há energia na reserva.'},{n:'Sobrecarga',i:'assets/img/mascara-sobrecarga.webp',t:'A órbita explode em luz branca com contorno roxo: a reserva passou do limite.'}];
+const EP=[{n:'Normal',i:'assets/img/olhos-normal.webp',t:'Os olhos permanecem cinzentos enquanto o reservatório energético está vazio.'},{n:'Reserva',i:'assets/img/olhos-reserva.webp',t:'Olhos roxos. Há energia na reserva, seja logo após absorver, seja enquanto ela é usada.'},{n:'Sobrecarga',i:'assets/img/olhos-sobrecarga.webp',t:'Olho branco brilhante com raios roxos. A energia ultrapassou o limite e vaza de forma instável.'}];
+const ER=[{n:'Normal',i:'assets/img/mascara-normal.webp',t:'As órbitas permanecem escuras enquanto o excedente energético é mínimo, condição presente no início da transformação e na proximidade de seu encerramento.'},{n:'Reserva',i:'assets/img/mascara-reserva.webp',t:'Um vórtice roxo se forma dentro da órbita conforme o excedente energético se acumula na reserva adicional.'},{n:'Sobrecarga',i:'assets/img/mascara-sobrecarga.webp',t:'A órbita explode em luz branca com contorno roxo quando a energia ultrapassa o limite da reserva expandida.'}];
 function eyeCar(sel,items){const w=$(sel),im=w.querySelector('.ei'),ov=w.querySelector('.eo'),en=w.querySelector('.en'),et=w.querySelector('.et'),pv=w.querySelector('.ep'),nx=w.querySelector('.nx');let i=0,tm=0,fin=null;
 const txt=()=>{en.textContent=items[i].n;et.textContent=items[i].t;pv.disabled=i==0;nx.disabled=i==items.length-1;w.classList.remove('tx')};
 function done(){clearTimeout(tm);if(fin){fin();fin=null}}
@@ -631,16 +764,16 @@ pv.onclick=()=>{if(i>0){i--;go(-1)}};nx.onclick=()=>{if(i<items.length-1){i++;go
 const EV=["assets/video/olhos-normal-reserva.mp4","assets/video/olhos-reserva-sobrecarga.mp4","assets/video/olhos-sobrecarga-reserva.mp4","assets/video/olhos-reserva-normal.mp4"];
 const EH='O roxo aqui indica a energia diminuindo: a Sobrecarga só termina quando a reserva chega a zero e o olho fica cinza.';
 const EVR=["assets/video/mascara-normal-reserva.mp4","assets/video/mascara-reserva-sobrecarga.mp4","assets/video/mascara-sobrecarga-reserva.mp4","assets/video/mascara-reserva-normal.mp4"];
-const EHR='O roxo aqui indica a energia diminuindo: a Sobrecarga só termina quando a reserva chega a zero e a órbita volta a ficar escura.';
+const EHR='O roxo indica a redução do excedente energético. Ao esgotá-lo, a transformação termina; a Sobrecarga permanece até a reserva total chegar a zero.';
 // 2,2x: 3,04 s -> ~1,38 s; a mistura final usa tempo real, não tempo do arquivo.
 const EYE_RATE=2.2,EYE_FADE=.24;
 function eyeVid(sel,items,VID,HINT){
  VID=VID||EV;HINT=HINT||EH;
  const w=$(sel),fr=w.querySelector('.fr'),im=w.querySelector('.ei'),en=w.querySelector('.en'),et=w.querySelector('.et'),pv=w.querySelector('.ep'),nx=w.querySelector('.nx');
  const section=w.closest('section'),MAP={'0>1':0,'1>2':1,'2>1':2,'1>0':3};
- let i=0,busy=false,back=0,warming=false;
+ let i=0,busy=false,back=0,warming=false,cancelPlayback=null,releaseTimer=0;
  const eh=document.createElement('p');eh.className='eh';eh.hidden=true;eh.textContent=HINT;et.after(eh);
- function set(){en.textContent=items[i].n;et.textContent=items[i].t;eh.hidden=!(back&&i==1);pv.disabled=busy||i==0;nx.disabled=busy||i==items.length-1}
+ function set(){const draining=!!(back&&i===1);en.textContent=draining?'Sobrecarga — dissipação':items[i].n;et.textContent=draining?(sel==='#eyeR'?'O vórtice roxo acompanha a redução do excedente energético.':'Os olhos recuperam a coloração roxa conforme a energia diminui.'):items[i].t;eh.hidden=!draining;pv.disabled=busy||i==0;nx.disabled=busy||i==items.length-1}
  const vs=VID.map(()=>{const v=document.createElement('video');v.className='ev';v.muted=true;v.defaultMuted=true;v.volume=0;v.playsInline=true;v.controls=false;v.loop=false;v.preload='none';v.disablePictureInPicture=true;v.disableRemotePlayback=true;
  ['muted','playsinline','webkit-playsinline','disablepictureinpicture','disableremoteplayback'].forEach(a=>v.setAttribute(a,''));v.setAttribute('aria-hidden','true');v.tabIndex=-1;fr.appendChild(v);return v});
  const prepared=[];
@@ -648,19 +781,20 @@ function eyeVid(sel,items,VID,HINT){
   if(!prepared[k]){
    const v=vs[k];let blobURL='';const ac=new AbortController(),timeout=setTimeout(()=>ac.abort(),45000);
    // Os clipes curtos são transferidos integralmente antes da reprodução.
-   const task=(async()=>{try{const url=VID[k];if(bgJob?.url===url)bgYield();videoRequested.add(url);let source=bgVideo.get(url);if(!source){const r=await fetch(url,{signal:ac.signal});if(!r.ok)throw new Error('Vídeo indisponível');const blob=await r.blob();blobURL=URL.createObjectURL(blob);source=blobURL}v.preload='auto';v.src=source;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;
+   const task=(async()=>{try{const url=VID[k];if(bgJob?.url===url)bgYield();videoRequested.add(url);let source=takeVideo(url,v);if(!source){const r=await fetch(url,{signal:ac.signal});if(!r.ok)throw new Error('Vídeo indisponível');const blob=await r.blob();blobURL=URL.createObjectURL(blob);ownedVideo.set(v,blobURL);source=blobURL}v.preload='auto';v.src=source;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;
     await mediaTimeout(new Promise((resolve,reject)=>{const clean=()=>{v.removeEventListener('loadeddata',ok);v.removeEventListener('canplay',ok);v.removeEventListener('error',fail)};const ok=()=>{if(v.readyState>=2){clean();resolve()}};const fail=()=>{clean();reject(new Error('Vídeo inválido'))};v.addEventListener('loadeddata',ok);v.addEventListener('canplay',ok);v.addEventListener('error',fail);ok()}));return v;
    }finally{clearTimeout(timeout)}})();
-   prepared[k]=foreground(task.catch(err=>{v.pause();v.removeAttribute('src');v.load();if(blobURL)URL.revokeObjectURL(blobURL);videoRequested.delete(VID[k]);delete prepared[k];throw err}));
+   prepared[k]=foreground(task.catch(err=>{clearVideo(v,VID[k]);delete prepared[k];throw err}));
   }return prepared[k];
  }
  async function warm(){if(warming||!section.classList.contains('on'))return;warming=true;
   items.forEach(e=>decodedImage(e.i).catch(()=>{}));
   try{const preferred=[i+1,i-1].filter(j=>j>=0&&j<items.length).map(j=>MAP[i+'>'+j]);for(const k of new Set([...preferred,0,1,2,3])){if(!section.classList.contains('on'))break;try{await prepare(k)}catch(_){}}}finally{warming=false}
  }
- tabHooks.push(()=>{if(section.classList.contains('on')){if(!im.hasAttribute('src')){im.src=items[i].i;im.alt=items[i].n}afterMainBodies(sel,()=>{if(section.classList.contains('on'))warm()})}});
+ function releaseInactive(){clearTimeout(releaseTimer);if(!section.classList.contains('on')&&!busy&&!warming){vs.forEach((v,k)=>{if(v.hasAttribute('src'))clearVideo(v,VID[k]);delete prepared[k]})}else if(!section.classList.contains('on'))releaseTimer=setTimeout(releaseInactive,10000)}
+ tabHooks.push(()=>{clearTimeout(releaseTimer);if(!section.classList.contains('on')){cancelPlayback?.();releaseTimer=setTimeout(releaseInactive,30000);return}if(section.classList.contains('on')){if(!im.hasAttribute('src')){im.src=items[i].i;im.alt=items[i].n}afterMainBodies(sel,()=>{if(section.classList.contains('on'))warm()})}});
  async function go(d){if(busy)return;bgYield();const j=i+d;if(j<0||j>=items.length)return;
-  const from=i,e=items[j],k=MAP[i+'>'+j];busy=true;set();w.setAttribute('aria-busy','true');mediaNotice(w,'');
+  const from=i,e=items[j],k=MAP[i+'>'+j];busy=true;set();w.setAttribute('aria-busy','true');mediaNotice(w,'');const stopWaiting=waitNotice(w,'Preparando transição…');
   let v=null,shown=false,ready=false,raf=0,frame=0,labelTimer=0,stall=0,ended=false,swapped=false,cleanup=()=>{};
   const oldBack=back;
   function label(){i=j;back=from==2&&j==1?1:0;set();w.classList.remove('tx')}
@@ -668,10 +802,10 @@ function eyeVid(sel,items,VID,HINT){
   function fade(){if(ended||!shown)return;const dur=v.duration;if(ready&&Number.isFinite(dur)&&dur>0){const t=Math.max(0,Math.min(1,(dur-v.currentTime)/(EYE_FADE*EYE_RATE)));v.style.opacity=String(t*t*(3-2*t))}raf=requestAnimationFrame(fade)}
   try{
    [v]=await Promise.all([prepare(k),decodedImage(e.i),decodedImage(items[from].i)]);
-   if(!section.classList.contains('on'))return;
+   stopWaiting();if(!isActive(section))return;
    v.style.opacity='0';v.style.transition='none';v.currentTime=0;v.defaultPlaybackRate=EYE_RATE;v.playbackRate=EYE_RATE;
    await new Promise((resolve,reject)=>{
-    const fail=()=>reject(new Error('Reprodução interrompida'));
+    const fail=()=>reject(new Error('Reprodução interrompida'));cancelPlayback=()=>reject(new Error('cancelled'));
     const resetStall=()=>{clearTimeout(stall);stall=setTimeout(fail,45000)};
     const showFrame=()=>{if(shown||ended)return;shown=true;v.style.opacity='1';w.classList.add('tx');labelTimer=setTimeout(label,400);revealTarget().catch(fail);raf=requestAnimationFrame(fade)};
     const playing=()=>{if(!v.requestVideoFrameCallback)requestAnimationFrame(showFrame)};
@@ -684,10 +818,10 @@ function eyeVid(sel,items,VID,HINT){
    ended=true;cancelAnimationFrame(raf);clearTimeout(labelTimer);
    if(!ready){im.src=e.i;im.alt=e.n;if(im.decode)await im.decode();ready=true}
    label();if(Number(v.style.opacity)>.01){v.style.transition='opacity '+EYE_FADE+'s ease-out';await nextPaint();v.style.opacity='0';await new Promise(r=>setTimeout(r,EYE_FADE*1000+30))}
-  }catch(err){i=from;back=oldBack;im.src=items[from].i;im.alt=items[from].n;mediaNotice(w,'Não foi possível reproduzir a transição. Tente novamente.')}
-  finally{ended=true;cancelAnimationFrame(raf);clearTimeout(stall);clearTimeout(labelTimer);cleanup();if(v){if(frame&&v.cancelVideoFrameCallback)v.cancelVideoFrameCallback(frame);v.pause();v.style.opacity='0';v.style.transition=''}busy=false;w.removeAttribute('aria-busy');w.classList.remove('tx');set();afterMainBodies(sel,()=>{if(section.classList.contains('on'))warm()})}
+  }catch(err){stopWaiting();i=from;back=oldBack;im.src=items[from].i;im.alt=items[from].n;if(err.message!=='cancelled')mediaNotice(w,'Não foi possível reproduzir a transição. Tente novamente.')}
+  finally{cancelPlayback=null;ended=true;cancelAnimationFrame(raf);clearTimeout(stall);clearTimeout(labelTimer);cleanup();if(v){if(frame&&v.cancelVideoFrameCallback)v.cancelVideoFrameCallback(frame);v.pause();v.style.opacity='0';v.style.transition=''}busy=false;w.removeAttribute('aria-busy');w.classList.remove('tx');set();afterMainBodies(sel,()=>{if(section.classList.contains('on'))warm()})}
  }
- pv.onclick=()=>go(-1);nx.onclick=()=>go(1);im.alt=items[0].n;set();
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelPlayback?.()});pv.onclick=()=>go(-1);nx.onclick=()=>go(1);im.alt=items[0].n;en.setAttribute('aria-live','polite');set();
 }
 eyeVid('#eyeP',EP);eyeVid('#eyeR',ER,EVR,EHR);
 document.querySelectorAll('.key').forEach(e=>{e.innerHTML=hl(e.textContent)});
@@ -700,11 +834,11 @@ function tl(id,S){const w=$('#'+id);w.className='tl';w.innerHTML='<div class="tn
 quads('q0b',[['Roupa base','Camisa e calça pretas, sem casaco nem cinto.','A base do visual de Fearness: camisa preta de gola em V e calça preta larga, com botas. É o que ele veste por baixo do casaco; o casaco e o cinto entram por cima dela.','assets/img/roupa-base.webp'],
 ['Casaco e gola','Longo, preto, com bordas brancas.','Casaco longo preto com faixas brancas verticais e barra pontiaguda, ombreiras hexagonais com borda branca e uma gola de pelo branco que cobre ombros e nuca.','assets/img/casaco-gola.webp'],
 ['Acessório de obsidiana','Acessório na região do peitoral.','Ornamentos negros com borda prateada, em forma de dragão com um olho branco, presos na região do peitoral, junto à gola de pelo.','assets/img/acessorio-obsidiana.webp'],
-['Selos','Faixas negras nos antebraços.','As faixas enroladas nos antebraços são os selos: limitam o armazenamento de energia e o acesso à Forsaken Rupture. Na transformação, os braços aparecem pretos e brilhantes, sem elas.','assets/img/selos-antebraco.webp'],
+['Selos','Faixas negras nos antebraços.','As faixas negras dos antebraços atuam como selos que restringem o acesso à Forsaken Rupture e, consequentemente, à sua capacidade adicional de armazenamento energético. Na transformação, os braços apresentam marcas negras e brilhantes.','assets/img/selos-antebraco.webp'],
 ['Cinto','Largo e preto.','Um cinto largo e preto na cintura, que separa o casaco da calça. As faixas brancas do casaco descem dos dois lados dele.','assets/img/cinto.webp'],
 ['Botas e enfaixados','Fivela e canelas enfaixadas.','Botas pretas de sola grossa com uma fivela na altura do tornozelo, e as canelas enfaixadas no mesmo padrão dos antebraços.','assets/img/botas.webp']]);
-quads('q3b',[['Máscara óssea','Crânio com grandes chifres.','Uma máscara de crânio de osso, com chifres segmentados, cobre o rosto e os olhos. A máscara esquelética reproduz características do rosto da entidade derrotada, manifestando parte de sua constituição assimilada durante o ritual. Os olhos da máscara também seguem Normal, Reserva e Sobrecarga.','assets/img/mascara-ossea.webp'],['Marcas negras','Surgem por todo o corpo.','As marcas negras surgem por todo o corpo: nos braços, nos ombros, no peitoral, no abdômen, nas coxas, nas pernas e também no pescoço e no rosto. Durante a transformação, elas são manifestações da constituição da entidade parcialmente integrada a Fearness.','assets/img/marcas-negras.webp'],['Manifestação sombria','A energia fica instável.','As manifestações elétricas de Fearness incorporam características sombrias, com aparência mais instável e ameaçadora. Esses efeitos sombrios refletem as características da entidade incorporadas à transformação, alterando tanto a manifestação visual quanto a composição da energia utilizada por Forsaken.','assets/img/manifestacao-sombria.webp']]);
-function sstU(){const e=$('#sst');if(!e)return;const s=tg.s,o=tg.o;e.innerHTML=[['Armazenamento',s?'Limite dos selos removido':'Limitado pelos selos'],['Anulação e absorção',o?'Interrompidas (Sobrecarga)':'Ativas'],['Acesso à Rupture',s&&o?'Liberado':'Bloqueado']].map(r=>'<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')}
+quads('q3b',[['Máscara óssea','Crânio com grandes chifres.','Uma máscara de crânio de osso, com chifres segmentados, cobre o rosto e os olhos. A máscara esquelética reproduz características do rosto da entidade derrotada, manifestando parte de sua constituição assimilada durante o ritual. O dinamismo dos olhos da máscara acompanha as condições da reserva adicional, nos estados Normal, Reserva e Sobrecarga.','assets/img/mascara-ossea.webp'],['Marcas negras','Surgem por todo o corpo.','As marcas negras surgem por todo o corpo: nos braços, nos ombros, no peitoral, no abdômen, nas coxas, nas pernas e também no pescoço e no rosto. Durante a transformação, elas são manifestações da constituição da entidade parcialmente integrada a Fearness.','assets/img/marcas-negras.webp'],['Manifestação sombria','Características sombrias da entidade.','Durante a Forsaken Rupture, as manifestações energéticas de Forsaken incorporam características provenientes da constituição da entidade assimilada, adquirindo uma aparência sombria.','assets/img/manifestacao-sombria.webp']]);
+function sstU(){const e=$('#sst');if(!e)return;const s=tg.s,o=tg.o;e.innerHTML=[['Armazenamento',s&&o?'Capacidade expandida':o?'Instável':'Convencional'],['Anulação e absorção',o&&!s?'Interrompidas':'Ativas'],['Forsaken Rupture',s&&o?'Ativa':s?'Liberada':'Restringida']].map(r=>'<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')}
 sstU();
 
 document.querySelectorAll('.eye').forEach(e=>{const h=e.previousElementSibling;if(h&&h.tagName==='H3')h.style.textAlign='center'});
@@ -719,7 +853,7 @@ const W=['Poder','Selo','Selos','I','II','III'];function sh(){document.querySele
 function ok(n){for(let p=n.parentNode;p;p=p.parentNode){if(p.nodeType===1&&(p.getAttribute('translate')==='no'||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName)))return false}return true}
 function prot(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),L=[];let n;while(n=w.nextNode()){R.lastIndex=0;if(R.test(n.nodeValue)&&ok(n))L.push(n)}
 L.forEach(t=>{const f=document.createDocumentFragment();t.nodeValue.split(R).forEach((p,i)=>{if(i%2){const e=document.createElement('span');e.setAttribute('translate','no');e.className='notranslate';e.textContent=p;f.appendChild(e)}else if(p)f.appendChild(document.createTextNode(p))});t.parentNode.replaceChild(f,t)})}
-let busy=0;const mo=new MutationObserver(()=>{if(busy)return;busy=1;requestAnimationFrame(()=>{mo.disconnect();sh();prot(document.body);mo.observe(document.body,{childList:true,subtree:true,characterData:true});busy=0})});
+let busy=0;const pending=new Set();const mo=new MutationObserver(records=>{for(const rec of records){if(rec.type==='characterData')pending.add(rec.target.parentElement);else for(const n of rec.addedNodes)pending.add(n.nodeType===1?n:n.parentElement)}if(busy)return;busy=1;requestAnimationFrame(()=>{mo.disconnect();sh();for(const el of pending)if(el?.isConnected)prot(el);pending.clear();mo.observe(document.body,{childList:true,subtree:true,characterData:true});busy=0})});
 sh();prot(document.body);mo.observe(document.body,{childList:true,subtree:true,characterData:true});
 document.documentElement.setAttribute('lang','pt-BR')})();
 </script>
