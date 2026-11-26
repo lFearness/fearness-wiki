@@ -238,7 +238,7 @@ h2{font-size:clamp(2.1rem,8.5vw,3.4rem)!important;margin:28px 0 18px!important}
 .eqn{flex-wrap:nowrap;gap:4px}.eqn span{flex:1;text-align:center;padding:6px 3px;font-size:.66rem}.eqn i{font-size:1rem}
 }
 .prg .ctl{position:relative;justify-content:center}.prg .ctl .pn{position:absolute;right:6px;top:50%;transform:translateY(-50%);min-width:0!important;font-family:'Cinzel',Georgia,serif;font-size:.95rem!important;color:var(--pu2)}
-section>h2{color:#fff!important;-webkit-text-stroke:0;font-size:clamp(1.2rem,5.4vw,2.5rem)!important;letter-spacing:.075em;white-space:nowrap;text-shadow:1.6px 0 0 #8a3ffc,-1.6px 0 0 #8a3ffc,0 1.6px 0 #8a3ffc,0 -1.6px 0 #8a3ffc,1.13px 1.13px 0 #8a3ffc,-1.13px 1.13px 0 #8a3ffc,1.13px -1.13px 0 #8a3ffc,-1.13px -1.13px 0 #8a3ffc,0 0 14px #8a3ffc99}
+section>h2{color:#d8bbff!important;-webkit-text-stroke:0;font-size:clamp(1.2rem,5.4vw,2.5rem)!important;letter-spacing:.075em;white-space:nowrap;text-shadow:1.6px 0 0 #8a3ffc,-1.6px 0 0 #8a3ffc,0 1.6px 0 #8a3ffc,0 -1.6px 0 #8a3ffc,1.13px 1.13px 0 #8a3ffc,-1.13px 1.13px 0 #8a3ffc,1.13px -1.13px 0 #8a3ffc,-1.13px -1.13px 0 #8a3ffc,0 0 8px #e7d4ff,0 0 18px #b77bff,0 0 28px #8a3ffc88}
 @media(max-width:700px){#fil{flex-wrap:nowrap;gap:4px}#fil .tgf{flex:1 1 auto;padding:7px 3px;font-size:.64rem;white-space:nowrap;text-align:center}}
 #fc{flex-wrap:nowrap}
 @media(max-width:700px){#fc{gap:4px}#fc .tgf{flex:1 1 auto;padding:7px 3px;font-size:clamp(.5rem,2.6vw,.66rem);white-space:nowrap;text-align:center}}
@@ -492,7 +492,7 @@ nav{overscroll-behavior-x:contain}
 <script>
 const $=s=>document.querySelector(s);
 const raf1=fn=>{let p=0;return()=>{if(p)return;p=requestAnimationFrame(()=>{p=0;fn()})}};
-// Recursos visuais: nenhuma fonte de vídeo é atribuída antes de ser necessária.
+// Recursos essenciais preparados globalmente, sem iniciar reprodução fora da área visível.
 const tabHooks=[];
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const isActive=el=>!document.hidden&&!!el.closest('section.on');
@@ -508,7 +508,29 @@ const mainBodies=[
  {tab:3,poster:'assets/img/poster-corpo-rupture.webp',video:'assets/video/corpo-rupture.mp4'}
 ];
 const mainBodyURLs=new Set(mainBodies.flatMap(b=>[b.poster,b.video]));
-function bodyOrder(){const i=Number(document.body.dataset.t)||0;const bodies=[...mainBodies].sort((a,b)=>Number(b.tab===i)-Number(a.tab===i));return [...bodies.map(b=>b.poster),...bodies.map(b=>b.video)]}
+const bodyVideoURLs=new Set(mainBodies.map(b=>b.video));
+// Recursos expostos sem abrir quadrantes, incluindo as exceções interativas.
+const exposedMedia=[
+ ['assets/img/poster-corpo-frente.webp','assets/img/rosto-frente.webp','assets/img/lado.webp','assets/img/costas.webp'],
+ ['assets/img/ciclo-fearness.webp','assets/img/olhos-normal.webp'],
+ ['assets/img/poster-corpo-sobrecarga.webp','assets/img/rosto-sobrecarga.webp','assets/img/selo.webp'],
+ ['assets/img/poster-corpo-rupture.webp','assets/img/rosto-rupture.webp','assets/img/mascara-normal.webp']
+];
+const interactionMedia=[[],[
+ 'assets/img/olhos-reserva.webp','assets/video/olhos-normal-reserva.mp4','assets/img/olhos-sobrecarga.webp','assets/video/olhos-reserva-sobrecarga.mp4','assets/video/olhos-sobrecarga-reserva.mp4','assets/video/olhos-reserva-normal.mp4'
+ ],['assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],[
+ 'assets/img/mascara-reserva.webp','assets/video/mascara-normal-reserva.mp4','assets/img/mascara-sobrecarga.webp','assets/video/mascara-reserva-sobrecarga.mp4','assets/video/mascara-sobrecarga-reserva.mp4','assets/video/mascara-reserva-normal.mp4'
+ ]];
+const essentialURLs=new Set([...exposedMedia.flat(),...bodyVideoURLs,...interactionMedia.flat()]);
+const interactiveURLs=new Set([...interactionMedia.flat().filter(u=>u.endsWith('.webp')),'assets/img/olhos-normal.webp','assets/img/mascara-normal.webp','assets/img/selo.webp']);
+function mediaOrder(i){return [i,...[0,1,2,3].filter(k=>k!==i)]}
+function essentialOrder(i){
+ const order=mediaOrder(i),interactions=[];
+ // Alternar as famílias de interações para que uma aba não bloqueie a outra.
+ for(let n=0;n<6;n++)for(const k of order)if(interactionMedia[k][n])interactions.push(interactionMedia[k][n]);
+ const bodies=[...mainBodies].sort((a,b)=>Number(b.tab===i)-Number(a.tab===i));
+ return [...new Set([...bodies.map(b=>b.poster),...order.flatMap(k=>exposedMedia[k]),...bodies.map(b=>b.video),...interactions])];
+}
 // Uma fila para recursos especulativos; MP4 longos usam o carregador nativo.
 const bgDone=new Set(),fgPending=new Set(),bgRetry=new Map(),ownedVideo=new WeakMap();
 const nativeMedia=new Map(),clipCache=new Map(),clipPending=new Map(),bodyWarmQueue=new Map();
@@ -516,7 +538,7 @@ const shortClip=u=>/\/(olhos|mascara)-.*\.mp4$/.test(u);
 const net=()=>navigator.connection||navigator.mozConnection||navigator.webkitConnection;
 const lowMemory=typeof navigator.deviceMemory==='number'&&navigator.deviceMemory<=4;
 const CLIP_LIMIT=(lowMemory?12:24)*1024*1024;
-let bgReady=false,clipBytes=0,bgJob=null,bgTimer=0,bgAfter=0,bodyPriorityUntil=0,pressureUntil=0;
+let bgReady=false,clipBytes=0,bgJob=null,bgTimer=0,bgAfter=0,pressureUntil=0;
 // Uma imagem já apresentada não precisa de novo pré-carregamento.
 const knownImages=new Set();
 document.addEventListener('load',e=>{const im=e.target;if(im instanceof HTMLImageElement&&im.naturalWidth){const url=im.getAttribute('src');if(url?.startsWith('assets/'))knownImages.add(url)}},{capture:true});
@@ -525,34 +547,60 @@ try{if(PerformanceObserver.supportedEntryTypes?.includes('longtask')){const obse
 function bgAllowed(){const c=net();return bgReady&&!document.hidden&&navigator.onLine!==false&&!(c&&(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'')||(typeof c.downlink==='number'&&c.downlink<2)))}
 function bgSchedule(ms=700){clearTimeout(bgTimer);if(bgAllowed())bgTimer=setTimeout(bgStep,ms)}
 function bgYield(ms=900,interrupt=false){bgAfter=Math.max(bgAfter,Date.now()+ms); // não descartar transferências úteis a cada toque
- if(interrupt&&bgJob&&!mainBodyURLs.has(bgJob.url)&&!shortClip(bgJob.url))bgJob.controller.abort();bgSchedule(ms)}
+ if(interrupt&&bgJob&&!essentialURLs.has(bgJob.url))bgJob.controller.abort();bgSchedule(ms)}
 function foreground(task){fgPending.add(task);const done=()=>{fgPending.delete(task);bgSchedule()};task.then(done,done);return task}
 function rememberClip(url,blob){if(clipCache.has(url)){clipBytes-=clipCache.get(url).size;clipCache.delete(url)}while(clipBytes+blob.size>CLIP_LIMIT&&clipCache.size){const k=clipCache.keys().next().value;clipBytes-=clipCache.get(k).size;clipCache.delete(k)}if(blob.size<=CLIP_LIMIT){clipCache.set(url,blob);clipBytes+=blob.size}return blob}
 function getClip(url){if(clipCache.has(url)){const b=clipCache.get(url);clipCache.delete(url);clipCache.set(url,b);return Promise.resolve(b)}if(clipPending.has(url))return clipPending.get(url);const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),45000);const task=(async()=>{try{const r=await fetch(url,{signal:ac.signal,cache:'default'});if(!r.ok)throw Error('Vídeo indisponível');return rememberClip(url,await r.blob())}finally{clearTimeout(timer);clipPending.delete(url)}})();clipPending.set(url,task);return task}
 function clearVideo(v,url){v.pause();v.removeAttribute('src');v.preload='none';v.load();const src=ownedVideo.get(v);if(src){URL.revokeObjectURL(src);ownedVideo.delete(v)}}
 function vsrc(v,url,mode='auto'){if(v.preload!==mode)v.preload=mode;if(!v.hasAttribute('src'))v.src=url}
 function registerNative(url,v){nativeMedia.set(url,v)}
-function nativeWarm(url,signal){const v=nativeMedia.get(url);if(!v||reduced.matches)return Promise.resolve();if(v.readyState>=1||(!v.paused&&v.hasAttribute('src')))return Promise.resolve();return new Promise(resolve=>{let timer=0;const finish=()=>{clearTimeout(timer);v.removeEventListener('loadedmetadata',finish);v.removeEventListener('error',finish);signal?.removeEventListener('abort',finish);resolve()};v.addEventListener('loadedmetadata',finish,{once:true});v.addEventListener('error',finish,{once:true});signal?.addEventListener('abort',finish,{once:true});timer=setTimeout(finish,2500);vsrc(v,url,'metadata');if(v.readyState>=1)finish()})}
-function bgKnown(url){return bgDone.has(url)||knownImages.has(url)||clipCache.has(url)||clipPending.has(url)||(nativeMedia.get(url)?.readyState>=1)}
+function nativeWarm(url,signal){
+ const v=nativeMedia.get(url);if(!v||reduced.matches)return Promise.resolve(true);
+ const body=bodyVideoURLs.has(url),target=body?2:1;
+ if(v.readyState>=target)return Promise.resolve(true);
+ return new Promise(resolve=>{let timer=0;
+  const finish=()=>{clearTimeout(timer);v.removeEventListener('loadedmetadata',check);v.removeEventListener('loadeddata',check);v.removeEventListener('canplay',check);v.removeEventListener('error',finish);signal?.removeEventListener('abort',finish);resolve(v.readyState>=target)};
+  const check=()=>{if(v.readyState>=target)finish()};
+  v.addEventListener('loadedmetadata',check);v.addEventListener('loadeddata',check);v.addEventListener('canplay',check);v.addEventListener('error',finish,{once:true});signal?.addEventListener('abort',finish,{once:true});
+  timer=setTimeout(finish,body?4500:2500);vsrc(v,url,body?'auto':'metadata');check();
+ });
+}
+function bgKnown(url){if(nativeMedia.has(url))return reduced.matches||(!bodyVideoURLs.has(url)&&bgDone.has(url))||nativeMedia.get(url).readyState>=(bodyVideoURLs.has(url)?2:1);return bgDone.has(url)||knownImages.has(url)||clipCache.has(url)||clipPending.has(url)}
 function afterMainBodies(key,fn){bodyWarmQueue.set(key,fn);bgSchedule(0)}
 function releaseBodyWarm(){if(!bgAllowed())return;const pending=[...bodyWarmQueue.values()];bodyWarmQueue.clear();pending.forEach(fn=>fn())}
-const priorityMedia=[[],['assets/img/olhos-normal.webp','assets/img/olhos-reserva.webp','assets/img/olhos-sobrecarga.webp',...mediaGroups[1].filter(shortClip)],['assets/img/selo.webp','assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],['assets/img/mascara-normal.webp','assets/img/mascara-reserva.webp','assets/img/mascara-sobrecarga.webp',...mediaGroups[3].filter(shortClip)]];
+async function warmImage(url){
+ const initialEye=url==='assets/img/olhos-normal.webp'?'#eyeP .ei':url==='assets/img/mascara-normal.webp'?'#eyeR .ei':null;
+ if(initialEye){const im=$(initialEye);if(im&&!im.hasAttribute('src')){im.dataset.src=url}}
+ const nodes=[...document.querySelectorAll('img:not(.qi)')].filter(im=>im.dataset.src===url||im.getAttribute('src')===url);
+ for(const im of nodes){im.loading='eager';loadImg(im)}
+ const poster=mainBodies.find(b=>b.poster===url);if(poster){const v=nativeMedia.get(poster.video);if(v&&v.dataset.poster){v.poster=url;delete v.dataset.poster}}
+ if(interactiveURLs.has(url)){await decodedImage(url,false);return}
+ // Decodificar a própria imagem visível quando possível; para posters, aquecer o cache.
+ const im=nodes[0];if(im){if(im.decode)await mediaTimeout(im.decode());else if(!im.complete)await mediaTimeout(new Promise((ok,fail)=>{im.addEventListener('load',ok,{once:true});im.addEventListener('error',fail,{once:true})}));if(!im.naturalWidth)throw Error('Imagem indisponível');return}
+ const img=new Image();img.decoding='async';img.src=url;await mediaTimeout(img.decode?img.decode():new Promise((ok,fail)=>{img.onload=ok;img.onerror=fail}));
+}
 async function bgStep(){
  if(bgJob||!bgAllowed())return;
  const now=Date.now(),i=Number(document.body.dataset.t)||0;
+ if(now<bgAfter||now<pressureUntil||fgPending.size||document.querySelector('section.on [aria-busy="true"]')){bgSchedule(350);return}
  const eligible=u=>!bgKnown(u)&&(!bgRetry.has(u)||bgRetry.get(u)<now);
- const first=bodyOrder().find(eligible);
- // Priorizar os corpos em todo o site, sem esperar seus arquivos completos.
- if(!first||now>=bodyPriorityUntil)releaseBodyWarm();
- if(now<bgAfter||now<pressureUntil||fgPending.size||document.querySelector('section.on [aria-busy="true"]')){bgSchedule(700);return}
- const order=[i,...mediaGroups.map((_,k)=>k).filter(k=>k!==i).sort((a,b)=>Math.abs(a-i)-Math.abs(b-i))];
- const rest=[...priorityMedia[i],...order.flatMap(k=>mediaGroups[k])].filter(u=>!mainBodyURLs.has(u));
- const url=(now>=bodyPriorityUntil?priorityMedia[i].find(eligible):null)||first||rest.find(eligible);
+ const essentials=essentialOrder(i),order=mediaOrder(i);
+ const first=essentials.find(eligible);
+ // Preparar o primeiro quadro do próximo clipe da aba ativa após iniciar os recursos essenciais.
+ if(!first||!exposedMedia[i].some(eligible)){releaseBodyWarm();if(fgPending.size){bgSchedule(350);return}}
+ const rest=order.flatMap(k=>mediaGroups[k]).filter(u=>!essentialURLs.has(u));
+ // Imagens de quadrantes e ampliações só depois das prioridades globais disponíveis.
+ const url=first||rest.find(eligible);
  if(!url){if(bgRetry.size)bgSchedule(15000);return}
  const controller=new AbortController(),job={url,controller};bgJob=job;const timer=setTimeout(()=>controller.abort(),45000);
- try{if(nativeMedia.has(url)){await nativeWarm(url,controller.signal)}else if(shortClip(url)){await getClip(url)}else{const r=await fetch(url,{signal:controller.signal,cache:'default',priority:mainBodyURLs.has(url)?'high':'low'});if(!r.ok)throw Error('Recurso indisponível');await r.arrayBuffer()}
-  if(!controller.signal.aborted){bgDone.add(url);bgRetry.delete(url)}
- }catch(e){if(!controller.signal.aborted)bgRetry.set(url,Date.now()+30000)}finally{clearTimeout(timer);if(bgJob===job)bgJob=null;bgSchedule(350)}
+ try{
+  let ready=true;
+  if(nativeMedia.has(url)){ready=await nativeWarm(url,controller.signal)}
+  else if(shortClip(url)){await getClip(url)}
+  else if(essentialURLs.has(url)){await warmImage(url)}
+  else{const r=await fetch(url,{signal:controller.signal,cache:'default',priority:'low'});if(!r.ok)throw Error('Recurso indisponível');await r.arrayBuffer()}
+  if(!controller.signal.aborted){if(ready){bgDone.add(url);bgRetry.delete(url)}else bgRetry.set(url,Date.now()+30000)}
+ }catch(e){if(!controller.signal.aborted)bgRetry.set(url,Date.now()+30000)}finally{clearTimeout(timer);if(bgJob===job)bgJob=null;bgSchedule(100)}
 }
 function bgResume(){if(bgAllowed())bgSchedule(0);else{clearTimeout(bgTimer);if(bgJob&&!shortClip(bgJob.url))bgJob.controller.abort()}}
 document.addEventListener('visibilitychange',bgResume);addEventListener('online',bgResume);addEventListener('offline',bgResume);net()?.addEventListener?.('change',bgResume);
@@ -562,13 +610,13 @@ document.addEventListener('pointerdown',e=>{if(e.target.closest('button,.badge,.
 const interactiveImages=new Map();
 const IMAGE_KEEP=lowMemory?5:9;
 function mediaTimeout(task,ms=45000){let t;return Promise.race([task,new Promise((_,reject)=>{t=setTimeout(()=>reject(new Error('Tempo de carregamento excedido')),ms)})]).finally(()=>clearTimeout(t))}
-function decodedImage(url){
+function decodedImage(url,urgent=true){
  if(interactiveImages.has(url)){const p=interactiveImages.get(url);interactiveImages.delete(url);interactiveImages.set(url,p);return p}
  if(!interactiveImages.has(url)){
   const img=new Image();img.decoding='async';img.loading='eager';
   const task=new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
   const ready=mediaTimeout(task.then(async()=>{if(img.decode)await img.decode();return img})).catch(err=>{interactiveImages.delete(url);throw err});
-  interactiveImages.set(url,foreground(ready));ready.then(()=>{bgDone.add(url);while(interactiveImages.size>IMAGE_KEEP){const k=interactiveImages.keys().next().value;if(k===url)break;interactiveImages.delete(k)}},()=>{});
+  interactiveImages.set(url,urgent?foreground(ready):ready);ready.then(()=>{bgDone.add(url);while(interactiveImages.size>IMAGE_KEEP){const k=interactiveImages.keys().next().value;if(k===url)break;interactiveImages.delete(k)}},()=>{});
  }
  return interactiveImages.get(url);
 }
@@ -576,7 +624,7 @@ function mediaNotice(root,message){let n=root.querySelector('.media-notice');if(
 function waitNotice(root,message){const timer=setTimeout(()=>mediaNotice(root,message),250);return()=>{clearTimeout(timer);mediaNotice(root,'')}}
 const nextPaint=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
 
-function activateMedia(i){bgYield(500,true);bodyPriorityUntil=Date.now()+3500;const sec=$('#s'+i);sec.querySelectorAll('img[data-src]:not(.qi)').forEach(loadImg);sec.querySelectorAll('video[data-poster]').forEach(v=>{v.poster=v.dataset.poster;delete v.dataset.poster});tabHooks.forEach(fn=>fn(i))}
+function activateMedia(i){bgYield(250,true);const sec=$('#s'+i);sec.querySelectorAll('img[data-src]:not(.qi)').forEach(im=>{if(essentialURLs.has(im.dataset.src))im.loading='eager';loadImg(im)});sec.querySelectorAll('video[data-poster]').forEach(v=>{v.poster=v.dataset.poster;delete v.dataset.poster});tabHooks.forEach(fn=>fn(i))}
 const tabs=['Personagem','Poder','Restrição','Transformação'];
 let INIT=true;const dq=matchMedia('(min-width:1000px)');
 function navH(){const n=document.getElementById('nav');const h=n?n.offsetHeight:92;document.documentElement.style.setProperty('--nh',h+'px');return h}
@@ -759,8 +807,7 @@ endTitles.forEach((title,i)=>{const topic=document.createElement('div');topic.cl
 initBarClocks();
 const tg={s:0,o:0};const SI=document.querySelector('img[alt="Selo: faixas do antebraço"]'),SC=SI.parentNode.parentNode.querySelector('figcaption'),SS=[SI.dataset.src||SI.src,'assets/img/selo-removido.webp','assets/img/selo-rupture.webp'],SN=['Selo','Selos removidos','Forsaken Rupture'];let sc=0;SI.style.transition='opacity .25s';
 const sealRoot=SI.closest('.selo'),sealButtons=[$('#t1'),$('#t2')];let sealBusy=false;
-function warmSeals(){if(!bgAllowed())return;SS.forEach(url=>decodedImage(url).catch(()=>{}))}
-tabHooks.push(k=>{if(k===2){SI.loading='eager';afterMainBodies('seals',()=>{if(document.body.dataset.t==='2')warmSeals()})}});
+tabHooks.push(k=>{if(k===2)SI.loading='eager'});
 async function sealToggle(key){
  if(sealBusy)return;bgYield(2200,true);const next={...tg,[key]:tg[key]^1},n=next.s&&next.o?2:next.s?1:0;
  if(n===sc){Object.assign(tg,next);tgu();return}
@@ -793,8 +840,8 @@ const BV=["assets/video/corpo-frente.mp4","assets/video/corpo-sobrecarga.mp4","a
 document.querySelectorAll('video.bv').forEach(v=>{v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.disablePictureInPicture=true;v.playbackRate=1});
 const bodyVideos=[...document.querySelectorAll('video.bv')];
 bodyVideos.forEach(v=>registerNative(BV[+v.dataset.v],v));
-const bodyVisibility=new Map(),bodyRelease=new WeakMap();
-function syncBodies(){for(const v of bodyVideos){const active=isActive(v)&&bodyVisibility.get(v)&&!reduced.matches;clearTimeout(bodyRelease.get(v));if(active){vsrc(v,BV[+v.dataset.v]);v.playbackRate=1;if(v.paused)v.play().catch(()=>{})}else{v.pause();if(v.hasAttribute('src')){v.preload='metadata';if(!v.closest('section.on'))bodyRelease.set(v,setTimeout(()=>{if(!v.closest('section.on')&&v.paused){clearVideo(v,BV[+v.dataset.v]);}},60000))}}}}
+const bodyVisibility=new Map();
+function syncBodies(){for(const v of bodyVideos){const active=isActive(v)&&bodyVisibility.get(v)&&!reduced.matches;const url=BV[+v.dataset.v];if(active){vsrc(v,url);v.playbackRate=1;if(v.paused)v.play().catch(()=>{})}else{v.pause();if(reduced.matches&&v.hasAttribute('src'))clearVideo(v,url)}}}
 
 const bio=new IntersectionObserver(es=>{for(const e of es)bodyVisibility.set(e.target,e.isIntersecting&&e.intersectionRatio>=.01);syncBodies()},{threshold:.01});bodyVideos.forEach(v=>bio.observe(v));
 tabHooks.push(syncBodies);document.addEventListener('visibilitychange',syncBodies);reduced.addEventListener('change',syncBodies);
@@ -841,7 +888,6 @@ function eyeVid(sel,items,VID,HINT){
   }return prepared[k];
  }
  async function warm(){if(warming||busy||!bgAllowed()||!section.classList.contains('on'))return;warming=true;
-  items.forEach(e=>decodedImage(e.i).catch(()=>{}));
   try{const preferred=[i+1,i-1].filter(j=>j>=0&&j<items.length).map(j=>MAP[i+'>'+j]);for(const k of preferred.slice(0,1)){if(!section.classList.contains('on')||busy)break;try{await prepare(k)}catch(_){}}if(!busy){for(let k=0;k<vs.length;k++){if(!preferred.includes(k)&&vs[k].hasAttribute('src')){clearVideo(vs[k],VID[k]);delete prepared[k]}}}}finally{warming=false;bgSchedule(0)}
  }
  function releaseInactive(){clearTimeout(releaseTimer);if(!section.classList.contains('on')&&!busy&&!warming){vs.forEach((v,k)=>{if(v.hasAttribute('src'))clearVideo(v,VID[k]);delete prepared[k]})}else if(!section.classList.contains('on'))releaseTimer=setTimeout(releaseInactive,10000)}
@@ -900,8 +946,9 @@ quads('qib',[['Informações base','','<div class="ibr"><span>Idade</span><b>20 
 document.querySelectorAll('img.alt').forEach(i=>{i.decoding='async'});
 show(0);navH();INIT=false;bgAfter=0;
 const bgGo=()=>{if(bgReady)return;bgReady=true;bgSchedule(0)};
-if(document.readyState==='complete')setTimeout(bgGo,300);else addEventListener('load',()=>setTimeout(bgGo,300),{once:true});
-setTimeout(bgGo,4000);
+setTimeout(bgGo,200);
+// Cache opcional: se o arquivo não existir, o carregamento nativo continua normalmente.
+if('serviceWorker' in navigator&&window.isSecureContext){navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'}).catch(()=>{})}
 </script><script>
 /* Protege os nomes próprios/conceitos da tradução automática (translate="no") */
 (function(){const R=/(Forsaken Rupture|Fearness|Forsaken|Rupture|Reset)/gi;
