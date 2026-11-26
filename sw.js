@@ -1,10 +1,10 @@
 /* Fearness — cache opcional dos recursos essenciais. Atualize a versão ao substituir mídias. */
 'use strict';
-const CACHE='fearness-essential-v1';
+const CACHE='fearness-essential-v2';
 const MAX_AGE=12*60*60*1000;
 const IMAGES=['poster-corpo-frente','poster-corpo-sobrecarga','poster-corpo-rupture','rosto-frente','rosto-sobrecarga','rosto-rupture','lado','costas','ciclo-fearness','olhos-normal','olhos-reserva','olhos-sobrecarga','mascara-normal','mascara-reserva','mascara-sobrecarga','selo','selo-removido','selo-rupture'];
-const VIDEOS=['corpo-frente','corpo-sobrecarga','corpo-rupture',...['olhos','mascara'].flatMap(p=>['normal-reserva','reserva-sobrecarga','sobrecarga-reserva','reserva-normal'].map(s=>p+'-'+s))];
-const urls=new Set([...IMAGES.map(n=>'assets/img/'+n+'.webp'),...VIDEOS.map(n=>'assets/video/'+n+'.mp4')].map(p=>new URL(p,self.registration.scope).href));
+const VIDEOS=['corpo-frente','corpo-sobrecarga','corpo-rupture','selo-sem-selo','selo-sem-selo-inverso','selo-rupture','selo-rupture-inverso',...['olhos','mascara'].flatMap(p=>['normal-reserva','reserva-sobrecarga','sobrecarga-reserva','reserva-normal'].map(s=>p+'-'+s))];
+const urls=new Set([...IMAGES.map(n=>'assets/img/'+n+'.webp'),...VIDEOS.flatMap(n=>['assets/video/'+n+'.mp4?v=fps2','assets/video/'+n+'.mp4'])].map(p=>new URL(p,self.registration.scope).href));
 self.addEventListener('install',event=>{event.waitUntil(self.skipWaiting())});
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{try{for(const key of await caches.keys())if(key.startsWith('fearness-essential-')&&key!==CACHE)await caches.delete(key)}finally{await self.clients.claim()}})())});
 function fresh(response){const date=Date.parse(response.headers.get('date')||'');return Number.isFinite(date)&&Date.now()-date<MAX_AGE}
