@@ -238,7 +238,7 @@ h2{font-size:clamp(2.1rem,8.5vw,3.4rem)!important;margin:28px 0 18px!important}
 .eqn{flex-wrap:nowrap;gap:4px}.eqn span{flex:1;text-align:center;padding:6px 3px;font-size:.66rem}.eqn i{font-size:1rem}
 }
 .prg .ctl{position:relative;justify-content:center}.prg .ctl .pn{position:absolute;right:6px;top:50%;transform:translateY(-50%);min-width:0!important;font-family:'Cinzel',Georgia,serif;font-size:.95rem!important;color:var(--pu2)}
-section>h2{color:#fff!important;-webkit-text-stroke:0;font-size:clamp(1.2rem,5.4vw,2.5rem)!important;letter-spacing:.04em;white-space:nowrap;text-shadow:1.2px 0 0 var(--pu),-1.2px 0 0 var(--pu),0 1.2px 0 var(--pu),0 -1.2px 0 var(--pu),.85px .85px 0 var(--pu),-.85px .85px 0 var(--pu),.85px -.85px 0 var(--pu),-.85px -.85px 0 var(--pu),0 0 14px #8a3ffc99}
+section>h2{color:#fff!important;-webkit-text-stroke:0;font-size:clamp(1.2rem,5.4vw,2.5rem)!important;letter-spacing:.075em;white-space:nowrap;text-shadow:1.6px 0 0 #8a3ffc,-1.6px 0 0 #8a3ffc,0 1.6px 0 #8a3ffc,0 -1.6px 0 #8a3ffc,1.13px 1.13px 0 #8a3ffc,-1.13px 1.13px 0 #8a3ffc,1.13px -1.13px 0 #8a3ffc,-1.13px -1.13px 0 #8a3ffc,0 0 14px #8a3ffc99}
 @media(max-width:700px){#fil{flex-wrap:nowrap;gap:4px}#fil .tgf{flex:1 1 auto;padding:7px 3px;font-size:.64rem;white-space:nowrap;text-align:center}}
 #fc{flex-wrap:nowrap}
 @media(max-width:700px){#fc{gap:4px}#fc .tgf{flex:1 1 auto;padding:7px 3px;font-size:clamp(.5rem,2.6vw,.66rem);white-space:nowrap;text-align:center}}
@@ -392,13 +392,13 @@ button:focus-visible,.badge:focus-visible,[role="button"]:focus-visible{outline:
 }
 /* Hierarquia cromática e destaque dos quadrantes somente durante a interação. */
 h3{color:var(--pu-section)}
-@media(max-width:700px){section>h2{font-size:clamp(1.5rem,7vw,2.8rem)!important;white-space:normal;text-wrap:balance}}
-.q > b,.ref > b{color:var(--pu-title)}
+@media(max-width:700px){section>h2{font-size:clamp(1.65rem,7.8vw,3rem)!important;white-space:normal;text-wrap:balance}}
+.q > b,.ref > b{color:var(--pu2)}
 .q,.ref{-webkit-tap-highlight-color:transparent}
 .q:active,.ref:active,.ref.open,#qib .q.open,#qib .q:active{border-color:var(--pu);box-shadow:0 0 22px #8a3ffc55}
 
 /* Contorno individual dos números romanos. */
-#q0 .q .n,#q2 .q .n,#q3 .q .n{color:#fff;-webkit-text-stroke:2.4px var(--pu);paint-order:stroke fill;text-shadow:0 0 14px #8a3ffc99}
+#q0 .q .n,#q2 .q .n,#q3 .q .n{font-family:'trajan-pro-3','Trajan Pro 3','Trajan Pro','Cinzel',Georgia,serif;color:#fff;-webkit-text-stroke:3px #a050ff;paint-order:stroke fill;text-shadow:0 0 14px #8a3ffc99}
 /* Em telas de toque, o fundo mantém a atmosfera sem filtros de tela inteira. */
 @media(hover:none) and (pointer:coarse){nav{backdrop-filter:none;-webkit-backdrop-filter:none;background:#0a0418f5}#fx{filter:none}}
 /* Barras fora da área visível não executam efeitos de instabilidade. */
