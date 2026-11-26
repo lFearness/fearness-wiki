@@ -533,7 +533,9 @@ function essentialOrder(i){
  // Alternar as famílias de interações para que uma aba não bloqueie a outra.
  for(let n=0;n<Math.max(...interactionMedia.map(m=>m.length));n++)for(const k of order)if(interactionMedia[k][n])interactions.push(interactionMedia[k][n]);
  const bodies=[...mainBodies].sort((a,b)=>Number(b.tab===i)-Number(a.tab===i));
- return [...new Set([...bodies.map(b=>b.poster),...order.flatMap(k=>exposedMedia[k]),...bodies.map(b=>b.video),...interactions])];
+ const firstClips=order.flatMap(k=>interactionMedia[k].filter(u=>/\.mp4/.test(u)).slice(0,1));
+ const activeBody=bodies.filter(b=>b.tab===i).map(b=>b.video);
+ return [...new Set([...bodies.map(b=>b.poster),...exposedMedia[i],...activeBody,...interactionMedia[i].slice(0,2),...order.flatMap(k=>exposedMedia[k]),...firstClips,...bodies.map(b=>b.video),...interactions])];
 }
 // Uma fila para recursos especulativos; MP4 longos usam o carregador nativo.
 const bgDone=new Set(),fgPending=new Set(),bgRetry=new Map(),ownedVideo=new WeakMap();
@@ -541,20 +543,22 @@ const nativeMedia=new Map(),clipCache=new Map(),clipPending=new Map(),bodyWarmQu
 const shortClip=u=>/\/(olhos|mascara|selo)-.*\.mp4(?:\?[^#]*)?$/.test(u);
 const net=()=>navigator.connection||navigator.mozConnection||navigator.webkitConnection;
 const lowMemory=typeof navigator.deviceMemory==='number'&&navigator.deviceMemory<=4;
-const CLIP_LIMIT=(lowMemory?12:24)*1024*1024;
+const CLIP_LIMIT=(lowMemory?20:32)*1024*1024;
 let bgReady=false,clipBytes=0,bgJob=null,bgTimer=0,bgAfter=0,pressureUntil=0;
 // Uma imagem já apresentada não precisa de novo pré-carregamento.
 const knownImages=new Set();
 document.addEventListener('load',e=>{const im=e.target;if(im instanceof HTMLImageElement&&im.naturalWidth){const url=im.getAttribute('src');if(url?.startsWith('assets/'))knownImages.add(url)}},{capture:true});
 // Em dispositivos ocupados, adiar somente trabalho especulativo, nunca a interação.
 try{if(PerformanceObserver.supportedEntryTypes?.includes('longtask')){const observer=new PerformanceObserver(list=>{if(list.getEntries().some(e=>e.duration>=80))pressureUntil=Date.now()+1200});observer.observe({entryTypes:['longtask']})}}catch(_){}
-function bgAllowed(){const c=net();return bgReady&&!document.hidden&&navigator.onLine!==false&&!(c&&(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'')||(typeof c.downlink==='number'&&c.downlink<2)))}
+function activeWarmAllowed(){const c=net();return !document.hidden&&navigator.onLine!==false&&!(c&&(c.saveData||/^(slow-2g|2g)$/.test(c.effectiveType||'')))}
+function bgAllowed(){const c=net();return bgReady&&activeWarmAllowed()&&!(c&&typeof c.downlink==='number'&&c.downlink<.8)}
+function fullWarmAllowed(){const c=net();return bgAllowed()&&!(c&&(/^(3g)$/.test(c.effectiveType||'')||(typeof c.downlink==='number'&&c.downlink<2)))}
 function bgSchedule(ms=700){clearTimeout(bgTimer);if(bgAllowed())bgTimer=setTimeout(bgStep,ms)}
 function bgYield(ms=900,interrupt=false){bgAfter=Math.max(bgAfter,Date.now()+ms); // não descartar transferências úteis a cada toque
  if(interrupt&&bgJob&&!essentialURLs.has(bgJob.url))bgJob.controller.abort();bgSchedule(ms)}
 function foreground(task){fgPending.add(task);const done=()=>{fgPending.delete(task);bgSchedule()};task.then(done,done);return task}
 function rememberClip(url,blob){if(clipCache.has(url)){clipBytes-=clipCache.get(url).size;clipCache.delete(url)}while(clipBytes+blob.size>CLIP_LIMIT&&clipCache.size){const k=clipCache.keys().next().value;clipBytes-=clipCache.get(k).size;clipCache.delete(k)}if(blob.size<=CLIP_LIMIT){clipCache.set(url,blob);clipBytes+=blob.size}return blob}
-function getClip(url){if(clipCache.has(url)){const b=clipCache.get(url);clipCache.delete(url);clipCache.set(url,b);return Promise.resolve(b)}if(clipPending.has(url))return clipPending.get(url);const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),45000);const task=(async()=>{try{const r=await fetch(url,{signal:ac.signal,cache:'default'});if(!r.ok)throw Error('Vídeo indisponível');return rememberClip(url,await r.blob())}finally{clearTimeout(timer);clipPending.delete(url)}})();clipPending.set(url,task);return task}
+function getClip(url,urgent=false){if(clipCache.has(url)){const b=clipCache.get(url);clipCache.delete(url);clipCache.set(url,b);return Promise.resolve(b)}if(clipPending.has(url))return clipPending.get(url);const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),45000);const task=(async()=>{try{const r=await fetch(url,{signal:ac.signal,cache:'default',priority:urgent?'high':'auto'});if(!r.ok)throw Error('Vídeo indisponível');return rememberClip(url,await r.blob())}finally{clearTimeout(timer);clipPending.delete(url)}})();clipPending.set(url,task);return task}
 function clearVideo(v,url){v.pause();v.removeAttribute('src');v.preload='none';v.load();const src=ownedVideo.get(v);if(src){URL.revokeObjectURL(src);ownedVideo.delete(v)}}
 function vsrc(v,url,mode='auto'){if(v.preload!==mode)v.preload=mode;if(!v.hasAttribute('src'))v.src=url}
 function registerNative(url,v){nativeMedia.set(url,v)}
@@ -594,7 +598,7 @@ async function bgStep(){
  if(!first||!exposedMedia[i].some(eligible)){releaseBodyWarm();if(fgPending.size){bgSchedule(350);return}}
  const rest=order.flatMap(k=>mediaGroups[k]).filter(u=>!essentialURLs.has(u));
  // Imagens de quadrantes e ampliações só depois das prioridades globais disponíveis.
- const url=first||rest.find(eligible);
+ const url=first||(fullWarmAllowed()?rest.find(eligible):null);
  if(!url){if(bgRetry.size)bgSchedule(15000);return}
  const controller=new AbortController(),job={url,controller};bgJob=job;const timer=setTimeout(()=>controller.abort(),45000);
  try{
@@ -823,11 +827,11 @@ function interruptibleMedia({root,frame,im,images,family,urls,rate,onTarget,onSe
  function hide(v){if(v){v.pause();v.style.opacity='0';v.style.zIndex='0';v.onended=null;v.onerror=null}}
  function finishStill(n){settled=n;quick=false;root.removeAttribute('aria-busy');onSettled?.(n);clearNotice();bgSchedule(100);scheduleWarm()}
  function waitMedia(v,ev,ready,ms=12000){let clean=()=>{};const task=new Promise((resolve,reject)=>{let timer;const fail=()=>{clean();reject(Error('Vídeo indisponível'))};const check=()=>{if(ready()){clean();resolve(v)}};clean=()=>{clearTimeout(timer);ev.forEach(e=>v.removeEventListener(e,check));v.removeEventListener('error',fail)};ev.forEach(e=>v.addEventListener(e,check));v.addEventListener('error',fail);timer=setTimeout(fail,ms);check()});return task}
- function prepare(k){if(pool.has(k))return pool.get(k).task;
+ function prepare(k,urgent=false){if(pool.has(k))return pool.get(k).task;
   const v=document.createElement('video');v.className=family==='selo'?'seal-clip':'ev';v.muted=true;v.defaultMuted=true;v.volume=0;v.playsInline=true;v.controls=false;v.loop=false;v.preload='auto';v.disablePictureInPicture=true;v.disableRemotePlayback=true;v.setAttribute('aria-hidden','true');v.setAttribute('playsinline','');v.setAttribute('muted','');v.tabIndex=-1;
   v.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:'+(family==='selo'?'contain':'fill')+';background:'+(family==='selo'?'#fff':'transparent')+';opacity:0;pointer-events:none;transition:none;z-index:0';frame.appendChild(v);
   const record={v,task:null};pool.set(k,record);
-  record.task=(async()=>{try{const blob=await getClip(paths[k]);if(pool.get(k)!==record)throw Error('cancelled');const source=URL.createObjectURL(blob);ownedVideo.set(v,source);v.src=source;await waitMedia(v,['loadeddata','canplay'],()=>v.readyState>=2);return v}catch(e){if(pool.get(k)===record){pool.delete(k);clearVideo(v,paths[k]);v.remove()}throw e}})();return record.task;
+  record.task=(async()=>{try{const blob=await getClip(paths[k],urgent);if(pool.get(k)!==record)throw Error('cancelled');const source=URL.createObjectURL(blob);ownedVideo.set(v,source);v.src=source;await waitMedia(v,['loadeddata','canplay'],()=>v.readyState>=2);return v}catch(e){if(pool.get(k)===record){pool.delete(k);clearVideo(v,paths[k]);v.remove()}throw e}})();return record.task;
  }
  function frameIndex(record){return Math.max(0,Math.min(map.counts[record.k]-1,Math.round(record.v.currentTime*60)))}
  function normalRate(k){return k==='02'||k==='20'?(family==='selo'?1.5:1):rate}
@@ -840,22 +844,32 @@ function interruptibleMedia({root,frame,im,images,family,urls,rate,onTarget,onSe
   const join=map.join[k];if(join&&p<=join.max)return {k:join.to,f:join.frames[f]};
   return {keep:true,fast:true};
  }
- async function showStill(n,t){prime(n);if(im.decode&&!(im.complete&&im.naturalWidth))await mediaTimeout(im.decode(),8000);if(!valid(t))return;if(cover){hide(cover);cover=null}finishStill(n)}
+ async function showStill(n,t){
+  // A imagem anterior continua visível até o vídeo terminar. O quadro final cobre a troca.
+  await decodedImage(images[n]);if(!valid(t))return;prime(n);
+  if(im.decode)await mediaTimeout(im.decode(),8000);if(!valid(t))return;
+  if(cover){await nextPaint();if(!valid(t))return;for(const r of pool.values())hide(r.v);cover=null}
+  finishStill(n)
+ }
  function ended(record){if(current!==record)return;record.v.pause();record.v.onended=null;record.v.onerror=null;settled=+record.k[1];current=null;cover=record.v;const t=++revision;drive(t)}
  async function start(k,f,t,fast=false){
-  preparingKey=k;const pending=prepare(k);if(!pool.get(k)?.v||pool.get(k).v.readyState<2)displayNotice();const v=await foreground(pending);if(!valid(t))return;
+  preparingKey=k;const pending=prepare(k,true);if(!pool.get(k)?.v||pool.get(k).v.readyState<2)displayNotice();const v=await foreground(pending);if(!valid(t))return;
   const last=Math.max(0,map.counts[k]-1)/60,at=Math.max(0,Math.min(last,f/60));v.pause();
   if(Math.abs(v.currentTime-at)>.009||v.ended){v.currentTime=at;await waitMedia(v,['seeked','loadeddata','canplay'],()=>!v.seeking&&v.readyState>=2,6000)}
   if(!valid(t))return;preparingKey=null;clearNotice();
   const record={k,v};const old=cover;current=record;cover=v;
   v.onended=()=>ended(record);v.onerror=()=>{if(current===record)fallback(revision)};
-  v.style.zIndex='2';v.style.opacity='1';if(old&&old!==v)hide(old);
-  // A imagem de chegada é preparada atrás do vídeo, sem espera extra no último quadro.
-  prime(+k[1]);const reverse=k[1]+k[0];if(bgAllowed()||clipCache.has(paths[reverse]))prepare(reverse).catch(()=>{});v.playbackRate=normalRate(k)*(fast?1.8:1);v.defaultPlaybackRate=v.playbackRate;
+  // O quadro anterior permanece sob o novo vídeo até este apresentar seu primeiro quadro.
+  for(const r of pool.values())if(r.v!==v&&r.v!==old)hide(r.v);
+  if(old&&old!==v)old.style.zIndex='2';v.style.zIndex='3';v.style.opacity='1';
+  const reveal=()=>{if(current===record&&old&&old!==v)hide(old)};
+  if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(reveal);else nextPaint().then(reveal);
+  // Pré-decodificar sem modificar o src da imagem visível: impede o flash do destino.
+  decodedImage(images[+k[1]],false).catch(()=>{});const reverse=k[1]+k[0];if(fullWarmAllowed()||clipCache.has(paths[reverse]))prepare(reverse).catch(()=>{});v.playbackRate=normalRate(k)*(fast?1.8:1);v.defaultPlaybackRate=v.playbackRate;
   try{await v.play()}catch(e){if(valid(t)&&current===record)throw e}
   if(!valid(t))return;if(v.ended&&current===record)ended(record);else scheduleWarm();
  }
- async function fallback(t){if(!valid(t))return;const n=desired;if(current){current.v.pause();current=null}clearNotice();try{await decodedImage(images[n]);if(valid(t))await showStill(n,t)}catch(_){if(!valid(t))return;if(cover){hide(cover);cover=null}prime(settled);desired=settled;onTarget?.(desired,desired);onFailure?.(desired);root.removeAttribute('aria-busy');mediaNotice(noticeRoot,'Não foi possível preparar a transição. Tente novamente.')}}
+ async function fallback(t){if(!valid(t))return;const n=desired;if(current){current.v.pause();current=null}clearNotice();try{await decodedImage(images[n]);if(valid(t))await showStill(n,t)}catch(_){if(!valid(t))return;for(const r of pool.values())hide(r.v);cover=null;prime(settled);desired=settled;onTarget?.(desired,desired);onFailure?.(desired);root.removeAttribute('aria-busy');mediaNotice(noticeRoot,'Não foi possível preparar a transição. Tente novamente.')}}
  async function drive(t){if(!valid(t))return;
   try{
    if(reduced.matches){if(current){current.v.pause();current=null}await showStill(desired,t);return}
@@ -865,17 +879,17 @@ function interruptibleMedia({root,frame,im,images,family,urls,rate,onTarget,onSe
    const k=String(settled)+String(desired);await start(k,0,t,quick&&Math.abs(desired-settled)===1);
   }catch(e){if(valid(t))fallback(t)}
  }
- function request(n){n=Math.max(0,Math.min(2,n|0));if(n===desired)return;const old=desired;desired=n;preparingKey=null;onTarget?.(n,old);root.setAttribute('aria-busy','true');mediaNotice(noticeRoot,'');bgYield(1300,true);const t=++revision;drive(t)}
+ function request(n){n=Math.max(0,Math.min(2,n|0));if(n===desired)return;const old=desired;desired=n;preparingKey=null;onTarget?.(n,old);root.setAttribute('aria-busy','true');mediaNotice(noticeRoot,'');bgYield(350,true);const t=++revision;drive(t)}
  function scheduleWarm(){clearTimeout(warmTimer);if(!isActive(root)||reduced.matches)return;warmTimer=setTimeout(()=>{
-   if(!isActive(root)||!bgAllowed())return;
+   if(!isActive(root)||!activeWarmAllowed())return;
    const k=current?.k;const order=k?[k[1]+k[0],...(map.join[k]?[map.join[k].to]:[]),...(k==='02'||k==='20'?['01','21']:[]),String(+k[1])+String(2-+k[0])]:desired===0?['01','10','02']:desired===2?['21','12','20']:['10','12','01','21'];
    // Prepare the next likely direction only; other clips stay in the existing global Blob queue.
-   const candidate=order.find(x=>paths[x]&&!pool.has(x));if(candidate)prepare(candidate).then(()=>scheduleWarm(),()=>{});
+   const likely=fullWarmAllowed()?order:order.slice(0,1);const candidate=likely.find(x=>paths[x]&&!pool.has(x));if(candidate)prepare(candidate).then(()=>scheduleWarm(),()=>{});
    // Keep at most four paused decoders plus the active/cover frame in the active tab.
    if(pool.size>4){for(const [key,r] of pool){if(pool.size<=4)break;if(key===preparingKey||r.v===cover||r.v===current?.v||order.includes(key))continue;pool.delete(key);clearVideo(r.v,paths[key]);r.v.remove()}}
-  },120)}
- function deactivate(){++revision;preparingKey=null;clearNotice();clearTimeout(warmTimer);if(current)hide(current.v);if(cover)hide(cover);current=cover=null;settled=desired;quick=false;prime(desired);root.removeAttribute('aria-busy');onSettled?.(desired);clearTimeout(releaseTimer);releaseTimer=setTimeout(()=>{if(!isActive(root)){for(const [k,r] of pool){pool.delete(k);clearVideo(r.v,paths[k]);r.v.remove()}}},20000)}
- tabHooks.push(()=>{if(isActive(root)){clearTimeout(releaseTimer);prime(desired);scheduleWarm()}else deactivate()});
+  },40)}
+ function deactivate(){++revision;preparingKey=null;clearNotice();clearTimeout(warmTimer);for(const r of pool.values())hide(r.v);current=cover=null;settled=desired;quick=false;prime(desired);root.removeAttribute('aria-busy');onSettled?.(desired);clearTimeout(releaseTimer);releaseTimer=setTimeout(()=>{if(!isActive(root)){for(const [k,r] of pool){pool.delete(k);clearVideo(r.v,paths[k]);r.v.remove()}}},20000)}
+ tabHooks.push(()=>{if(isActive(root)){clearTimeout(releaseTimer);if(!current&&!cover)prime(settled);decodedImage(images[desired===0?1:desired===2?1:0],false).catch(()=>{});scheduleWarm()}else deactivate()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)deactivate();else if(isActive(root))scheduleWarm()});
  return {request,get target(){return desired}};
 }
