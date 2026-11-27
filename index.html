@@ -557,12 +557,12 @@ html.nav-swipe-commit body{overflow-anchor:none}
 html.nav-swiping{overflow-x:clip;overscroll-behavior-x:none;overflow-anchor:none;scroll-behavior:auto!important}
 html.nav-swiping body{overflow-anchor:none;overflow-x:clip}
 html.nav-swiping .nav-swipe-chrome{will-change:transform;transition:none!important}
-html.nav-swiping .nav-swipe-chrome.nav-swipe-settle{transition:transform .19s cubic-bezier(.22,.65,.35,1)!important}
+html.nav-swiping .nav-swipe-chrome.nav-swipe-settle{transition:transform var(--swipe-ms,280ms) cubic-bezier(.22,.75,.25,1)!important}
 section.nav-swipe-out{will-change:transform;transition:none!important}
 section.nav-swipe-preview{display:flow-root!important;position:fixed!important;margin:0!important;z-index:3;pointer-events:none!important;will-change:transform;transition:none!important}
 section.nav-swipe-preview>* ,section.on.nav-returning>*,section.nav-swipe-out>*{animation:none!important}
 section.nav-swipe-preview .ring,section.nav-swipe-preview .bar *,section.nav-swipe-out .ring,section.nav-swipe-out .bar *{animation-play-state:paused!important}
-section.nav-swipe-out.nav-swipe-settle,section.nav-swipe-preview.nav-swipe-settle{transition:transform .19s cubic-bezier(.22,.65,.35,1)!important}
+section.nav-swipe-out.nav-swipe-settle,section.nav-swipe-preview.nav-swipe-settle{transition:transform var(--swipe-ms,280ms) cubic-bezier(.22,.75,.25,1)!important}
 @media(prefers-reduced-motion:reduce){section.nav-swipe-settle{transition:none!important}}
 
 </style></head><body>
@@ -858,7 +858,7 @@ document.addEventListener('keydown',e=>{
  const main=document.querySelector('main'),fingers=new Set();let gesture=null,visual=null,suppressUntil=0;
  const edge=24,chrome=[document.querySelector('body>h1'),document.querySelector('body>.sub'),nav].filter(Boolean);
  let pendingFrame=0;
- function clearVisual(){if(pendingFrame){cancelAnimationFrame(pendingFrame);pendingFrame=0}if(!visual)return;clearTimeout(visual.timer);for(const p of [visual.out,visual.in,...chrome])if(p){p.classList.remove('nav-swipe-out','nav-swipe-preview','nav-swipe-settle','nav-swipe-chrome');for(const prop of ['transform','left','top','width','clip-path'])p.style.removeProperty(prop)}document.documentElement.classList.remove('nav-swiping');visual=null}
+ function clearVisual(){if(pendingFrame){cancelAnimationFrame(pendingFrame);pendingFrame=0}if(!visual)return;clearTimeout(visual.timer);if(visual.endNode&&visual.onEnd)visual.endNode.removeEventListener('transitionend',visual.onEnd);document.documentElement.style.removeProperty('--swipe-ms');for(const p of [visual.out,visual.in,...chrome])if(p){p.classList.remove('nav-swipe-out','nav-swipe-preview','nav-swipe-settle','nav-swipe-chrome');for(const prop of ['transform','left','top','width','clip-path'])p.style.removeProperty(prop)}document.documentElement.classList.remove('nav-swiping');visual=null}
  stopSwipe=()=>{gesture=null;clearVisual()};
  function chromeAt(v,progress){if(!v.in)return;const delta=(v.fromY-v.targetY)*progress;for(const p of chrome){p.classList.add('nav-swipe-chrome');const y=p===nav?v.navDelta*progress:delta;p.style.transform='translate3d(0,'+y+'px,0)'}}
  function render(g,dx){
@@ -881,16 +881,23 @@ document.addEventListener('keydown',e=>{
     const y=base-target;incoming.style.top=y+'px';incoming.style.clipPath='inset('+Math.max(0,Math.max(sticky,navNatural-target)+nav.offsetHeight-y)+'px 0 0 0)';
    }
   }
-  const v=visual,move=v.in?Math.max(-W,Math.min(W,dx)):Math.sign(dx)*Math.min(44,Math.abs(dx)*.18);
+  const v=visual,move=v.in?Math.max(-W,Math.min(W,dx)):Math.sign(dx)*Math.min(44,Math.abs(dx)*.18);v.move=move;
   v.out.style.transform='translate3d('+move+'px,0,0)';if(v.in){v.in.style.transform='translate3d('+(move+dir*W)+'px,0,0)';chromeAt(v,Math.min(1,Math.abs(move)/W))}
  }
  function settle(commit,next){
   if(pendingFrame){cancelAnimationFrame(pendingFrame);pendingFrame=0}
   const v=visual;if(!v){if(commit)show(next,{swipe:true});return}if(reduced.matches){clearVisual();if(commit)show(next,{swipe:true});return}
+  const distance=Math.abs((commit?-v.dir*v.W:0)-(v.move||0));
+  if(distance<1){if(commit)show(next,{swipe:true,targetY:v.targetY});else clearVisual();return}
+  // Duração proporcional ao percurso restante. Consolidar o quadro inicial antes de animar.
+  const ms=Math.round(Math.max(145,Math.min(360,150+distance/v.W*215)));
+  document.documentElement.style.setProperty('--swipe-ms',ms+'ms');
+  void v.out.offsetWidth;
   v.out.classList.add('nav-swipe-settle');v.in?.classList.add('nav-swipe-settle');chrome.forEach(p=>p.classList.add('nav-swipe-settle'));
+  const done=()=>{if(visual!==v||v.finishing)return;v.finishing=true;clearTimeout(v.timer);requestAnimationFrame(()=>{if(visual!==v)return;if(commit)show(next,{swipe:true,targetY:v.targetY});else clearVisual()})};
+  v.endNode=commit&&v.in?v.in:v.out;v.onEnd=e=>{if(e.target===v.endNode&&e.propertyName==='transform')done()};v.endNode.addEventListener('transitionend',v.onEnd);
   v.out.style.transform='translate3d('+(commit?-v.dir*v.W:0)+'px,0,0)';if(v.in)v.in.style.transform='translate3d('+(commit?0:v.dir*v.W)+'px,0,0)';chromeAt(v,commit?1:0);
-  const done=()=>{if(visual!==v)return;if(commit){const y=v.targetY;show(next,{swipe:true,targetY:y})}else clearVisual()};
-  v.timer=setTimeout(done,210);
+  v.timer=setTimeout(done,ms+80);
  }
  document.addEventListener('pointerdown',e=>{
   suppressUntil=0;if(e.pointerType!=='touch')return;fingers.add(e.pointerId);
@@ -902,7 +909,7 @@ document.addEventListener('keydown',e=>{
  },{capture:true,passive:true});
  document.addEventListener('pointermove',e=>{const g=gesture;if(!g||g.id!==e.pointerId)return;const dx=e.clientX-g.x,dy=e.clientY-g.y;if(!g.locked){if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)*1.1){gesture=null;return}if(Math.abs(dx)<12||Math.abs(dx)<Math.abs(dy)*1.5)return;g.locked=true}g.dx=dx;if(!pendingFrame)pendingFrame=requestAnimationFrame(()=>{pendingFrame=0;if(gesture===g)render(g,g.dx)})},{passive:true});
  function finish(e){if(e.pointerType!=='touch')return;fingers.delete(e.pointerId);const g=gesture;if(!g||g.id!==e.pointerId)return;gesture=null;const dx=e.clientX-g.x,dy=e.clientY-g.y,next=g.tab+(dx<0?1:-1),threshold=Math.max(60,Math.min(100,innerWidth*.13));const moved=g.locked||Math.abs(dx)>=threshold&&Math.abs(dx)>Math.abs(dy)*1.65;const commit=e.type==='pointerup'&&!fingers.size&&activeTab===g.tab&&Math.abs(dx)>=threshold&&Math.abs(dx)>Math.abs(dy)*1.45&&next>=0&&next<tabs.length;
-  if(moved)suppressUntil=performance.now()+450;if(commit&&(!visual||visual.next!==next))render(g,dx);settle(commit,next);
+  if(moved)suppressUntil=performance.now()+450;if(g.locked&&Number.isFinite(g.dx)&&pendingFrame)render(g,g.dx);if(commit&&(!visual||visual.next!==next))render(g,dx);settle(commit,next);
  }
  document.addEventListener('pointerup',finish,{capture:true,passive:true});document.addEventListener('pointercancel',finish,{capture:true,passive:true});
  document.addEventListener('click',e=>{if(performance.now()<suppressUntil&&e.detail!==0){e.preventDefault();e.stopImmediatePropagation();suppressUntil=0}},true);
@@ -923,26 +930,35 @@ const zoomValues=new WeakMap();
 function zoom(){tick=false;if(reduced.matches||document.hidden||document.documentElement.classList.contains('nav-swiping'))return;const vh=innerHeight,section=document.querySelector('section.on'),updates=[];if(!section)return;for(const el of zNear){if(!section.contains(el))continue;const r=el.getBoundingClientRect();if(!r.height||r.bottom<-80||r.top>vh+80)continue;const d=Math.min(1,Math.abs(r.top+r.height/2-vh/2)/(vh/2)),value=Math.round((1.08-.18*d)*100)/100;if(zoomValues.get(el)!==value)updates.push([el,value])}for(const [el,value] of updates){zoomValues.set(el,value);el.style.transform='scale('+value+')'}}
 if(touch){zs.forEach(e=>e.classList.add('t'));const zio=new IntersectionObserver(es=>{for(const en of es){if(en.isIntersecting){zNear.add(en.target);en.target.style.willChange='transform'}else{zNear.delete(en.target);en.target.style.willChange=''}}if(!tick){tick=true;requestAnimationFrame(zoom)}},{rootMargin:'80px 0px'});zs.forEach(e=>zio.observe(e));addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(zoom)}},{passive:true});addEventListener('resize',raf1(zoom))}
 (function(){const cv=document.createElement('canvas');cv.id='fx';cv.setAttribute('aria-hidden','true');document.body.prepend(cv);const x=cv.getContext('2d');if(!x)return;
-let W,H,fxTimer=0,fxFrame=0,scrollingUntil=0,clock=0,last=0,next=650,fxTab=-1,bolts=[];
+let W,H,fxTimer=0,fxFrame=0,scrollingUntil=0,clock=0,last=0,lastDraw=0,next=180,fxTab=-1,bolts=[];
 const mobileFX=matchMedia('(hover:none) and (pointer:coarse)').matches;
 const rand=(a,b)=>a+Math.random()*(b-a),tau=Math.PI*2;
 // Quantidade máxima, intervalo, comprimento relativo, desvio, ramificações, duração, intensidade.
 const profiles=[
- {max:2,gap:[1300,2600],length:[.24,.60],jag:.58,branch:.06,life:[1050,1750],grow:[270,410],alpha:.65,width:.78},
- {max:3,gap:[750,1500],length:[.35,.85],jag:.76,branch:.10,life:[950,1450],grow:[180,300],alpha:.84,width:1},
- {max:5,gap:[270,690],length:[.38,1.12],jag:1.25,branch:.23,life:[730,1200],grow:[100,210],alpha:1,width:1.18},
- {max:3,gap:[650,1500],length:[.39,1.02],jag:.94,branch:.13,life:[1250,2050],grow:[230,380],alpha:.95,width:1.16}
+ {max:2,gap:[650,1150],length:[.22,.43],jag:.70,branch:.06,life:[1350,1950],grow:[300,470],alpha:.76,width:1.05},
+ {max:3,gap:[420,850],length:[.27,.54],jag:.80,branch:.10,life:[1100,1650],grow:[210,340],alpha:.86,width:1.15},
+ {max:5,gap:[200,480],length:[.32,.68],jag:1.15,branch:.20,life:[800,1300],grow:[120,240],alpha:1,width:1.30},
+ {max:3,gap:[400,900],length:[.30,.64],jag:.96,branch:.13,life:[1450,2200],grow:[250,410],alpha:.95,width:1.16}
 ];
 function rs(){const d=Math.min(devicePixelRatio||1,mobileFX?1:1.5);W=innerWidth;H=innerHeight;cv.width=Math.round(W*d);cv.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);bolts=[];next=clock+120}
 let rsT=0;rs();addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(innerWidth!==W||Math.abs(innerHeight-H)>=120)rs()},180)});
 // Linhas quebradas em qualquer direção; a forma mantém a silhueta de raio original.
-function mk(mode){const p=profiles[mode],scale=Math.min(Math.max(W,H),Math.hypot(W,H)*.8),len=scale*rand(...p.length),a=rand(0,tau),ux=Math.cos(a),uy=Math.sin(a),nx=-uy,ny=ux;
- let sx,sy;const edge=Math.random()<.64;if(edge){const k=Math.floor(rand(0,4));sx=k===0?-8:k===1?W+8:rand(0,W);sy=k===2?-8:k===3?H+8:rand(0,H)}else{sx=rand(.05,.95)*W;sy=rand(.05,.95)*H}
- // Nos cantos, orientar o raio para dentro; no interior, qualquer ângulo.
- let dx=ux,dy=uy;if(edge&&((W/2-sx)*dx+(H/2-sy)*dy<0)){dx=-dx;dy=-dy}const px=-dy,py=dx;
- const pts=[[sx,sy]],br=[];const count=Math.max(4,Math.min(48,Math.round(len/rand(19,31))));let drift=0;
- for(let i=1;i<=count;i++){const q=i/count,step=len/count;drift=drift*.63+rand(-1,1)*step*p.jag;const xx=sx+dx*len*q+px*drift,yy=sy+dy*len*q+py*drift;pts.push([xx,yy]);if(i>1&&i<count&&br.length<4&&Math.random()<p.branch){const B=[[xx,yy]],sign=Math.random()<.5?-1:1,n=Math.floor(rand(3,7));let bx=xx,by=yy;for(let j=0;j<n;j++){const f=step*rand(.42,.85),side=step*rand(.25,.95)*sign;bx+=dx*f+px*side;by+=dy*f+py*side;B.push([bx,by])}br.push(B)}}
- const all=[[pts,1],...br.map(b=>[b,.48])];return{pts,all,fl:mode===3?all.map(([a,w])=>[prep(a),w]):null,t0:clock,life:rand(...p.life),grow:rand(...p.grow),alpha:p.alpha*rand(.72,1),width:p.width*rand(.68,1.22),ph:Array.from({length:4},()=>rand(0,tau)),mode};
+let side=0;
+function mk(mode){const p=profiles[mode],scale=Math.min(Math.min(W,H)*1.14,Math.max(W,H)*.70),len=scale*rand(...p.length);
+ // Alternar as laterais no celular: ao menos uma parte do raio fica exposta, mesmo com blocos largos.
+ const lateral=mobileFX?(side++%4!==3):Math.random()<.40;
+ let a=rand(0,tau),cx=rand(.10,.90)*W,cy=rand(.16,.84)*H;
+ if(lateral){const left=side%2===0;cx=left?rand(9,24):W-rand(9,24);cy=rand(.18,.85)*H;a=(Math.random()<.5?Math.PI/2:-Math.PI/2)+rand(-.20,.20)}
+ else if(Math.random()<.48){const k=Math.floor(rand(0,4));if(k===0)cx=rand(.03,.12)*W;if(k===1)cx=rand(.88,.97)*W;if(k===2)cy=rand(.06,.18)*H;if(k===3)cy=rand(.82,.94)*H}
+ const dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx,sx=cx-dx*len/2,sy=cy-dy*len/2;
+ const pts=[[sx,sy]],br=[],count=Math.max(5,Math.min(28,Math.round(len/rand(13,24))));let drift=0;
+ for(let i=1;i<=count;i++){const q=i/count,step=len/count;drift=drift*.52+rand(-1,1)*step*p.jag;const xx=sx+dx*len*q+px*drift,yy=sy+dy*len*q+py*drift;pts.push([xx,yy]);if(i>1&&i<count-1&&br.length<3&&Math.random()<p.branch){const B=[[xx,yy]],sign=Math.random()<.5?-1:1,n=Math.floor(rand(2,5));let bx=xx,by=yy;for(let j=0;j<n;j++){const f=step*rand(.35,.65),d=step*rand(.2,.7)*sign;bx+=dx*f+px*d;by+=dy*f+py*d;B.push([bx,by])}br.push(B)}}
+ // Manter início e fim dentro do campo visual, sem atravessar a tela de uma borda à outra.
+ const all=[[pts,1],...br.map(b=>[b,.48])],points=all.flatMap(([q])=>q),pad=6;
+ const minX=Math.min(...points.map(q=>q[0])),maxX=Math.max(...points.map(q=>q[0])),minY=Math.min(...points.map(q=>q[1])),maxY=Math.max(...points.map(q=>q[1]));
+ const shiftX=minX<pad?pad-minX:maxX>W-pad?W-pad-maxX:0,shiftY=minY<pad?pad-minY:maxY>H-pad?H-pad-maxY:0;
+ points.forEach(q=>{q[0]+=shiftX;q[1]+=shiftY});
+ return{pts,all,fl:mode===3?all.map(([a,w])=>[prep(a),w]):null,t0:clock,life:rand(...p.life),grow:rand(...p.grow),alpha:p.alpha*rand(.82,1),width:p.width*rand(.86,1.23),ph:Array.from({length:4},()=>rand(0,tau)),mode};
 }
 function prep(p){let q=p;for(let it=0;it<1;it++){const r=[q[0]];for(let i=0;i<q.length-1;i++){const a=q[i],b=q[i+1];r.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75])}r.push(q[q.length-1]);q=r}
 const c=[0];for(let i=1;i<q.length;i++)c.push(c[i-1]+Math.hypot(q[i][0]-q[i-1][0],q[i][1]-q[i-1][1]));const L=c[c.length-1],A=[];let j=0;
@@ -960,15 +976,18 @@ function draw(b){const age=clock-b.t0,g=Math.min(1,age/b.grow),fade=Math.max(0,1
  const st=b.pts[0],en=b.pts[b.pts.length-1],G=(rgb,al)=>{const k=x.createLinearGradient(...st,...en);k.addColorStop(0,`rgba(${rgb},${al*a*.70})`);k.addColorStop(.25,`rgba(${rgb},${al*a})`);k.addColorStop(1,`rgba(${rgb},${al*a*.34})`);return k};
  x.lineCap=x.lineJoin='round';x.shadowBlur=0;
  if(dk){const fs=b.fl.map(([pr,w])=>[flame(pr,w*b.width,g,clock,b.ph),w]).filter(o=>o[0]);for(const[o,w]of fs){x.strokeStyle=G('97,0,255',.32);x.lineWidth=9*Math.max(w,.55);x.stroke(o);x.strokeStyle=G('151,76,255',1);x.lineWidth=2.8*Math.max(w,.6);x.stroke(o);x.fillStyle=G('0,0,0',1);x.fill(o)}}
- else{for(const [pts,w] of b.all){path(pts,g);x.strokeStyle=G('97,0,255',.22);x.lineWidth=15*w*b.width;x.stroke();x.strokeStyle=G('97,0,255',.75);x.lineWidth=6*w*b.width;x.stroke();x.strokeStyle=G(unstable?'240,227,255':'166,115,255',unstable?.92:.72);x.lineWidth=1.15*w*b.width;x.stroke()}}
+ else{for(const [pts,w] of b.all){path(pts,g);x.strokeStyle=G('97,0,255',.22);x.lineWidth=18*w*b.width;x.stroke();x.strokeStyle=G('97,0,255',.84);x.lineWidth=8*w*b.width;x.stroke();x.strokeStyle=G(unstable?'240,227,255':'166,115,255',unstable?.92:.80);x.lineWidth=2.6*w*b.width;x.stroke()}}
 }
 function wakeFX(delay=0){clearTimeout(fxTimer);if(fxFrame)cancelAnimationFrame(fxFrame);fxFrame=0;if(document.hidden||reduced.matches)return;if(delay>0)fxTimer=setTimeout(()=>{fxFrame=requestAnimationFrame(f)},delay);else fxFrame=requestAnimationFrame(f)}
 function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H);last=0;return}
- if(document.documentElement.classList.contains('nav-swiping')||document.documentElement.classList.contains('nav-swipe-commit')||(mobileFX&&t<scrollingUntil)){last=0;wakeFX(100);return}
- const mode=Number(document.body.dataset.t)||0,p=profiles[mode];if(mode!==fxTab){fxTab=mode;bolts=[];next=clock+140}
+ // Não congelar durante toque, rolagem ou troca de abas: apenas reduzir a taxa de desenho.
+ const busy=document.documentElement.classList.contains('nav-swiping')||document.documentElement.classList.contains('nav-swipe-commit')||(mobileFX&&t<scrollingUntil);
+ const interval=busy?40:mobileFX?25:16;
+ if(lastDraw&&t-lastDraw<interval-2){fxFrame=requestAnimationFrame(f);return}lastDraw=t;
+ const mode=Number(document.body.dataset.t)||0,p=profiles[mode];if(mode!==fxTab){fxTab=mode;bolts.forEach(b=>{b.life=Math.min(b.life,Math.max(b.grow+1,clock-b.t0+240))});next=clock}
  clock+=last?Math.min(120,t-last):0;last=t;bolts=bolts.filter(b=>clock-b.t0<b.life);
- const max=mobileFX?Math.min(4,p.max):p.max;if(clock>=next&&bolts.length<max){bolts.push(mk(mode));next=clock+rand(...p.gap)}
- x.clearRect(0,0,W,H);for(const b of bolts)draw(b);wakeFX(mobileFX?44:28);
+ const max=mobileFX?Math.min(4,p.max):p.max;if(clock>=next&&bolts.length<max){bolts.push(mk(mode));next=clock+rand(...p.gap)*(mobileFX?.82:1)}
+ x.clearRect(0,0,W,H);for(const b of bolts)draw(b);fxFrame=requestAnimationFrame(f);
 }
 if(mobileFX)addEventListener('scroll',()=>{scrollingUntil=performance.now()+150},{passive:true});
 function fxVisibility(){if(document.hidden||reduced.matches){clearTimeout(fxTimer);cancelAnimationFrame(fxFrame);fxFrame=0;last=0;bolts=[];x.clearRect(0,0,W,H)}else{last=0;next=clock+120;wakeFX(0)}}
