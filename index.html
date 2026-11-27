@@ -549,13 +549,17 @@ nav{overscroll-behavior-x:contain}
 }
 
 
-/* Navegação por gesto: prévia temporária, sem elementos adicionais permanentes. */
+/* Navegação por gesto: prévia e aba final compartilham a mesma geometria. */
+@media(any-pointer:coarse){main>section.on{display:flow-root}html,body{overflow-anchor:none}}
+html.nav-swiping,html.nav-swipe-commit{overflow-anchor:none;scroll-behavior:auto!important}
+html.nav-swipe-commit body{overflow-anchor:none}
+
 html.nav-swiping{overflow-x:clip;overscroll-behavior-x:none;overflow-anchor:none;scroll-behavior:auto!important}
 html.nav-swiping body{overflow-anchor:none;overflow-x:clip}
 html.nav-swiping .nav-swipe-chrome{will-change:transform;transition:none!important}
 html.nav-swiping .nav-swipe-chrome.nav-swipe-settle{transition:transform .19s cubic-bezier(.22,.65,.35,1)!important}
 section.nav-swipe-out{will-change:transform;transition:none!important}
-section.nav-swipe-preview{display:block!important;position:fixed!important;margin:0!important;z-index:3;pointer-events:none!important;will-change:transform;transition:none!important}
+section.nav-swipe-preview{display:flow-root!important;position:fixed!important;margin:0!important;z-index:3;pointer-events:none!important;will-change:transform;transition:none!important}
 section.nav-swipe-preview>* ,section.on.nav-returning>*,section.nav-swipe-out>*{animation:none!important}
 section.nav-swipe-preview .ring,section.nav-swipe-preview .bar *,section.nav-swipe-out .ring,section.nav-swipe-out .bar *{animation-play-state:paused!important}
 section.nav-swipe-out.nav-swipe-settle,section.nav-swipe-preview.nav-swipe-settle{transition:transform .19s cubic-bezier(.22,.65,.35,1)!important}
@@ -801,7 +805,7 @@ function goTop(i){let y=0;if(!INIT&&dq.matches){const h=document.querySelector('
 addEventListener('resize',raf1(navH));addEventListener('load',navH);
 const nav=$('#nav');
 // Memória em sessão: o DOM de cada aba permanece montado, incluindo quadrantes e estados.
-const tabScroll=[null,null,null,null];let activeTab=-1,stopSwipe=()=>{};
+const tabScroll=[null,null,null,null];let activeTab=-1,stopSwipe=()=>{},syncPowerHeights=()=>{};
 function anticipateTab(i){
  if(i<0||i>=tabs.length||i===activeTab||!activeWarmAllowed())return;
  if(anticipatedTab===i&&Date.now()<anticipationUntil)return;
@@ -814,7 +818,10 @@ function anticipateTab(i){
 }
 function show(i,opts={}){
  if(!Number.isInteger(i)||i<0||i>=tabs.length)return;
- stopSwipe();if(activeTab===i&&!INIT)return;
+ if(activeTab===i&&!INIT){stopSwipe();return}
+ const committing=!!opts.swipe;const root=document.documentElement;
+ if(committing)root.classList.add('nav-swipe-commit');
+ stopSwipe();
  if(activeTab>=0)tabScroll[activeTab]=Math.max(0,scrollY);
  const saved=tabScroll[i],returning=saved!==null,old=activeTab;activeTab=i;
  if(anticipatedTab===i){anticipatedTab=-1;anticipationUntil=0}
@@ -828,6 +835,10 @@ function show(i,opts={}){
  const activate=()=>{if(activeTab!==i)return;activateMedia(i);sfx.tab(i);if(window.tipRe)setTimeout(window.tipRe,0)};
  if(opts.swipe&&!INIT){requestAnimationFrame(()=>setTimeout(activate,0))}else activate();
  try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+ if(committing){
+  // Uma única troca de layout e de scroll antes de pintar; manter a ancoragem desligada na entrega.
+  requestAnimationFrame(()=>requestAnimationFrame(()=>root.classList.remove('nav-swipe-commit')));
+ }
  if(typeof touch!=='undefined'&&touch)setTimeout(zoom,80)
 }
 tabs.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.id='tab'+i;b.setAttribute('role','tab');b.setAttribute('aria-controls','s'+i);b.setAttribute('aria-selected','false');b.tabIndex=-1;const panel=$('#s'+i);panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',b.id);b.onclick=()=>show(i);let warmTimer=0;b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')warmTimer=setTimeout(()=>anticipateTab(i),120)});b.addEventListener('pointerleave',()=>clearTimeout(warmTimer));b.addEventListener('focus',()=>anticipateTab(i));nav.appendChild(b)});
@@ -856,14 +867,14 @@ document.addEventListener('keydown',e=>{
   if(visual&&(visual.next!==next||visual.dir!==dir))clearVisual();
   if(!visual){
    const out=$('#s'+g.tab),r=out.getBoundingClientRect(),incoming=next>=0&&next<tabs.length?$('#s'+next):null,fromY=scrollY;
-   const base=r.top+fromY,navNatural=main.getBoundingClientRect().top+fromY-nav.offsetHeight,sticky=parseFloat(getComputedStyle(nav).top)||0;
+   const base=main.getBoundingClientRect().top+fromY+(parseFloat(getComputedStyle(main).paddingTop)||0),navNatural=main.getBoundingClientRect().top+fromY-nav.offsetHeight,sticky=parseFloat(getComputedStyle(nav).top)||0;
    const navTop=nav.getBoundingClientRect().top,tail=Math.max(0,document.documentElement.scrollHeight-(r.bottom+fromY));
    visual={out,in:incoming,next,dir,W,timer:0,fromY,targetY:fromY,navDelta:0};
    document.documentElement.classList.add('nav-swiping');out.classList.add('nav-swipe-out');bgYield(550);
    if(incoming){
     // Reservar a geometria das imagens antes de medir a prévia, mesmo sem rede.
     incoming.querySelectorAll('img[data-src]').forEach(im=>{const sz=imageSizes[im.dataset.src];if(sz){im.width=sz[0];im.height=sz[1]}});
-    anticipateTab(next);incoming.classList.add('nav-swipe-preview');incoming.style.left=r.left+'px';incoming.style.width=r.width+'px';incoming.style.top='0px';
+    anticipateTab(next);incoming.classList.add('nav-swipe-preview');incoming.style.left=r.left+'px';incoming.style.width=r.width+'px';incoming.style.top='0px';if(next===1)syncPowerHeights();
     const limit=Math.max(0,base+incoming.offsetHeight+tail-innerHeight);
     let target=tabScroll[next];if(target===null){target=0;if(dq.matches){const h=incoming.querySelector('.hero');if(h)target=base+h.getBoundingClientRect().top-nav.offsetHeight-12}}
     target=Math.max(0,Math.min(limit,target));visual.targetY=target;visual.navDelta=Math.max(sticky,navNatural-target)-navTop;
@@ -912,68 +923,56 @@ const zoomValues=new WeakMap();
 function zoom(){tick=false;if(reduced.matches||document.hidden||document.documentElement.classList.contains('nav-swiping'))return;const vh=innerHeight,section=document.querySelector('section.on'),updates=[];if(!section)return;for(const el of zNear){if(!section.contains(el))continue;const r=el.getBoundingClientRect();if(!r.height||r.bottom<-80||r.top>vh+80)continue;const d=Math.min(1,Math.abs(r.top+r.height/2-vh/2)/(vh/2)),value=Math.round((1.08-.18*d)*100)/100;if(zoomValues.get(el)!==value)updates.push([el,value])}for(const [el,value] of updates){zoomValues.set(el,value);el.style.transform='scale('+value+')'}}
 if(touch){zs.forEach(e=>e.classList.add('t'));const zio=new IntersectionObserver(es=>{for(const en of es){if(en.isIntersecting){zNear.add(en.target);en.target.style.willChange='transform'}else{zNear.delete(en.target);en.target.style.willChange=''}}if(!tick){tick=true;requestAnimationFrame(zoom)}},{rootMargin:'80px 0px'});zs.forEach(e=>zio.observe(e));addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(zoom)}},{passive:true});addEventListener('resize',raf1(zoom))}
 (function(){const cv=document.createElement('canvas');cv.id='fx';cv.setAttribute('aria-hidden','true');document.body.prepend(cv);const x=cv.getContext('2d');if(!x)return;
-let W,H,fxLast=0,fxTimer=0,fxFrame=0,scrollingUntil=0,calmTime=0,calmLast=0,fxTab=-1,energyTime=0,energyLast=0;
+let W,H,fxTimer=0,fxFrame=0,scrollingUntil=0,clock=0,last=0,next=650,fxTab=-1,bolts=[];
 const mobileFX=matchMedia('(hover:none) and (pointer:coarse)').matches;
-function rs(){const d=Math.min(devicePixelRatio||1,mobileFX?1:1.5);W=innerWidth;H=innerHeight;cv.width=Math.round(W*d);cv.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0)}let rsT=0;rs();addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(innerWidth===W&&Math.abs(innerHeight-H)<120)return;rs()},180)});
-function calm(t){
- const dt=calmLast?Math.min(80,t-calmLast):0;calmLast=t;calmTime+=dt;
- const u=calmTime/1000;
- x.clearRect(0,0,W,H);x.lineCap='round';x.lineJoin='round';x.shadowBlur=0;
- // A luz acompanha os filamentos nas extremidades; o centro permanece escuro.
- for(const side of [0,1]){
-  const phase=side*2.8,drift=Math.sin(u*.20+phase),pulse=.72+.28*Math.sin(u*.34+phase);
-  const px=W*(side?.91:.09),py=H*(.61+.17*drift),r=Math.max(140,Math.min(W*.46,H*.63));
-  const glow=x.createRadialGradient(px,py,0,px,py,r);
-  glow.addColorStop(0,`rgba(97,0,255,${.23*pulse})`);glow.addColorStop(.45,`rgba(83,25,173,${.09*pulse})`);glow.addColorStop(1,'rgba(97,0,255,0)');
-  x.fillStyle=glow;x.fillRect(px-r,py-r,r*2,r*2);
-  for(let j=0;j<2;j++){
-   const span=W*(mobileFX?.40:.44),base=H*(.32+side*.29+j*.17),amp=H*(.07+j*.018),sign=side?-1:1,start=side?W:0;
-   const grad=x.createLinearGradient(start,0,start+sign*span,0);
-   const alpha=(j?.24:.38)*pulse;
-   grad.addColorStop(0,`rgba(97,0,255,${alpha*.3})`);grad.addColorStop(.30,`rgba(132,57,255,${alpha})`);grad.addColorStop(.66,`rgba(97,0,255,${alpha*.5})`);grad.addColorStop(1,'rgba(97,0,255,0)');
-   x.beginPath();for(let k=0;k<=24;k++){const q=k/24,xx=start+sign*span*q,yy=base+amp*Math.sin(q*5.1+u*.28+phase+j*1.7)+H*.032*Math.sin(q*8-u*.18+j);if(k)x.lineTo(xx,yy);else x.moveTo(xx,yy)}
-   x.strokeStyle=grad;x.lineWidth=j?4:7;x.globalAlpha=.24;x.stroke();x.lineWidth=j?.75:1.25;x.globalAlpha=1;x.stroke();
-  }
- }
+const rand=(a,b)=>a+Math.random()*(b-a),tau=Math.PI*2;
+// Quantidade máxima, intervalo, comprimento relativo, desvio, ramificações, duração, intensidade.
+const profiles=[
+ {max:2,gap:[1300,2600],length:[.24,.60],jag:.58,branch:.06,life:[1050,1750],grow:[270,410],alpha:.65,width:.78},
+ {max:3,gap:[750,1500],length:[.35,.85],jag:.76,branch:.10,life:[950,1450],grow:[180,300],alpha:.84,width:1},
+ {max:5,gap:[270,690],length:[.38,1.12],jag:1.25,branch:.23,life:[730,1200],grow:[100,210],alpha:1,width:1.18},
+ {max:3,gap:[650,1500],length:[.39,1.02],jag:.94,branch:.13,life:[1250,2050],grow:[230,380],alpha:.95,width:1.16}
+];
+function rs(){const d=Math.min(devicePixelRatio||1,mobileFX?1:1.5);W=innerWidth;H=innerHeight;cv.width=Math.round(W*d);cv.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);bolts=[];next=clock+120}
+let rsT=0;rs();addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(innerWidth!==W||Math.abs(innerHeight-H)>=120)rs()},180)});
+// Linhas quebradas em qualquer direção; a forma mantém a silhueta de raio original.
+function mk(mode){const p=profiles[mode],scale=Math.min(Math.max(W,H),Math.hypot(W,H)*.8),len=scale*rand(...p.length),a=rand(0,tau),ux=Math.cos(a),uy=Math.sin(a),nx=-uy,ny=ux;
+ let sx,sy;const edge=Math.random()<.64;if(edge){const k=Math.floor(rand(0,4));sx=k===0?-8:k===1?W+8:rand(0,W);sy=k===2?-8:k===3?H+8:rand(0,H)}else{sx=rand(.05,.95)*W;sy=rand(.05,.95)*H}
+ // Nos cantos, orientar o raio para dentro; no interior, qualquer ângulo.
+ let dx=ux,dy=uy;if(edge&&((W/2-sx)*dx+(H/2-sy)*dy<0)){dx=-dx;dy=-dy}const px=-dy,py=dx;
+ const pts=[[sx,sy]],br=[];const count=Math.max(4,Math.min(48,Math.round(len/rand(19,31))));let drift=0;
+ for(let i=1;i<=count;i++){const q=i/count,step=len/count;drift=drift*.63+rand(-1,1)*step*p.jag;const xx=sx+dx*len*q+px*drift,yy=sy+dy*len*q+py*drift;pts.push([xx,yy]);if(i>1&&i<count&&br.length<4&&Math.random()<p.branch){const B=[[xx,yy]],sign=Math.random()<.5?-1:1,n=Math.floor(rand(3,7));let bx=xx,by=yy;for(let j=0;j<n;j++){const f=step*rand(.42,.85),side=step*rand(.25,.95)*sign;bx+=dx*f+px*side;by+=dy*f+py*side;B.push([bx,by])}br.push(B)}}
+ const all=[[pts,1],...br.map(b=>[b,.48])];return{pts,all,fl:mode===3?all.map(([a,w])=>[prep(a),w]):null,t0:clock,life:rand(...p.life),grow:rand(...p.grow),alpha:p.alpha*rand(.72,1),width:p.width*rand(.68,1.22),ph:Array.from({length:4},()=>rand(0,tau)),mode};
 }
+function prep(p){let q=p;for(let it=0;it<1;it++){const r=[q[0]];for(let i=0;i<q.length-1;i++){const a=q[i],b=q[i+1];r.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75])}r.push(q[q.length-1]);q=r}
+const c=[0];for(let i=1;i<q.length;i++)c.push(c[i-1]+Math.hypot(q[i][0]-q[i-1][0],q[i][1]-q[i-1][1]));const L=c[c.length-1],A=[];let j=0;
+for(let s=0;s<=L;s+=5){while(j<c.length-2&&c[j+1]<s)j++;const u=(s-c[j])/((c[j+1]-c[j])||1);A.push({x:q[j][0]+(q[j+1][0]-q[j][0])*u,y:q[j][1]+(q[j+1][1]-q[j][1])*u,s})}
+A.forEach((o,k)=>{const a=A[Math.max(0,k-3)],b=A[Math.min(A.length-1,k+3)],tx=b.x-a.x,ty=b.y-a.y,m=Math.hypot(tx,ty)||1;o.nx=-ty/m;o.ny=tx/m});return{A,L}}
+const saw=z=>{z-=Math.floor(z);return z<.7?Math.pow(z/.7,1.7):Math.pow((1-z)/.3,1.3)};
+function flame(pr,sc,gg,t,ph){const A=pr.A,L=pr.L,Lg=L*gg,Lp=[],Rp=[];
+for(const q of A){if(q.s>Lg)break;const env=Math.min(1,(Lg-q.s)/42+.05)*Math.pow(Math.max(.04,Math.min(1,(L-q.s)/(L*.4))),.75),n=.5+.5*Math.sin(q.s*.05+ph[0]+t*.0065),m=.5+.5*Math.sin(q.s*.13+ph[1]-t*.011),b=1.9+1.8*n+.8*m,hl=(b+9*saw(q.s/40+ph[2]-t*.0012))*sc*env,hr=(b+9*saw(q.s/33+ph[3]-t*.0014))*sc*env;Lp.push([q.x+q.nx*hl,q.y+q.ny*hl]);Rp.push([q.x-q.nx*hr,q.y-q.ny*hr])}
+if(Lp.length<2)return null;const P=Lp.concat(Rp.reverse()),o=new Path2D();o.moveTo((P[0][0]+P[P.length-1][0])/2,(P[0][1]+P[P.length-1][1])/2);
+for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];o.quadraticCurveTo(a[0],a[1],(a[0]+b[0])/2,(a[1]+b[1])/2)}o.closePath();return o}
 
-// A mesma energia violeta em três comportamentos diferentes. Todas as formas são procedurais.
-const tau=Math.PI*2;
-function edgeGlow(side,py,r,alpha){const px=W*(side?.96:.04),g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,`rgba(97,0,255,${alpha})`);g.addColorStop(.42,`rgba(97,0,255,${alpha*.33})`);g.addColorStop(1,'rgba(97,0,255,0)');x.fillStyle=g;x.fillRect(px-r,py-r,r*2,r*2)}
-function trace(points){x.beginPath();for(let i=0;i<points.length;i++){const [px,py]=points[i];if(i)x.lineTo(px,py);else x.moveTo(px,py)}}
-function energy(t,mode){const dt=energyLast?Math.min(90,t-energyLast):0;energyLast=t;energyTime+=dt;const u=energyTime/1000;
- x.clearRect(0,0,W,H);x.globalAlpha=1;x.lineCap='round';x.lineJoin='round';x.shadowBlur=0;
- const dark=mode===3,unstable=mode===2,span=W*(mobileFX?.40:.43),N=dark?40:unstable?18:32;
- for(let side=0;side<2;side++){
-  const dir=side?-1:1,start=side?W:0,ph=side*2.7;
-  const pulse=unstable?.66+.22*Math.sin(u*2.4+ph)+.12*Math.sin(u*4.2+ph):.76+.24*Math.sin(u*(dark?.42:.64)+ph);
-  edgeGlow(side,H*(.54+.18*Math.sin(u*.25+ph)),Math.max(150,Math.min(W*.54,H*.72)),(dark?.44:unstable?.40:.27)*pulse);
-  for(let j=0;j<(unstable?3:2);j++){
-   const base=H*(.20+j*.29+side*.13),len=span*(j===1?.83:1),speed=dark?.36:unstable?1.15:.58,amp=H*(dark?.12:unstable?.10:.075),P=[];
-   const g=x.createLinearGradient(start,0,start+dir*len,0),a=(dark?.86:unstable?.83:.68)*pulse;
-   g.addColorStop(0,`rgba(97,0,255,${a*.45})`);g.addColorStop(.22,`rgba(111,36,255,${a})`);g.addColorStop(.62,`rgba(112,30,255,${a*.70})`);g.addColorStop(1,'rgba(97,0,255,0)');
-   for(let k=0;k<=N;k++){const q=k/N;let py=base+amp*Math.sin(q*5.4+u*speed+ph+j*1.8)+amp*.35*Math.sin(q*10-u*speed*.7+j);if(unstable)py+=H*.045*Math.sin(k*2.7+j*4+ph+u*1.8)*(.6+.4*Math.sin(u*2.1+k*.7));P.push([start+dir*len*q,py])}
-   if(dark){
-    // Contorno flamejante com interior negro: a constituição assimilada se manifesta como sombra.
-    const L=[],R=[];for(let k=0;k<P.length;k++){const q=k/N,[px,py]=P[k],env=Math.pow(Math.max(0,1-q),.72),f=.5+.5*Math.sin(q*28-u*1.5+ph+j),w=(2+H*.019*(.3+.7*f)+H*.008*Math.sin(q*53+u*.9+j)**2)*env;L.push([px,py-w]);R.push([px,py+w*(.5+.5*Math.sin(q*16+u*.8+j)**2)])}
-    const outline=L.concat(R.reverse());trace(outline);x.closePath();x.strokeStyle=g;x.globalAlpha=.27;x.lineWidth=12;x.stroke();x.globalAlpha=1;x.fillStyle='#020005';x.fill();x.strokeStyle=g;x.lineWidth=2.1;x.stroke();
-   }else{
-    trace(P);x.strokeStyle=g;x.globalAlpha=.25;x.lineWidth=unstable?12:7;x.stroke();x.globalAlpha=1;x.lineWidth=unstable?3.2:2;x.stroke();
-    const core=x.createLinearGradient(start,0,start+dir*len,0);core.addColorStop(0,'rgba(164,115,255,0)');core.addColorStop(.25,`rgba(${unstable?'241,229,255':'165,123,255'},${a*(unstable?.85:.5)})`);core.addColorStop(1,'rgba(164,115,255,0)');x.strokeStyle=core;x.lineWidth=unstable?1.1:.8;x.stroke();
-    if(unstable){for(let k of [5,11]){const [px,py]=P[k],sign=(k+j+side)%2?1:-1,B=[[px,py],[px+dir*len*.08,py+sign*H*.045],[px+dir*len*.12,py+sign*H*.085],[px+dir*len*.18,py+sign*H*.11]];trace(B);x.strokeStyle=g;x.globalAlpha=.65;x.lineWidth=1.2;x.stroke();x.globalAlpha=1}}
-   }
-  }
- }
+function path(p,g){const n=(p.length-1)*g,i=Math.floor(n);x.beginPath();x.moveTo(...p[0]);for(let k=1;k<=i;k++)x.lineTo(...p[k]);if(i<p.length-1){const u=n-i;x.lineTo(p[i][0]+(p[i+1][0]-p[i][0])*u,p[i][1]+(p[i+1][1]-p[i][1])*u)}}
+function draw(b){const age=clock-b.t0,g=Math.min(1,age/b.grow),fade=Math.max(0,1-Math.max(0,age-b.grow)/(b.life-b.grow)),dk=b.mode===3,unstable=b.mode===2;
+ const a=b.alpha*fade*(unstable?.78+.22*Math.sin(age*.011+b.ph[0]):1);if(a<=0)return;
+ const st=b.pts[0],en=b.pts[b.pts.length-1],G=(rgb,al)=>{const k=x.createLinearGradient(...st,...en);k.addColorStop(0,`rgba(${rgb},${al*a*.70})`);k.addColorStop(.25,`rgba(${rgb},${al*a})`);k.addColorStop(1,`rgba(${rgb},${al*a*.34})`);return k};
+ x.lineCap=x.lineJoin='round';x.shadowBlur=0;
+ if(dk){const fs=b.fl.map(([pr,w])=>[flame(pr,w*b.width,g,clock,b.ph),w]).filter(o=>o[0]);for(const[o,w]of fs){x.strokeStyle=G('97,0,255',.32);x.lineWidth=9*Math.max(w,.55);x.stroke(o);x.strokeStyle=G('151,76,255',1);x.lineWidth=2.8*Math.max(w,.6);x.stroke(o);x.fillStyle=G('0,0,0',1);x.fill(o)}}
+ else{for(const [pts,w] of b.all){path(pts,g);x.strokeStyle=G('97,0,255',.22);x.lineWidth=15*w*b.width;x.stroke();x.strokeStyle=G('97,0,255',.75);x.lineWidth=6*w*b.width;x.stroke();x.strokeStyle=G(unstable?'240,227,255':'166,115,255',unstable?.92:.72);x.lineWidth=1.15*w*b.width;x.stroke()}}
 }
 function wakeFX(delay=0){clearTimeout(fxTimer);if(fxFrame)cancelAnimationFrame(fxFrame);fxFrame=0;if(document.hidden||reduced.matches)return;if(delay>0)fxTimer=setTimeout(()=>{fxFrame=requestAnimationFrame(f)},delay);else fxFrame=requestAnimationFrame(f)}
-function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H);calmLast=energyLast=0;return}
- if(document.documentElement.classList.contains('nav-swiping')||(mobileFX&&t<scrollingUntil)){calmLast=energyLast=0;wakeFX(100);return}
- const mode=Number(document.body.dataset.t)||0,step=mobileFX?(mode===2?50:65):34;if(t-fxLast<step){wakeFX(step-(t-fxLast));return}fxLast=t;if(mode===0)calm(t);else energy(t,mode);wakeFX(step);
+function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H);last=0;return}
+ if(document.documentElement.classList.contains('nav-swiping')||document.documentElement.classList.contains('nav-swipe-commit')||(mobileFX&&t<scrollingUntil)){last=0;wakeFX(100);return}
+ const mode=Number(document.body.dataset.t)||0,p=profiles[mode];if(mode!==fxTab){fxTab=mode;bolts=[];next=clock+140}
+ clock+=last?Math.min(120,t-last):0;last=t;bolts=bolts.filter(b=>clock-b.t0<b.life);
+ const max=mobileFX?Math.min(4,p.max):p.max;if(clock>=next&&bolts.length<max){bolts.push(mk(mode));next=clock+rand(...p.gap)}
+ x.clearRect(0,0,W,H);for(const b of bolts)draw(b);wakeFX(mobileFX?44:28);
 }
-if(mobileFX)addEventListener('scroll',()=>{scrollingUntil=performance.now()+180},{passive:true});
-function fxVisibility(){if(document.hidden||reduced.matches){clearTimeout(fxTimer);cancelAnimationFrame(fxFrame);fxFrame=0;calmLast=energyLast=0;x.clearRect(0,0,W,H)}else{calmLast=energyLast=0;wakeFX(0)}}
-document.addEventListener('visibilitychange',fxVisibility);reduced.addEventListener('change',fxVisibility);
-tabHooks.push(i=>{if(i===fxTab)return;fxTab=i;calmLast=energyLast=0;fxLast=0;wakeFX(0)});wakeFX(1500)})();
+if(mobileFX)addEventListener('scroll',()=>{scrollingUntil=performance.now()+150},{passive:true});
+function fxVisibility(){if(document.hidden||reduced.matches){clearTimeout(fxTimer);cancelAnimationFrame(fxFrame);fxFrame=0;last=0;bolts=[];x.clearRect(0,0,W,H)}else{last=0;next=clock+120;wakeFX(0)}}
+document.addEventListener('visibilitychange',fxVisibility);reduced.addEventListener('change',fxVisibility);tabHooks.push(i=>{if(i!==fxTab){last=0;wakeFX(0)}});wakeFX(450)})();
 function mkbar(id,l){const w=$('#'+id);w.className='bar';w.innerHTML='<div class="bl"><span>'+l+'</span><b class="bs"></b></div><div class="trk"><div class="zn"></div><div class="fl"></div><div class="ex"></div><div class="mk"></div></div>';const q=s=>w.querySelector(s);return{fl:q('.fl'),ex:q('.ex'),zn:q('.zn'),mk:q('.mk'),bs:q('.bs'),w}}
 const p1=mkbar('b1','RESERVA DE ENERGIA'),p2=mkbar('b2','RESERVA × LIMITE'),p3=mkbar('b3','RESERVA DA RUPTURE');
 p1.zn.style.display=p1.ex.style.display=p1.mk.style.display='none';p1.w.classList.add('sm');
@@ -1094,12 +1093,12 @@ quads('q1',[['Anulação','O contato direto permite a anulação parcial ou inte
   if(!ref.offsetWidth)return;
   const st=getComputedStyle(ref);
   let height=number(st,'paddingTop')+number(st,'paddingBottom')+number(st,'borderTopWidth')+number(st,'borderBottomWidth');
-  for(const el of parts){const cs=getComputedStyle(el);height+=el.getBoundingClientRect().height+number(cs,'marginTop')+number(cs,'marginBottom')}
+  for(const el of parts){const cs=getComputedStyle(el);height+=el.offsetHeight+number(cs,'marginTop')+number(cs,'marginBottom')}
   const value=Math.ceil(height)+'px';
   if(grid.style.getPropertyValue('--q1-reference-height')!==value)grid.style.setProperty('--q1-reference-height',value);
  }
  if('ResizeObserver' in window){const ro=new ResizeObserver(sync);parts.forEach(el=>ro.observe(el))}
- const refresh=raf1(sync);tabHooks.push(refresh);desktopMotion.addEventListener('change',refresh);addEventListener('resize',refresh,{passive:true});document.fonts?.ready.then(refresh);refresh();
+ syncPowerHeights=sync;const refresh=raf1(sync);tabHooks.push(refresh);desktopMotion.addEventListener('change',refresh);addEventListener('resize',refresh,{passive:true});document.fonts?.ready.then(refresh);refresh();
 })();
 quads('q2',[['O que é','A energia ultrapassa o limite estável.','A Sobrecarga ocorre quando a energia acumulada ultrapassa a capacidade de armazenamento estável do reservatório, podendo resultar de uma absorção excessiva ou de absorções sucessivas sem tempo suficiente para dissipar a energia armazenada. A absorção que desencadeia a Sobrecarga é concluída antes da interrupção da anulação e da absorção.'],
 ['Efeitos','Vazamento instável e danos progressivos.','Durante a Sobrecarga, a instabilidade do reservatório provoca o vazamento passivo e progressivo da energia armazenada até seu esvaziamento completo, causando consequências físicas e metabólicas e danos progressivos ao corpo.<br><br>Fearness mantém a capacidade de converter e dissipar a energia restante. Anulação e absorção ficam indisponíveis. A intensidade dos efeitos acompanha a quantidade de energia armazenada e o esforço empregado por Fearness, diminuindo progressivamente conforme o reservatório se esvazia.<br><br>O reservatório possui uma capacidade máxima de tolerância à Sobrecarga. Ultrapassar a tolerância do organismo pode provocar consequências fatais.'],
