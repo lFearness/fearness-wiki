@@ -66,7 +66,7 @@ figure{margin:0}
 #bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,#8a3ffc10,transparent 62%),radial-gradient(ellipse at 50% 120%,#000000aa,transparent 60%)}
 body[data-t="0"] #bg{background-color:#020005}body[data-t="1"] #bg{background-color:#04000b}body[data-t="2"] #bg{background-color:#010003}body[data-t="3"] #bg{background-color:#040009}
 #fx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.42;transition:opacity .35s ease}
-body[data-t="1"] #fx{opacity:.53}body[data-t="2"] #fx{opacity:.65}body[data-t="3"] #fx{opacity:.62}
+body[data-t="1"] #fx{opacity:.53}body[data-t="2"] #fx{opacity:.46}body[data-t="3"] #fx{opacity:.62}
 p,li,h3{text-shadow:0 1px 8px #000c}
 nav{background:#0a0418f2}
 nav button{transition:background-color .3s ease,border-color .3s ease,color .3s ease}nav button:hover{border-color:var(--pu);color:#fff}
@@ -937,29 +937,47 @@ const rand=(a,b)=>a+Math.random()*(b-a),tau=Math.PI*2;
 const profiles=[
  {max:2,gap:[650,1150],length:[.22,.43],jag:.70,branch:.06,life:[1350,1950],grow:[300,470],alpha:.76,width:1.05},
  {max:3,gap:[420,850],length:[.27,.54],jag:.80,branch:.10,life:[1100,1650],grow:[210,340],alpha:.86,width:1.15},
- {max:5,gap:[200,480],length:[.32,.68],jag:1.15,branch:.20,life:[800,1300],grow:[120,240],alpha:1,width:1.30},
+ {max:3,gap:[650,1100],length:[.30,.60],jag:1.10,branch:.16,life:[1500,2150],grow:[350,540],alpha:.78,width:1.25},
  {max:3,gap:[400,900],length:[.30,.64],jag:.96,branch:.13,life:[1450,2200],grow:[250,410],alpha:.95,width:1.16}
 ];
 function rs(){const d=Math.min(devicePixelRatio||1,mobileFX?1:1.5);W=innerWidth;H=innerHeight;cv.width=Math.round(W*d);cv.height=Math.round(H*d);x.setTransform(d,0,0,d,0,0);bolts=[];next=clock+120}
 let rsT=0;rs();addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(innerWidth!==W||Math.abs(innerHeight-H)>=120)rs()},180)});
-// Linhas quebradas em qualquer direção; a forma mantém a silhueta de raio original.
+// Cada manifestação nasce na borda e termina dentro da tela. Reservar sua área,
+// incluindo ramificações e brilho, impede a sobreposição entre raios independentes.
 let side=0;
 function mk(mode){const p=profiles[mode],scale=Math.min(Math.min(W,H)*1.14,Math.max(W,H)*.70),len=scale*rand(...p.length);
- // Alternar as laterais no celular: ao menos uma parte do raio fica exposta, mesmo com blocos largos.
- const lateral=mobileFX?(side++%4!==3):Math.random()<.40;
- let a=rand(0,tau),cx=rand(.10,.90)*W,cy=rand(.16,.84)*H;
- if(lateral){const left=side%2===0;cx=left?rand(9,24):W-rand(9,24);cy=rand(.18,.85)*H;a=(Math.random()<.5?Math.PI/2:-Math.PI/2)+rand(-.20,.20)}
- else if(Math.random()<.48){const k=Math.floor(rand(0,4));if(k===0)cx=rand(.03,.12)*W;if(k===1)cx=rand(.88,.97)*W;if(k===2)cy=rand(.06,.18)*H;if(k===3)cy=rand(.82,.94)*H}
- const dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx,sx=cx-dx*len/2,sy=cy-dy*len/2;
+ const k=mobileFX&&Math.random()<.90?(side++%2)*2:Math.floor(rand(0,4));
+ const vertical=k===0||k===2,span=vertical?H:W,depth=vertical?W:H;
+ const inward=mobileFX&&vertical?rand(.15,.40):rand(.35,.85),along=Math.sqrt(1-inward*inward),sgn=Math.random()<.5?-1:1;
+ const tangent=along*sgn,room=len*along+12;if(room>span-16||len*inward>depth-12)return null;
+ const u=sgn>0?rand(8,span-room):rand(room,span-8);
+ const sx=vertical?(k===0?0:W):u,sy=vertical?u:(k===1?0:H);
+ const dx=vertical?(k===0?inward:-inward):tangent,dy=vertical?tangent:(k===1?inward:-inward),px=-dy,py=dx;
+ const fit=(xx,yy)=>[Math.max(2,Math.min(W-2,xx)),Math.max(2,Math.min(H-2,yy))];
  const pts=[[sx,sy]],br=[],count=Math.max(5,Math.min(28,Math.round(len/rand(13,24))));let drift=0;
- for(let i=1;i<=count;i++){const q=i/count,step=len/count;drift=drift*.52+rand(-1,1)*step*p.jag;const xx=sx+dx*len*q+px*drift,yy=sy+dy*len*q+py*drift;pts.push([xx,yy]);if(i>1&&i<count-1&&br.length<3&&Math.random()<p.branch){const B=[[xx,yy]],sign=Math.random()<.5?-1:1,n=Math.floor(rand(2,5));let bx=xx,by=yy;for(let j=0;j<n;j++){const f=step*rand(.35,.65),d=step*rand(.2,.7)*sign;bx+=dx*f+px*d;by+=dy*f+py*d;B.push([bx,by])}br.push(B)}}
- // Manter início e fim dentro do campo visual, sem atravessar a tela de uma borda à outra.
- const all=[[pts,1],...br.map(b=>[b,.48])],points=all.flatMap(([q])=>q),pad=6;
- const minX=Math.min(...points.map(q=>q[0])),maxX=Math.max(...points.map(q=>q[0])),minY=Math.min(...points.map(q=>q[1])),maxY=Math.max(...points.map(q=>q[1]));
- const shiftX=minX<pad?pad-minX:maxX>W-pad?W-pad-maxX:0,shiftY=minY<pad?pad-minY:maxY>H-pad?H-pad-maxY:0;
- points.forEach(q=>{q[0]+=shiftX;q[1]+=shiftY});
- return{pts,all,fl:mode===3?all.map(([a,w])=>[prep(a),w]):null,t0:clock,life:rand(...p.life),grow:rand(...p.grow),alpha:p.alpha*rand(.82,1),width:p.width*rand(.86,1.23),ph:Array.from({length:4},()=>rand(0,tau)),mode};
+ for(let i=1;i<=count;i++){const q=i/count,step=len/count;drift=drift*.52+rand(-1,1)*step*p.jag;const [xx,yy]=fit(sx+dx*len*q+px*drift,sy+dy*len*q+py*drift);pts.push([xx,yy]);if(i>1&&i<count-1&&br.length<3&&Math.random()<p.branch){const B=[[xx,yy]],sign=Math.random()<.5?-1:1,n=Math.floor(rand(2,5));let bx=xx,by=yy;for(let j=0;j<n;j++){const f=step*rand(.35,.65),d=step*rand(.2,.7)*sign;bx+=dx*f+px*d;by+=dy*f+py*d;B.push(fit(bx,by))}br.push(B)}}
+ const all=[[pts,1],...br.map(b=>[b,.48])],points=all.flatMap(([q])=>q),pad=mode===3?34:22;
+ const bounds=[Math.min(...points.map(q=>q[0]))-pad,Math.min(...points.map(q=>q[1]))-pad,Math.max(...points.map(q=>q[0]))+pad,Math.max(...points.map(q=>q[1]))+pad];
+ if(bolts.some(b=>bounds[0]<b.bounds[2]&&bounds[2]>b.bounds[0]&&bounds[1]<b.bounds[3]&&bounds[3]>b.bounds[1]))return null;
+ return{pts,all,bounds,fl:mode===3?all.map(([a,w])=>[prep(a),w]):null,t0:clock,life:rand(...p.life),grow:rand(...p.grow),alpha:p.alpha*rand(.82,1),width:p.width*rand(.86,1.23),ph:Array.from({length:4},()=>rand(0,tau)),mode};
 }
+// Atenuar o fundo na área de leitura visível, sem modificar o conteúdo.
+let reading=1,readingTarget=1,readingAt=-Infinity;
+function measureReading(t){
+ if(t-readingAt<180)return;readingAt=t;
+ const section=document.querySelector('section.on');if(!section){readingTarget=1;return}
+ const top=Math.max(0,document.querySelector('nav').getBoundingClientRect().bottom),bottom=innerHeight,area=Math.max(1,(bottom-top)*innerWidth);
+ let open=false,coverage=0;
+ const visibleArea=e=>{const r=e.getBoundingClientRect();return Math.max(0,Math.min(bottom,r.bottom)-Math.max(top,r.top))*Math.max(0,Math.min(innerWidth,r.right)-Math.max(0,r.left))};
+ for(const el of section.querySelectorAll('.q.open,.ref.open,details[open]'))if(visibleArea(el)>800){open=true;break}
+ for(const el of section.querySelectorAll('p,li,.q:not(.open) .t,#ctxt,.pv,.ref .more')){
+  if(el.hidden||el.textContent.trim().length<45||el.closest('.q.open,.ref.open,details[open]'))continue;
+  if(el.matches('.ref .more')&&!el.closest('.ref.open'))continue;
+  coverage+=visibleArea(el);
+ }
+ readingTarget=open?.23:1-.62*Math.min(1,coverage/area/.36);
+}
+document.addEventListener('click',()=>{readingAt=-Infinity});
 function prep(p){let q=p;for(let it=0;it<1;it++){const r=[q[0]];for(let i=0;i<q.length-1;i++){const a=q[i],b=q[i+1];r.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75])}r.push(q[q.length-1]);q=r}
 const c=[0];for(let i=1;i<q.length;i++)c.push(c[i-1]+Math.hypot(q[i][0]-q[i-1][0],q[i][1]-q[i-1][1]));const L=c[c.length-1],A=[];let j=0;
 for(let s=0;s<=L;s+=5){while(j<c.length-2&&c[j+1]<s)j++;const u=(s-c[j])/((c[j+1]-c[j])||1);A.push({x:q[j][0]+(q[j+1][0]-q[j][0])*u,y:q[j][1]+(q[j+1][1]-q[j][1])*u,s})}
@@ -972,11 +990,11 @@ for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];o.quadraticCurveTo(
 
 function path(p,g){const n=(p.length-1)*g,i=Math.floor(n);x.beginPath();x.moveTo(...p[0]);for(let k=1;k<=i;k++)x.lineTo(...p[k]);if(i<p.length-1){const u=n-i;x.lineTo(p[i][0]+(p[i+1][0]-p[i][0])*u,p[i][1]+(p[i+1][1]-p[i][1])*u)}}
 function draw(b){const age=clock-b.t0,g=Math.min(1,age/b.grow),fade=Math.max(0,1-Math.max(0,age-b.grow)/(b.life-b.grow)),dk=b.mode===3,unstable=b.mode===2;
- const a=b.alpha*fade*(unstable?.78+.22*Math.sin(age*.011+b.ph[0]):1);if(a<=0)return;
+ const a=b.alpha*fade*(unstable?.94+.06*Math.sin(age*.003+b.ph[0]):1);if(a<=0)return;
  const st=b.pts[0],en=b.pts[b.pts.length-1],G=(rgb,al)=>{const k=x.createLinearGradient(...st,...en);k.addColorStop(0,`rgba(${rgb},${al*a*.70})`);k.addColorStop(.25,`rgba(${rgb},${al*a})`);k.addColorStop(1,`rgba(${rgb},${al*a*.34})`);return k};
  x.lineCap=x.lineJoin='round';x.shadowBlur=0;
  if(dk){const fs=b.fl.map(([pr,w])=>[flame(pr,w*b.width,g,clock,b.ph),w]).filter(o=>o[0]);for(const[o,w]of fs){x.strokeStyle=G('97,0,255',.32);x.lineWidth=9*Math.max(w,.55);x.stroke(o);x.strokeStyle=G('151,76,255',1);x.lineWidth=2.8*Math.max(w,.6);x.stroke(o);x.fillStyle=G('0,0,0',1);x.fill(o)}}
- else{for(const [pts,w] of b.all){path(pts,g);x.strokeStyle=G('97,0,255',.22);x.lineWidth=18*w*b.width;x.stroke();x.strokeStyle=G('97,0,255',.84);x.lineWidth=8*w*b.width;x.stroke();x.strokeStyle=G(unstable?'240,227,255':'166,115,255',unstable?.92:.80);x.lineWidth=2.6*w*b.width;x.stroke()}}
+ else{for(const [pts,w] of b.all){path(pts,g);x.strokeStyle=G('97,0,255',.22);x.lineWidth=18*w*b.width;x.stroke();x.strokeStyle=G('97,0,255',.84);x.lineWidth=8*w*b.width;x.stroke();x.strokeStyle=G(unstable?'215,190,255':'166,115,255',unstable?.80:.80);x.lineWidth=2.6*w*b.width;x.stroke()}}
 }
 function wakeFX(delay=0){clearTimeout(fxTimer);if(fxFrame)cancelAnimationFrame(fxFrame);fxFrame=0;if(document.hidden||reduced.matches)return;if(delay>0)fxTimer=setTimeout(()=>{fxFrame=requestAnimationFrame(f)},delay);else fxFrame=requestAnimationFrame(f)}
 function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H);last=0;return}
@@ -984,10 +1002,12 @@ function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H
  const busy=document.documentElement.classList.contains('nav-swiping')||document.documentElement.classList.contains('nav-swipe-commit')||(mobileFX&&t<scrollingUntil);
  const interval=busy?40:mobileFX?25:16;
  if(lastDraw&&t-lastDraw<interval-2){fxFrame=requestAnimationFrame(f);return}lastDraw=t;
- const mode=Number(document.body.dataset.t)||0,p=profiles[mode];if(mode!==fxTab){fxTab=mode;bolts.forEach(b=>{b.life=Math.min(b.life,Math.max(b.grow+1,clock-b.t0+240))});next=clock}
+ const mode=Number(document.body.dataset.t)||0,p=profiles[mode];if(mode!==fxTab){fxTab=mode;readingAt=-Infinity;bolts.forEach(b=>{b.life=Math.min(b.life,Math.max(b.grow+1,clock-b.t0+240))});next=clock}
  clock+=last?Math.min(120,t-last):0;last=t;bolts=bolts.filter(b=>clock-b.t0<b.life);
- const max=mobileFX?Math.min(4,p.max):p.max;if(clock>=next&&bolts.length<max){bolts.push(mk(mode));next=clock+rand(...p.gap)*(mobileFX?.82:1)}
- x.clearRect(0,0,W,H);for(const b of bolts)draw(b);fxFrame=requestAnimationFrame(f);
+ measureReading(t);reading+=(readingTarget-reading)*.12;
+ const max=mobileFX?Math.min(3,p.max):p.max;
+ if(clock>=next&&bolts.length<max){let bolt=null;for(let attempt=0;attempt<18&&!bolt;attempt++)bolt=mk(mode);if(bolt){bolts.push(bolt);next=clock+rand(...p.gap)*(mobileFX?.82:1)*(1+(1-readingTarget)*.6)}else next=clock+160}
+ x.clearRect(0,0,W,H);x.globalAlpha=reading;for(const b of bolts)draw(b);x.globalAlpha=1;fxFrame=requestAnimationFrame(f);
 }
 if(mobileFX)addEventListener('scroll',()=>{scrollingUntil=performance.now()+150},{passive:true});
 function fxVisibility(){if(document.hidden||reduced.matches){clearTimeout(fxTimer);cancelAnimationFrame(fxFrame);fxFrame=0;last=0;bolts=[];x.clearRect(0,0,W,H)}else{last=0;next=clock+120;wakeFX(0)}}
