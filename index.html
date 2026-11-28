@@ -4,7 +4,7 @@
 <title>Fearness — O Fragmento Funesto</title>
 <meta name="description" content="Referência oficial de Fearness — O Fragmento Funesto: personagem, Forsaken, restrições e Forsaken Rupture.">
 <link rel="canonical" href="https://lfearness.github.io/fearness-wiki/">
-<link rel="icon" type="image/webp" href="assets/img/rosto-frente.webp">
+<link rel="icon" type="image/webp" href="assets/img/rosto-frente.webp?v=visual3">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Fearness — O Fragmento Funesto">
 <meta property="og:description" content="Personagem, poder, restrições e transformação.">
@@ -15,7 +15,7 @@
 <meta name="theme-color" content="#050507">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="assets/img/poster-corpo-frente.webp" type="image/webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/img/poster-corpo-frente.webp?v=visual3" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800&display=swap"></noscript>
 <style>
@@ -573,7 +573,7 @@ section.nav-swipe-out.nav-swipe-settle,section.nav-swipe-preview.nav-swipe-settl
 <section id="s0">
 <h2>Fearness</h2>
 <div class="hero"><div class="hl">
-<figure class="big" id="bigf"><div class="fr"><video class="m1 bv" data-v="0" data-poster="assets/img/poster-corpo-frente.webp" muted loop playsinline preload="none" disablepictureinpicture aria-label="Frente"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-frente.webp" alt="Rosto"></div></figure>
+<figure class="big" id="bigf"><div class="fr"><video class="m1 bv" data-v="0" data-poster="assets/img/poster-corpo-frente.webp?v=visual3" muted loop playsinline preload="none" disablepictureinpicture aria-label="Frente"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-frente.webp?v=visual3" alt="Rosto"></div></figure>
 </div><div class="hr">
 <div class="qg" id="qib"></div>
 <h3>Quem é Fearness</h3>
@@ -612,7 +612,7 @@ section.nav-swipe-out.nav-swipe-settle,section.nav-swipe-preview.nav-swipe-settl
 <section id="s2">
 <h2>Restrição</h2>
 <div class="hero"><div class="hl">
-<figure><div class="fr"><video class="bv" data-v="1" data-poster="assets/img/poster-corpo-sobrecarga.webp" muted loop playsinline preload="none" disablepictureinpicture aria-label="Sobrecarga, corpo inteiro"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-sobrecarga.webp" alt="Sobrecarga, rosto"></div><figcaption>Fearness em Sobrecarga</figcaption></figure>
+<figure><div class="fr"><video class="bv" data-v="1" data-poster="assets/img/poster-corpo-sobrecarga.webp?v=visual3" muted loop playsinline preload="none" disablepictureinpicture aria-label="Sobrecarga, corpo inteiro"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-sobrecarga.webp?v=visual3" alt="Sobrecarga, rosto"></div><figcaption>Fearness em Sobrecarga</figcaption></figure>
 </div><div class="hr">
 <h3>Sobrecarga</h3>
 <p class="key">Quando a energia ultrapassa a capacidade de armazenamento estável, o reservatório se torna instável e a energia armazenada vaza progressivamente. A anulação e a absorção ficam indisponíveis até a reserva chegar a zero.</p>
@@ -631,7 +631,7 @@ section.nav-swipe-out.nav-swipe-settle,section.nav-swipe-preview.nav-swipe-settl
 <section id="s3">
 <h2>Forsaken Rupture</h2>
 <div class="hero"><div class="hl">
-<figure><div class="fr"><video class="bv" data-v="2" data-poster="assets/img/poster-corpo-rupture.webp" muted loop playsinline preload="none" disablepictureinpicture aria-label="Forsaken Rupture, corpo inteiro"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-rupture.webp" alt="Forsaken Rupture, rosto"></div><figcaption>Fearness em Forsaken Rupture</figcaption></figure>
+<figure><div class="fr"><video class="bv" data-v="2" data-poster="assets/img/poster-corpo-rupture.webp?v=visual3" muted loop playsinline preload="none" disablepictureinpicture aria-label="Forsaken Rupture, corpo inteiro"></video></div><div class="badge"><img loading="lazy" decoding="async" data-src="assets/img/rosto-rupture.webp?v=visual3" alt="Forsaken Rupture, rosto"></div><figcaption>Fearness em Forsaken Rupture</figcaption></figure>
 </div><div class="hr">
 <div class="qg" id="qor"></div>
 <h3>Barra de reserva</h3><div id="b3"></div><p style="color:var(--mut);font-size:.85rem">Com os selos removidos, o excedente energético desencadeia a Forsaken Rupture. A expansão estabiliza esse excedente, que passa a sustentar a transformação e permite acumular mais energia na reserva adicional.</p>
@@ -658,24 +658,24 @@ const desktopMotion=matchMedia('(min-width:1000px)');
 const contentMotion=()=>desktopMotion.matches||!reduced.matches;
 const isActive=el=>!document.hidden&&!!el.closest('section.on');
 const isVisible=el=>{const r=el.getBoundingClientRect();return isActive(el)&&r.width>0&&r.height>0&&r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth};
-const imageSizes={"assets/img/acessorio-obsidiana.webp":[1305,1386],"assets/img/botas.webp":[1443,1572],"assets/img/casaco-gola.webp":[1024,1536],"assets/img/ciclo-fearness.webp":[1536,1536],"assets/img/cinto.webp":[1596,1386],"assets/img/costas.webp":[1024,1536],"assets/img/dissipacao.webp":[1536,1536],"assets/img/lado.webp":[1025,1536],"assets/img/manifestacao-sombria.webp":[1536,1536],"assets/img/marcas-negras.webp":[948,1606],"assets/img/mascara-normal.webp":[1536,1149],"assets/img/mascara-ossea.webp":[1536,1536],"assets/img/mascara-reserva.webp":[1536,1149],"assets/img/mascara-sobrecarga.webp":[1536,1149],"assets/img/olhos-normal.webp":[1536,1149],"assets/img/olhos-reserva.webp":[1536,1149],"assets/img/olhos-sobrecarga.webp":[1536,1149],"assets/img/poster-corpo-frente.webp":[1080,1920],"assets/img/poster-corpo-rupture.webp":[1080,1920],"assets/img/poster-corpo-sobrecarga.webp":[1080,1920],"assets/img/rosto-frente.webp":[1536,1536],"assets/img/rosto-rupture.webp":[1536,1536],"assets/img/rosto-sobrecarga.webp":[1536,1536],"assets/img/roupa-base.webp":[936,1536],"assets/img/selo-removido.webp":[1200,1311],"assets/img/selo-rupture.webp":[1406,1536],"assets/img/selo.webp":[1200,1311],"assets/img/selos-antebraco.webp":[1200,1311],"assets/img/zoom-rosto-frente.webp":[1536,1536],"assets/img/zoom-rosto-rupture.webp":[1536,1536]};
+const imageSizes={"assets/img/acessorio-obsidiana.webp":[1305,1386],"assets/img/botas.webp":[1443,1572],"assets/img/casaco-gola.webp":[1024,1536],"assets/img/ciclo-fearness.webp":[1536,1536],"assets/img/cinto.webp":[1596,1386],"assets/img/costas.webp":[1024,1536],"assets/img/dissipacao.webp":[1536,1536],"assets/img/lado.webp":[1025,1536],"assets/img/manifestacao-sombria.webp":[1536,1536],"assets/img/marcas-negras.webp":[948,1606],"assets/img/mascara-normal.webp":[1536,1149],"assets/img/mascara-ossea.webp":[1536,1536],"assets/img/mascara-reserva.webp":[1536,1149],"assets/img/mascara-sobrecarga.webp":[1536,1149],"assets/img/olhos-normal.webp":[1536,1149],"assets/img/olhos-reserva.webp":[1536,1149],"assets/img/olhos-sobrecarga.webp":[1536,1149],"assets/img/poster-corpo-frente.webp?v=visual3":[1620,2880],"assets/img/poster-corpo-rupture.webp?v=visual3":[1620,2880],"assets/img/poster-corpo-sobrecarga.webp?v=visual3":[1620,2880],"assets/img/rosto-frente.webp?v=visual3":[1536,1536],"assets/img/rosto-rupture.webp?v=visual3":[1536,1536],"assets/img/rosto-sobrecarga.webp?v=visual3":[1536,1536],"assets/img/roupa-base.webp":[936,1536],"assets/img/selo-removido.webp":[1200,1311],"assets/img/selo-rupture.webp":[1406,1536],"assets/img/selo.webp":[1200,1311],"assets/img/selos-antebraco.webp":[1200,1311],"assets/img/zoom-rosto-frente.webp?v=visual3":[1536,1536],"assets/img/zoom-rosto-rupture.webp?v=visual3":[1536,1536]};
 function loadImg(img){if(img.dataset.src){const url=img.dataset.src,size=imageSizes[url];if(size){img.width=size[0];img.height=size[1]}img.decoding="async";if(img.closest(".badge"))img.fetchPriority="high";img.src=url;delete img.dataset.src}}
 // Fila progressiva: um download secundário por vez, sem alterar os arquivos.
-const mediaGroups=[["assets/img/poster-corpo-frente.webp","assets/img/rosto-frente.webp","assets/video/corpo-frente.mp4?v=fps2","assets/img/lado.webp","assets/img/costas.webp","assets/img/roupa-base.webp","assets/img/casaco-gola.webp","assets/img/acessorio-obsidiana.webp","assets/img/selos-antebraco.webp","assets/img/cinto.webp","assets/img/botas.webp","assets/img/zoom-rosto-frente.webp","assets/video/zoom-rosto-frente.mp4?v=fps2"],["assets/img/olhos-normal.webp","assets/img/olhos-reserva.webp","assets/img/olhos-sobrecarga.webp","assets/video/olhos-normal-reserva.mp4?v=seek1","assets/video/olhos-reserva-normal.mp4?v=seek1","assets/video/olhos-reserva-sobrecarga.mp4?v=seek1","assets/video/olhos-sobrecarga-reserva.mp4?v=seek1","assets/img/ciclo-fearness.webp","assets/img/dissipacao.webp"],["assets/img/selo.webp","assets/img/selo-removido.webp","assets/img/selo-rupture.webp","assets/video/selo-sem-selo.mp4?v=seek1","assets/video/selo-sem-selo-inverso.mp4?v=seek1","assets/video/selo-rupture.mp4?v=seek1","assets/video/selo-rupture-inverso.mp4?v=seek1","assets/img/poster-corpo-sobrecarga.webp","assets/img/rosto-sobrecarga.webp","assets/video/corpo-sobrecarga.mp4?v=fps2","assets/video/zoom-rosto-sobrecarga.mp4?v=fps2"],["assets/img/mascara-normal.webp","assets/img/mascara-reserva.webp","assets/img/mascara-sobrecarga.webp","assets/video/mascara-normal-reserva.mp4?v=seek1","assets/video/mascara-reserva-normal.mp4?v=seek1","assets/video/mascara-reserva-sobrecarga.mp4?v=seek1","assets/video/mascara-sobrecarga-reserva.mp4?v=seek1","assets/img/poster-corpo-rupture.webp","assets/img/rosto-rupture.webp","assets/video/corpo-rupture.mp4?v=fps2","assets/img/mascara-ossea.webp","assets/img/marcas-negras.webp","assets/img/manifestacao-sombria.webp","assets/img/zoom-rosto-rupture.webp","assets/video/zoom-rosto-rupture.mp4?v=fps2"]];
+const mediaGroups=[["assets/img/poster-corpo-frente.webp?v=visual3","assets/img/rosto-frente.webp?v=visual3","assets/video/corpo-frente.mp4?v=visual3","assets/img/lado.webp","assets/img/costas.webp","assets/img/roupa-base.webp","assets/img/casaco-gola.webp","assets/img/acessorio-obsidiana.webp","assets/img/selos-antebraco.webp","assets/img/cinto.webp","assets/img/botas.webp","assets/img/zoom-rosto-frente.webp?v=visual3","assets/video/zoom-rosto-frente.mp4?v=visual3"],["assets/img/olhos-normal.webp","assets/img/olhos-reserva.webp","assets/img/olhos-sobrecarga.webp","assets/video/olhos-normal-reserva.mp4?v=seek1","assets/video/olhos-reserva-normal.mp4?v=seek1","assets/video/olhos-reserva-sobrecarga.mp4?v=seek1","assets/video/olhos-sobrecarga-reserva.mp4?v=seek1","assets/img/ciclo-fearness.webp","assets/img/dissipacao.webp"],["assets/img/selo.webp","assets/img/selo-removido.webp","assets/img/selo-rupture.webp","assets/video/selo-sem-selo.mp4?v=seek1","assets/video/selo-sem-selo-inverso.mp4?v=seek1","assets/video/selo-rupture.mp4?v=seek1","assets/video/selo-rupture-inverso.mp4?v=seek1","assets/img/poster-corpo-sobrecarga.webp?v=visual3","assets/img/rosto-sobrecarga.webp?v=visual3","assets/video/corpo-sobrecarga.mp4?v=visual3","assets/video/zoom-rosto-sobrecarga.mp4?v=visual3"],["assets/img/mascara-normal.webp","assets/img/mascara-reserva.webp","assets/img/mascara-sobrecarga.webp","assets/video/mascara-normal-reserva.mp4?v=seek1","assets/video/mascara-reserva-normal.mp4?v=seek1","assets/video/mascara-reserva-sobrecarga.mp4?v=seek1","assets/video/mascara-sobrecarga-reserva.mp4?v=seek1","assets/img/poster-corpo-rupture.webp?v=visual3","assets/img/rosto-rupture.webp?v=visual3","assets/video/corpo-rupture.mp4?v=visual3","assets/img/mascara-ossea.webp","assets/img/marcas-negras.webp","assets/img/manifestacao-sombria.webp","assets/img/zoom-rosto-rupture.webp?v=visual3","assets/video/zoom-rosto-rupture.mp4?v=visual3"]];
 // Os três corpos principais têm prioridade global, mesmo fora da aba ativa.
 const mainBodies=[
- {tab:0,poster:'assets/img/poster-corpo-frente.webp',video:'assets/video/corpo-frente.mp4?v=fps2'},
- {tab:2,poster:'assets/img/poster-corpo-sobrecarga.webp',video:'assets/video/corpo-sobrecarga.mp4?v=fps2'},
- {tab:3,poster:'assets/img/poster-corpo-rupture.webp',video:'assets/video/corpo-rupture.mp4?v=fps2'}
+ {tab:0,poster:'assets/img/poster-corpo-frente.webp?v=visual3',video:'assets/video/corpo-frente.mp4?v=visual3'},
+ {tab:2,poster:'assets/img/poster-corpo-sobrecarga.webp?v=visual3',video:'assets/video/corpo-sobrecarga.mp4?v=visual3'},
+ {tab:3,poster:'assets/img/poster-corpo-rupture.webp?v=visual3',video:'assets/video/corpo-rupture.mp4?v=visual3'}
 ];
 const mainBodyURLs=new Set(mainBodies.flatMap(b=>[b.poster,b.video]));
 const bodyVideoURLs=new Set(mainBodies.map(b=>b.video));
 // Recursos expostos sem abrir quadrantes, incluindo as exceções interativas.
 const exposedMedia=[
- ['assets/img/poster-corpo-frente.webp','assets/img/rosto-frente.webp','assets/img/lado.webp','assets/img/costas.webp'],
+ ['assets/img/poster-corpo-frente.webp?v=visual3','assets/img/rosto-frente.webp?v=visual3','assets/img/lado.webp','assets/img/costas.webp'],
  ['assets/img/ciclo-fearness.webp','assets/img/olhos-normal.webp'],
- ['assets/img/poster-corpo-sobrecarga.webp','assets/img/rosto-sobrecarga.webp','assets/img/selo.webp'],
- ['assets/img/poster-corpo-rupture.webp','assets/img/rosto-rupture.webp','assets/img/mascara-normal.webp']
+ ['assets/img/poster-corpo-sobrecarga.webp?v=visual3','assets/img/rosto-sobrecarga.webp?v=visual3','assets/img/selo.webp'],
+ ['assets/img/poster-corpo-rupture.webp?v=visual3','assets/img/rosto-rupture.webp?v=visual3','assets/img/mascara-normal.webp']
 ];
 const interactionMedia=[[],[
  'assets/img/olhos-reserva.webp','assets/video/olhos-normal-reserva.mp4?v=seek1','assets/img/olhos-sobrecarga.webp','assets/video/olhos-reserva-sobrecarga.mp4?v=seek1','assets/video/olhos-sobrecarga-reserva.mp4?v=seek1','assets/video/olhos-reserva-normal.mp4?v=seek1'
@@ -1251,7 +1251,7 @@ H.forEach(h=>{const b=document.createElement('button');b.className='hs';b.setAtt
 I.push({n:'Rosto',s:face,el:bd});bd.tabIndex=0;bd.setAttribute('role','button');bd.setAttribute('aria-label','Ampliar rosto');bd.setAttribute('aria-expanded','false');bd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cur<0?sh(I.length-1):hide()}else if(e.key==='Escape'){hide()}});bd.addEventListener('blur',hide);document.addEventListener('visibilitychange',()=>{if(document.hidden)hide()});const faceObserver=new IntersectionObserver(es=>{if(!es[0].isIntersecting)hide()},{threshold:.01});faceObserver.observe(fig);
 I.forEach((o,i)=>{if(touch){o.el.onclick=ev=>{ev.stopPropagation();cur==i?hide():sh(i)}}else{o.el.onmouseenter=()=>sh(i);o.el.onmouseleave=hide;o.el.onclick=()=>{if(cur!==i)sh(i);else if(zvid&&zvid.paused&&contentMotion())zvid.play().catch(()=>{})}}});
 if(touch)fig.onclick=hide;tabHooks.push(()=>{if(!fig.closest('section').classList.contains('on')){hide();if(zvid)zvid.pause()}});hide()}
-const BV=["assets/video/corpo-frente.mp4?v=fps2","assets/video/corpo-sobrecarga.mp4?v=fps2","assets/video/corpo-rupture.mp4?v=fps2"];
+const BV=["assets/video/corpo-frente.mp4?v=visual3","assets/video/corpo-sobrecarga.mp4?v=visual3","assets/video/corpo-rupture.mp4?v=visual3"];
 document.querySelectorAll('video.bv').forEach(v=>{v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.disablePictureInPicture=true;v.playbackRate=1});
 const bodyVideos=[...document.querySelectorAll('video.bv')];
 bodyVideos.forEach(v=>registerNative(BV[+v.dataset.v],v));
@@ -1274,9 +1274,9 @@ addEventListener('resize',bodySyncFrame,{passive:true});addEventListener('scroll
 document.addEventListener('click',()=>syncBodies(true),{capture:true});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')syncBodies(true)},{capture:true});
 
-zoomer($('#bigf'),[],'assets/img/zoom-rosto-frente.webp',undefined,'assets/video/zoom-rosto-frente.mp4?v=fps2');
-zoomer(document.querySelector('#s2 .hl figure'),[],'assets/img/rosto-sobrecarga.webp',undefined,'assets/video/zoom-rosto-sobrecarga.mp4?v=fps2');
-zoomer(document.querySelector('#s3 .hl figure'),[],'assets/img/zoom-rosto-rupture.webp',undefined,'assets/video/zoom-rosto-rupture.mp4?v=fps2');
+zoomer($('#bigf'),[],'assets/img/zoom-rosto-frente.webp?v=visual3',undefined,'assets/video/zoom-rosto-frente.mp4?v=visual3');
+zoomer(document.querySelector('#s2 .hl figure'),[],'assets/img/rosto-sobrecarga.webp?v=visual3',undefined,'assets/video/zoom-rosto-sobrecarga.mp4?v=visual3');
+zoomer(document.querySelector('#s3 .hl figure'),[],'assets/img/zoom-rosto-rupture.webp?v=visual3',undefined,'assets/video/zoom-rosto-rupture.mp4?v=visual3');
 let sg=0;
 document.addEventListener('click',e=>{const el=e.target.closest('.q,.nd,.ref,nav button,.ctl button,.abtn,.tgl');if(!el)return;sfx.tick();if(el.classList.contains('tgl'))setTimeout(()=>{const b=tg.s&&tg.o;if(b&&!sg)sfx.surge();sg=b?1:0},0)});
 const EP=[{n:'Normal',i:'assets/img/olhos-normal.webp',t:'Os olhos permanecem cinzentos enquanto o reservatório energético está vazio.'},{n:'Reserva',i:'assets/img/olhos-reserva.webp',t:'Olhos roxos. Há energia na reserva, seja logo após absorver, seja enquanto ela é usada.'},{n:'Sobrecarga',i:'assets/img/olhos-sobrecarga.webp',t:'Olho branco brilhante com raios roxos. A energia ultrapassou o limite e vaza de forma instável.'}];
