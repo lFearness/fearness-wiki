@@ -1,10 +1,10 @@
 /* Fearness — cache opcional dos recursos essenciais. Atualize a versão ao substituir mídias. */
 'use strict';
-const CACHE='fearness-essential-v6';
+const CACHE='fearness-essential-v7';
 const MAX_AGE=12*60*60*1000;
 const IMAGES=['poster-corpo-frente','poster-corpo-sobrecarga','poster-corpo-rupture','rosto-frente','rosto-sobrecarga','rosto-rupture','lado','costas','ciclo-fearness','olhos-normal','olhos-reserva','olhos-sobrecarga','mascara-normal','mascara-reserva','mascara-sobrecarga','selo','selo-removido','selo-rupture'];
 const VIDEOS=['olhos-normal-sobrecarga','olhos-sobrecarga-normal','mascara-normal-sobrecarga','mascara-sobrecarga-normal','selo-direto-rupture','selo-direto-rupture-inverso','corpo-frente','corpo-sobrecarga','corpo-rupture','selo-sem-selo','selo-sem-selo-inverso','selo-rupture','selo-rupture-inverso',...['olhos','mascara'].flatMap(p=>['normal-reserva','reserva-sobrecarga','sobrecarga-reserva','reserva-normal'].map(s=>p+'-'+s))];
-const urls=new Set([...IMAGES.flatMap(n=>['assets/img/'+n+'.webp','assets/img/'+n+'.webp?v=visual3',...(n==='selo'?['assets/img/selo.webp?v=seal4']:[])]),...VIDEOS.flatMap(n=>['assets/video/'+n+'.mp4?v=visual3','assets/video/'+n+'.mp4?v=fps2','assets/video/'+n+'.mp4?v=seek1','assets/video/'+n+'.mp4?v=seek2','assets/video/'+n+'.mp4?v=seek3','assets/video/'+n+'.mp4'])].map(p=>new URL(p,self.registration.scope).href));
+const urls=new Set([...IMAGES.flatMap(n=>['assets/img/'+n+'.webp','assets/img/'+n+'.webp?v=visual3',...(n==='selo'?['assets/img/selo.webp?v=seal4']:[])]),...VIDEOS.flatMap(n=>['assets/video/'+n+'.mp4?v=visual3',...(n==='corpo-sobrecarga'?['assets/video/corpo-sobrecarga.mp4?v=visual4']:[]),'assets/video/'+n+'.mp4?v=fps2','assets/video/'+n+'.mp4?v=seek1','assets/video/'+n+'.mp4?v=seek2','assets/video/'+n+'.mp4?v=seek3','assets/video/'+n+'.mp4'])].map(p=>new URL(p,self.registration.scope).href));
 self.addEventListener('install',event=>{event.waitUntil(self.skipWaiting())});
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{try{for(const key of await caches.keys())if(key.startsWith('fearness-essential-')&&key!==CACHE)await caches.delete(key)}finally{try{const cache=await caches.open(CACHE);for(const request of await cache.keys()){const u=new URL(request.url);if(/\/(olhos|mascara|selo)-.*\.mp4$/.test(u.pathname)&&u.searchParams.get('v')==='fps2')await cache.delete(request)}}catch(_){}await self.clients.claim()}})())});
 function fresh(response){const date=Date.parse(response.headers.get('date')||'');return Number.isFinite(date)&&Date.now()-date<MAX_AGE}
