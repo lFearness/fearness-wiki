@@ -21,7 +21,7 @@
 <style>
 :root{--bg:#050507;--card:#0e0d14;--fg:#ecebf2;--mut:#a9a6b8;--pu:#8a3ffc;--pu2:#b78bff;--pu-title:#b295e4;--pu-section:#9e6af0;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-html{background:#050507}body{margin:0;background:transparent;color:var(--fg);font:16px/1.65 Georgia,serif}
+html{background:#050507}body{margin:0;background:transparent;color:var(--fg);font:16px/1.65 Georgia,serif;isolation:isolate}
 h1,h2,h3{font-family:'Permanent Marker',Impact,sans-serif;font-weight:400;margin:0}
 h1{font-size:clamp(2.2rem,9vw,4rem);text-align:center;padding:22px 12px 4px;letter-spacing:2px}
 .sub{text-align:center;color:var(--pu2);margin:0 0 10px;font-size:.9rem}
@@ -391,6 +391,17 @@ button:focus-visible,.badge:focus-visible,[role="button"]:focus-visible{outline:
  .z,.z:hover{transform:none!important}#fx{display:none!important}
  .bar.ov .trk,.bar.ov .fl,.bar.ov .ex{animation:none!important}
 }
+@media (prefers-reduced-motion:reduce) and (min-width:1000px), (prefers-reduced-motion:reduce) and (hover:hover) and (pointer:fine){
+ #fx{display:block!important}
+ .cyc .ring{animation-duration:2.5s!important;animation-iteration-count:infinite!important}
+ #b1.sm .fl{transition-duration:1.8s!important}
+ /* Expansão funcional: mesma duração dos quadrantes em dispositivos móveis. */
+ .q .d{transition-duration:.55s,.4s,.4s,.4s!important}
+ .ref .more{transition-duration:.5s,.4s,.4s,.4s!important}
+ .q .d[style*="transition: none"]{transition-duration:0s!important}
+ #b1.hold .fl{animation-duration:1.8s!important;animation-iteration-count:infinite!important}
+ /* A reserva continua animada pelo JS; tremores e flashes rápidos permanecem desativados. */
+}
 /* Hierarquia cromática e destaque dos quadrantes somente durante a interação. */
 h3{color:var(--pu-section)}
 @media(max-width:700px){section>h2{font-size:clamp(1.65rem,7.8vw,3rem)!important;white-space:normal;text-wrap:balance}}
@@ -654,8 +665,10 @@ const tabHooks=[];
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 // No desktop, as demonstrações do personagem permanecem ativas mesmo quando o
 // sistema pede menos movimento; a preferência continua valendo para os efeitos decorativos.
-const desktopMotion=matchMedia('(min-width:1000px)');
+const desktopMotion=matchMedia('(min-width:1000px), (hover:hover) and (pointer:fine)');
 const contentMotion=()=>desktopMotion.matches||!reduced.matches;
+// No computador, o fundo permanece ativo, com intensidade moderada se o sistema pedir menos movimento.
+const ambientMotion=contentMotion;
 const isActive=el=>!document.hidden&&!!el.closest('section.on');
 const isVisible=el=>{const r=el.getBoundingClientRect();return isActive(el)&&r.width>0&&r.height>0&&r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth};
 const imageSizes={"assets/img/acessorio-obsidiana.webp":[1305,1386],"assets/img/botas.webp":[1443,1572],"assets/img/casaco-gola.webp":[1024,1536],"assets/img/ciclo-fearness.webp":[1536,1536],"assets/img/cinto.webp":[1596,1386],"assets/img/costas.webp":[1024,1536],"assets/img/dissipacao.webp":[1536,1536],"assets/img/lado.webp":[1025,1536],"assets/img/manifestacao-sombria.webp":[1536,1536],"assets/img/marcas-negras.webp":[948,1606],"assets/img/mascara-normal.webp":[1536,1149],"assets/img/mascara-ossea.webp":[1536,1536],"assets/img/mascara-reserva.webp":[1536,1149],"assets/img/mascara-sobrecarga.webp":[1536,1149],"assets/img/olhos-normal.webp":[1536,1149],"assets/img/olhos-reserva.webp":[1536,1149],"assets/img/olhos-sobrecarga.webp":[1536,1149],"assets/img/poster-corpo-frente.webp?v=visual3":[1620,2880],"assets/img/poster-corpo-rupture.webp?v=visual3":[1620,2880],"assets/img/poster-corpo-sobrecarga.webp?v=visual3":[1620,2880],"assets/img/rosto-frente.webp?v=visual3":[1536,1536],"assets/img/rosto-rupture.webp?v=visual3":[1536,1536],"assets/img/rosto-sobrecarga.webp?v=visual3":[1536,1536],"assets/img/roupa-base.webp":[936,1536],"assets/img/selo-removido.webp":[1200,1311],"assets/img/selo-rupture.webp":[1406,1536],"assets/img/selo.webp?v=seal4":[1200,1311],"assets/img/selos-antebraco.webp?v=seal4":[1200,1311],"assets/img/zoom-rosto-frente.webp?v=visual3":[1536,1536],"assets/img/zoom-rosto-rupture.webp?v=visual3":[1536,1536]};
@@ -917,7 +930,10 @@ document.addEventListener('keydown',e=>{
 })();
 
 const C=[['ANULAÇÃO','O contato direto com um poder manifestado externamente permite sua anulação parcial ou integral, conforme a escolha de Fearness. Durante a Sobrecarga, essa função fica indisponível.'],['ABSORÇÃO','A energia anulada é absorvida por Fearness. Com energia na reserva estável, seus olhos ficam roxos.'],['RESERVA','A energia absorvida fica armazenada temporariamente. Ultrapassar a capacidade de armazenamento estável ao concluir uma absorção desencadeia a Sobrecarga.'],['CONVERSÃO','A energia armazenada vira aprimoramento físico e motor, que Fearness distribui livremente entre força, velocidade, reação, resistência e aceleração.'],['DISSIPAÇÃO','A energia convertida é consumida durante a ação, reduzindo a quantidade armazenada no reservatório. Esse processo é o Reset.']];
-const cy=$('#cyc');new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('vis',e.isIntersecting))).observe(cy);
+const cy=$('#cyc');
+const syncCycleVisibility=raf1(()=>cy.classList.toggle('vis',isVisible(cy)));
+new IntersectionObserver(syncCycleVisibility).observe(cy);
+tabHooks.push(syncCycleVisibility);addEventListener('scroll',syncCycleVisibility,{passive:true});addEventListener('resize',syncCycleVisibility,{passive:true});document.addEventListener('visibilitychange',syncCycleVisibility);
 C.forEach((c,i)=>{const a=(-90+i*360/C.length)*Math.PI/180,b=document.createElement('button');b.className='nd';b.textContent=c[0];b.style.left=50+41*Math.cos(a)+'%';b.style.top=50+41*Math.sin(a)+'%';b.onclick=()=>pick(i);cy.appendChild(b)});
 let CUR=0;const mq=matchMedia('(min-width:1000px)');
 function tip(i){const t=$('#ctxt'),w=$('.cyw');if(!w)return;if(t.parentNode!==w)w.appendChild(t);t.style.cssText='';t.classList.remove('tp','tr','tl')}
@@ -996,8 +1012,8 @@ function draw(b){const age=clock-b.t0,g=Math.min(1,age/b.grow),fade=Math.max(0,1
  if(dk){const fs=b.fl.map(([pr,w])=>[flame(pr,w*b.width,g,clock,b.ph),w]).filter(o=>o[0]);for(const[o,w]of fs){x.strokeStyle=G('97,0,255',.32);x.lineWidth=9*Math.max(w,.55);x.stroke(o);x.strokeStyle=G('151,76,255',1);x.lineWidth=2.8*Math.max(w,.6);x.stroke(o);x.fillStyle=G('0,0,0',1);x.fill(o)}}
  else{for(const [pts,w] of b.all){path(pts,g);x.strokeStyle=G('97,0,255',.22);x.lineWidth=18*w*b.width;x.stroke();x.strokeStyle=G('97,0,255',.84);x.lineWidth=8*w*b.width;x.stroke();x.strokeStyle=G(unstable?'215,190,255':'166,115,255',unstable?.80:.80);x.lineWidth=2.6*w*b.width;x.stroke()}}
 }
-function wakeFX(delay=0){clearTimeout(fxTimer);if(fxFrame)cancelAnimationFrame(fxFrame);fxFrame=0;if(document.hidden||reduced.matches)return;if(delay>0)fxTimer=setTimeout(()=>{fxFrame=requestAnimationFrame(f)},delay);else fxFrame=requestAnimationFrame(f)}
-function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H);last=0;return}
+function wakeFX(delay=0){clearTimeout(fxTimer);if(fxFrame)cancelAnimationFrame(fxFrame);fxFrame=0;if(document.hidden||!ambientMotion())return;if(delay>0)fxTimer=setTimeout(()=>{fxFrame=requestAnimationFrame(f)},delay);else fxFrame=requestAnimationFrame(f)}
+function f(t){fxFrame=0;if(document.hidden||!ambientMotion()){x.clearRect(0,0,W,H);last=0;return}
  // Não congelar durante toque, rolagem ou troca de abas: apenas reduzir a taxa de desenho.
  const busy=document.documentElement.classList.contains('nav-swiping')||document.documentElement.classList.contains('nav-swipe-commit')||(mobileFX&&t<scrollingUntil);
  const interval=busy?40:mobileFX?25:16;
@@ -1007,11 +1023,11 @@ function f(t){fxFrame=0;if(document.hidden||reduced.matches){x.clearRect(0,0,W,H
  measureReading(t);reading+=(readingTarget-reading)*.12;
  const max=mobileFX?Math.min(3,p.max):p.max;
  if(clock>=next&&bolts.length<max){let bolt=null;for(let attempt=0;attempt<18&&!bolt;attempt++)bolt=mk(mode);if(bolt){bolts.push(bolt);next=clock+rand(...p.gap)*(mobileFX?.82:1)*(1+(1-readingTarget)*.6)}else next=clock+160}
- x.clearRect(0,0,W,H);x.globalAlpha=reading;for(const b of bolts)draw(b);x.globalAlpha=1;fxFrame=requestAnimationFrame(f);
+ x.clearRect(0,0,W,H);x.globalAlpha=reading*(reduced.matches?.62:1);for(const b of bolts)draw(b);x.globalAlpha=1;fxFrame=requestAnimationFrame(f);
 }
 if(mobileFX)addEventListener('scroll',()=>{scrollingUntil=performance.now()+150},{passive:true});
-function fxVisibility(){if(document.hidden||reduced.matches){clearTimeout(fxTimer);cancelAnimationFrame(fxFrame);fxFrame=0;last=0;bolts=[];x.clearRect(0,0,W,H)}else{last=0;next=clock+120;wakeFX(0)}}
-document.addEventListener('visibilitychange',fxVisibility);reduced.addEventListener('change',fxVisibility);tabHooks.push(i=>{if(i!==fxTab){last=0;wakeFX(0)}});wakeFX(450)})();
+function fxVisibility(){if(document.hidden||!ambientMotion()){clearTimeout(fxTimer);cancelAnimationFrame(fxFrame);fxFrame=0;last=0;bolts=[];x.clearRect(0,0,W,H)}else{last=0;next=clock+120;wakeFX(0)}}
+document.addEventListener('visibilitychange',fxVisibility);reduced.addEventListener('change',fxVisibility);desktopMotion.addEventListener('change',fxVisibility);tabHooks.push(i=>{if(i!==fxTab){last=0;wakeFX(0)}});wakeFX(450)})();
 function mkbar(id,l){const w=$('#'+id);w.className='bar';w.innerHTML='<div class="bl"><span>'+l+'</span><b class="bs"></b></div><div class="trk"><div class="zn"></div><div class="fl"></div><div class="ex"></div><div class="mk"></div></div>';const q=s=>w.querySelector(s);return{fl:q('.fl'),ex:q('.ex'),zn:q('.zn'),mk:q('.mk'),bs:q('.bs'),w}}
 const p1=mkbar('b1','RESERVA DE ENERGIA'),p2=mkbar('b2','RESERVA × LIMITE'),p3=mkbar('b3','RESERVA DA RUPTURE');
 p1.zn.style.display=p1.ex.style.display=p1.mk.style.display='none';p1.w.classList.add('sm');
@@ -1102,8 +1118,15 @@ function initBarClocks(){
  const byElement=new Map(configs.map(([p,state])=>{reserveClocks.set(p,{state,t:0});return [p.w,p]}));
  const observer=new IntersectionObserver(entries=>{for(const entry of entries){const p=byElement.get(entry.target);if(!p)continue;const on=entry.isIntersecting&&entry.intersectionRatio>0&&p.w.closest('section.on')&&(!p.w.closest('.end-quad')||p.w.closest('.end-quad.open'));if(on){visibleBars.add(p);p.w.classList.add('running')}else{visibleBars.delete(p);p.w.classList.remove('running')}}syncBarClock()},{threshold:0});
  for(const [p,state] of configs){observer.observe(p.w);if(state)paintReserve(p,...state(0))}
- tabHooks.push(()=>{for(const p of visibleBars){if(!p.w.closest('section.on')){visibleBars.delete(p);p.w.classList.remove('running')}}syncBarClock()});
- document.addEventListener('visibilitychange',()=>{for(const p of visibleBars)p.w.classList.toggle('running',!document.hidden);syncBarClock()});
+ // Revalidar quando a aba reaparece, quando a janela muda e durante a rolagem.
+ // O observador sozinho pode manter o estado anterior durante a troca de painéis.
+ const refresh=raf1(()=>{for(const [p] of configs){
+  let on=isVisible(p.w);const end=p.w.closest('.end-quad');
+  if(end){const d=end.querySelector('.d'),r=p.w.getBoundingClientRect(),dr=d.getBoundingClientRect();on=on&&end.classList.contains('open')&&r.bottom>dr.top&&r.top<dr.bottom}
+  if(on)visibleBars.add(p);else visibleBars.delete(p);p.w.classList.toggle('running',on);
+ }syncBarClock()});
+ tabHooks.push(refresh);addEventListener('scroll',refresh,{passive:true});addEventListener('resize',refresh,{passive:true});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const p of visibleBars)p.w.classList.remove('running');syncBarClock()}else refresh()});
  reduced.addEventListener('change',syncBarClock);desktopMotion.addEventListener('change',syncBarClock);
  // As demonstrações recomeçam ao abrir novamente o quadrante de encerramento.
  document.querySelector('#q3 .end-quad').addEventListener('click',()=>{if(!document.querySelector('#q3 .end-quad.open')){for(const p of endBars){reserveClocks.get(p).t=0;visibleBars.delete(p);p.w.classList.remove('running');paintReserve(p,...reserveClocks.get(p).state(0))}syncBarClock()}});
@@ -1114,8 +1137,8 @@ const KV=new RegExp('(^|[^\\p{L}])(obsessão|vencer|derrotado|derrota|fúria|ód
 const KP=new RegExp('(^|[^\\p{L}])(anulá-la|neutralizá-la|limite máximo|reserva temporária|anul\\p{L}*|neutraliz\\p{L}*|absor\\p{L}*|convers\\p{L}*|convert\\p{L}*|dissip\\p{L}*|reset|sobrecarga|aprimoramentos)(?![\\p{L}])','giu');
 function hl(s,r){try{return s.replace(r||KR,(m,a,b)=>a+'<span class="k">'+b+'</span>')}catch(e){return s}}
 function qFree(d){d.style.transition='none';d.style.maxHeight='';void d.offsetHeight;d.style.transition=''}
-function qOpen(b){const d=b.querySelector('.d');if(!d)return;clearTimeout(d._qt);const h=d.scrollHeight;b.classList.add('open');b.setAttribute('aria-expanded','true');d.setAttribute('aria-hidden','false');if(reduced.matches)return;d.style.maxHeight=(h+16)+'px';d._qt=setTimeout(()=>qFree(d),700)}
-function qClose(b){const d=b.querySelector('.d');b.setAttribute('aria-expanded','false');if(!d){b.classList.remove('open');return}const was=b.classList.contains('open');clearTimeout(d._qt);d.setAttribute('aria-hidden','true');if(was&&!reduced.matches){d.style.transition='none';d.style.maxHeight=d.offsetHeight+'px';void d.offsetHeight;d.style.transition='';b.classList.remove('open');d.style.maxHeight='0px';d._qt=setTimeout(()=>qFree(d),700)}else{b.classList.remove('open');d.style.maxHeight=''}}
+function qOpen(b){const d=b.querySelector('.d');if(!d)return;clearTimeout(d._qt);const h=d.scrollHeight;b.classList.add('open');b.setAttribute('aria-expanded','true');d.setAttribute('aria-hidden','false');if(!contentMotion())return;d.style.maxHeight=(h+16)+'px';d._qt=setTimeout(()=>qFree(d),700)}
+function qClose(b){const d=b.querySelector('.d');b.setAttribute('aria-expanded','false');if(!d){b.classList.remove('open');return}const was=b.classList.contains('open');clearTimeout(d._qt);d.setAttribute('aria-hidden','true');if(was&&contentMotion()){d.style.transition='none';d.style.maxHeight=d.offsetHeight+'px';void d.offsetHeight;d.style.transition='';b.classList.remove('open');d.style.maxHeight='0px';d._qt=setTimeout(()=>qFree(d),700)}else{b.classList.remove('open');d.style.maxHeight=''}}
 function quads(id,D){const g=$('#'+id);D.forEach((d,i)=>{const b=document.createElement('button');b.className='q';b.setAttribute('aria-expanded','false');b.innerHTML=(['q0','q2','q3'].includes(id)?'<span class="n">'+['I','II','III'][i]+'</span>':'')+'<b>'+d[0]+'</b><span class="t">'+d[1]+'</span><i></i><div class="d">'+(d[3]?'<img class="qi" decoding="async" data-src="'+d[3]+'" alt="'+d[0]+'">':'')+hl(d[2],d[4])+'</div>';b.onclick=()=>{const o=b.classList.contains('open');g.querySelectorAll('.q').forEach(qClose);if(!o){b.querySelectorAll('img[data-src]').forEach(loadImg);qOpen(b)}};const detail=b.querySelector('.d');detail.id=id+'-detail-'+i;detail.setAttribute('aria-hidden','true');b.setAttribute('aria-controls',detail.id);g.appendChild(b)})}
 quads('q0',[['Personalidade','Solitário, sereno e sem propósito.','Fearness é pouco comunicativo, sereno e indiferente à maior parte do que acontece ao seu redor. Não tem uma ambição que organize sua existência e segue seu caminho sem precisar de um sentido maior.<br><br>Encontra conforto na solidão, que não é sofrimento nem ressentimento. Pode criar vínculos e cooperar, mas não depende da companhia ou do reconhecimento alheio.<br><br>Não ter propósito não é ser incapaz de desejar: diante de situações específicas, ele pode desenvolver desejos intensos, ainda que sem direção permanente.'],
 ['Vencer para não perder','Uma direção imediata que surge na luta.','Fearness tem uma obsessão em vencer para não ser derrotado. Ela não é ambição constante nem busca por glória, reconhecimento ou superioridade: aparece com intensidade diante de uma luta.<br><br>A dificuldade do combate e a proximidade da derrota intensificam sua concentração e despertam uma fúria contida. Quando a derrota se impõe, nasce em Fearness um ódio profundo contra si mesmo, alimentado pelo sentimento de sua própria incapacidade. Ele não precisa entender por que perder lhe é tão intolerável, nem ter uma justificativa proporcional aos sacrifícios que aceita fazer.<br><br>A obsessão não preenche sua ausência de propósito: só oferece uma direção imediata, poderosa o bastante para conduzi-lo.',0,KV],
